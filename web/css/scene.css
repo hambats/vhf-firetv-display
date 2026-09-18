@@ -99,18 +99,36 @@ html, body {
   to { transform: scale(1) translate(0, 0); }
 }
 
-.scene__photo-img,
-.photo-grid__img {
+.scene__photo-img {
   animation: vhf-ken-burns-in linear both;
   animation-duration: var(--vhf-scene-duration, 12s);
   transform-origin: center;
 }
 
-/* Each grid cell drifts independently and in a different direction so the
-   grid never moves as one synchronized block (D4.3). */
-.photo-grid__cell:nth-child(2) .photo-grid__img { animation-name: vhf-ken-burns-out; }
-.photo-grid__cell:nth-child(3) .photo-grid__img { animation-name: vhf-ken-burns-in; }
-.photo-grid__cell:nth-child(4) .photo-grid__img { animation-name: vhf-ken-burns-out; }
+/* Burn-in mitigation (M4): a very slow, sub-perceptible positional drift for
+   fixed-position chrome (the corner brand mark and the centered lockup) that
+   would otherwise render in the exact same pixels on every scene, for
+   months, unattended. Amplitude stays in the 2-4px range and the cycle is
+   minutes long, so it reads as "the mark never moves" to any viewer glancing
+   at the screen while still sweeping the mark across a small neighborhood of
+   pixels over time. transform-only (no top/left) so it's compositor-driven
+   and never triggers layout/reflow. */
+@keyframes vhf-pixel-shift {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(3px, -2px); }
+  50% { transform: translate(-2px, 3px); }
+  75% { transform: translate(2px, 2px); }
+}
+
+/* Same drift as vhf-pixel-shift, but composed with .scene__lockup's own
+   translateX(-50%) centering so the mark keeps its horizontal center while
+   it drifts. */
+@keyframes vhf-pixel-shift-lockup {
+  0%, 100% { transform: translateX(-50%) translate(0, 0); }
+  25% { transform: translateX(-50%) translate(3px, -2px); }
+  50% { transform: translateX(-50%) translate(-2px, 3px); }
+  75% { transform: translateX(-50%) translate(2px, 2px); }
+}
 
 @keyframes vhf-fade-up {
   from { opacity: 0; transform: translateY(12px); }
@@ -149,6 +167,26 @@ html, body {
   object-fit: cover;
   opacity: var(--vhf-wash-opacity);
   z-index: 0;
+}
+
+/* A partner/organization logo (e.g. an outside group's meeting on the
+   calendar) reads as a shape, not a scene composition — cropping it full-
+   bleed like .scene__wash turns a circular badge into an unrecognizable
+   sliver. Shown small and plain instead, same corner as .scene__brand would
+   sit but opposite it, on its own light card so a logo drawn for a white
+   background stays legible against the event scene's dark fade. */
+.scene__partner-logo {
+  position: absolute;
+  top: 48px;
+  left: 64px;
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 50%;
+  padding: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  z-index: 1;
 }
 
 .scene__fade {
@@ -276,6 +314,12 @@ html, body {
   height: auto;
   filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
   z-index: 2;
+  /* Burn-in mitigation (M4): this mark renders in the same corner on nearly
+     every scene, for months, unattended, on an LCD panel — the single
+     highest burn-in risk on the display. A slow, tiny, imperceptible
+     positional drift (a few px over minutes, transform-only so it never
+     triggers layout) is the standard fixed-logo mitigation for signage. */
+  animation: vhf-pixel-shift 240s ease-in-out infinite;
 }
 
 /* Event/impact families move the mark to the opposite corner from the
@@ -295,6 +339,12 @@ html, body {
   height: auto;
   z-index: 2;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+  /* Burn-in mitigation (M4): larger than .scene__brand and shown less often
+     (Welcome + announcement scenes only), but still fixed-position and
+     opaque, so it gets the same slow drift. The base translateX(-50%)
+     centering is folded into the keyframes so the mark stays centered
+     while it drifts. */
+  animation: vhf-pixel-shift-lockup 240s ease-in-out infinite;
 }
 
 .scene--announcement .scene__lockup {
@@ -378,46 +428,6 @@ html, body {
 
 .scene--crisis .scene__eyebrow {
   color: var(--vhf-terracotta);
-}
-
-/* ---- Photo grid (multi-photo pool) scene ---- */
-
-.scene--photo-grid {
-  display: grid;
-  gap: 6px;
-  background-color: #000;
-}
-
-.scene--photo-grid-2 {
-  grid-template-columns: 1fr 1fr;
-}
-
-.scene--photo-grid-3 {
-  grid-template-columns: 2fr 1fr;
-  grid-template-rows: 1fr 1fr;
-}
-
-.scene--photo-grid-3 .photo-grid__cell:first-child {
-  grid-row: 1 / 3;
-}
-
-.scene--photo-grid-4 {
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
-}
-
-.photo-grid__cell {
-  position: relative;
-  overflow: hidden;
-}
-
-.photo-grid__img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center 35%;
 }
 
 /* ---- Events (plural) list scene ---- */
@@ -522,4 +532,10 @@ html, body {
   font-family: var(--vhf-font-ui);
   font-size: var(--vhf-size-body);
   color: var(--vhf-text-error);
+}
+
+/* ---- Quiet hours ---- */
+
+.scene--blank {
+  background-color: #000;
 }

@@ -86,6 +86,19 @@ var VhfScenes = (function () {
     scene.appendChild(img("scene__wash", photo.src, "decoration"));
   }
 
+  // Curated sets that hold an organization's logo rather than candid photos
+  // of a program: cropping a badge full-bleed at low opacity (.scene__wash)
+  // turns it into an unrecognizable sliver, so these render small and plain
+  // instead (.scene__partner-logo) — see buildEventScene.
+  var LOGO_PROGRAM_IDS = ["program-hendersonville-womans-club"];
+
+  function appendPartnerLogo(scene, data, programId) {
+    var photos = usablePhotos(curatedSet(data, programId));
+    if (photos.length === 0) return false;
+    scene.appendChild(img("scene__partner-logo", photos[0].src, "decoration"));
+    return true;
+  }
+
   /*
    * Event times are the one thing on this display that can be wrong without
    * looking wrong.
@@ -348,32 +361,12 @@ var VhfScenes = (function () {
       ? curatedSet(data, content.source)
       : ((data.gallery && data.gallery.photos) || []).concat(curatedSet(data, "gen-pop-additions"));
     if (photos.length === 0) throw new Error("photo pool '" + (content.source || "gallery") + "' is empty");
-    var count = content.count || 1;
 
     var poolKey = content.source || "gallery";
 
-    if (count <= 1 || photos.length < count) {
-      var photo = drawPhotos(poolKey, photos, 1)[0];
-      if (!photo) throw new Error("photo pool has no usable photos left");
-      return buildPhotoScene(photo.src, "cover", null, content.eyebrow);
-    }
-
-    var picks = drawPhotos(poolKey, photos, count);
-    if (picks.length === 0) throw new Error("photo pool has no usable photos left");
-    var scene = el("div", "scene scene--photo scene--photo-grid scene--photo-grid-" + picks.length);
-    picks.forEach(function (p) {
-      var cell = el("div", "photo-grid__cell");
-      cell.appendChild(img("photo-grid__img", p.src, "content"));
-      scene.appendChild(cell);
-    });
-    scene.appendChild(el("div", "scene__fade scene__fade--subtle"));
-    if (content.eyebrow) {
-      var label = el("div", "scene__content scene__content--photo-label");
-      label.appendChild(el("p", "scene__eyebrow", content.eyebrow));
-      scene.appendChild(label);
-    }
-    brand(scene);
-    return scene;
+    var photo = drawPhotos(poolKey, photos, 1)[0];
+    if (!photo) throw new Error("photo pool has no usable photos left");
+    return buildPhotoScene(photo.src, "cover", null, content.eyebrow);
   }
 
   function renderCustom(item) {
@@ -390,7 +383,11 @@ var VhfScenes = (function () {
     // the event title against a known program's keywords, so a "Pottery
     // with resident potter Sophia" event shows an actual pottery photo
     // instead of a random farm photo.
-    appendWash(scene, data, evt.programId);
+    if (LOGO_PROGRAM_IDS.indexOf(evt.programId) !== -1) {
+      if (!appendPartnerLogo(scene, data, evt.programId)) appendWash(scene, data, evt.programId);
+    } else {
+      appendWash(scene, data, evt.programId);
+    }
     scene.appendChild(el("div", "scene__fade"));
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", "What's Happening at the Farm"));
@@ -478,6 +475,12 @@ var VhfScenes = (function () {
     return scene;
   }
 
+  // Quiet hours: a plain black frame with no images to warm, so it can
+  // never be skipped as "unusable" and never costs a preload budget.
+  function renderBlank() {
+    return el("div", "scene scene--blank");
+  }
+
   var renderers = {
     information: renderInformation,
     announcement: renderAnnouncement,
@@ -498,6 +501,7 @@ var VhfScenes = (function () {
   return {
     render: render,
     renderError: renderError,
+    renderBlank: renderBlank,
     markImageFailed: markImageFailed,
     setTimeZone: setTimeZone
   };

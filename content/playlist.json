@@ -18,7 +18,7 @@
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 3 }
+      "content": {}
     },
     {
       "id": "announcements",
@@ -39,14 +39,14 @@
       "type": "photo-pool",
       "duration": 10,
       "enabled": true,
-      "content": { "source": "in-uniform", "count": 1, "eyebrow": "Our Members, In Uniform" }
+      "content": { "source": "in-uniform", "eyebrow": "Our Members, In Uniform" }
     },
     {
       "id": "photo-pool-2",
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 2 }
+      "content": {}
     },
     {
       "id": "our-mission",
@@ -82,12 +82,12 @@
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 4 }
+      "content": {}
     },
     {
       "id": "program-agritherapy",
       "type": "information",
-      "duration": 10,
+      "duration": 8,
       "enabled": true,
       "content": {
         "eyebrow": "Agritherapy",
@@ -96,9 +96,16 @@
       }
     },
     {
+      "id": "photo-pool-10",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
+    },
+    {
       "id": "program-herb-squad",
       "type": "information",
-      "duration": 10,
+      "duration": 8,
       "enabled": true,
       "content": {
         "eyebrow": "Medicinal Herb Squad",
@@ -118,19 +125,19 @@
       "type": "photo-pool",
       "duration": 10,
       "enabled": true,
-      "content": { "source": "military-art", "count": 1, "eyebrow": "Military Heritage" }
+      "content": { "source": "military-art", "eyebrow": "Military Heritage" }
     },
     {
       "id": "photo-pool-4",
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 3 }
+      "content": {}
     },
     {
       "id": "program-beekeeping",
       "type": "information",
-      "duration": 10,
+      "duration": 8,
       "enabled": true,
       "content": {
         "eyebrow": "Beekeeping Squad",
@@ -141,7 +148,7 @@
     {
       "id": "program-workshops",
       "type": "information",
-      "duration": 10,
+      "duration": 8,
       "enabled": true,
       "content": {
         "eyebrow": "Workshops",
@@ -154,7 +161,7 @@
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 2 }
+      "content": {}
     },
     {
       "id": "event-pool-4",
@@ -166,7 +173,7 @@
     {
       "id": "resource-fair",
       "type": "information",
-      "duration": 10,
+      "duration": 8,
       "enabled": true,
       "content": {
         "family": "impact",
@@ -178,7 +185,7 @@
     {
       "id": "memorial-wall",
       "type": "information",
-      "duration": 10,
+      "duration": 8,
       "enabled": true,
       "content": {
         "family": "impact",
@@ -192,12 +199,12 @@
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 4 }
+      "content": {}
     },
     {
       "id": "our-impact-2025",
       "type": "information",
-      "duration": 10,
+      "duration": 8,
       "enabled": true,
       "content": {
         "family": "impact",
@@ -207,22 +214,18 @@
       }
     },
     {
-      "id": "produce-partners",
-      "type": "information",
-      "duration": 10,
+      "id": "photo-pool-11",
+      "type": "photo-pool",
+      "duration": 12,
       "enabled": true,
-      "content": {
-        "eyebrow": "Every Harvest, Shared",
-        "title": "Feeding Our Veteran Community",
-        "body": "Our produce goes directly to the Charles George VA Medical Center, Veterans Restoration Quarters, Hendersonville Rescue Mission, SafeLight Women's Shelter, IAM Food Pantry, and The Storehouse."
-      }
+      "content": {}
     },
     {
       "id": "photo-pool-7",
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 3 }
+      "content": {}
     },
     {
       "id": "event-pool-5",
@@ -239,18 +242,7 @@
       "content": {
         "eyebrow": "No Cost to Veterans",
         "title": "Every Program, Free",
-        "body": "Every program, workshop, and event at Veterans Healing Farm is offered to Veterans and their families completely free of charge."
-      }
-    },
-    {
-      "id": "nonprofit-status",
-      "type": "information",
-      "duration": 10,
-      "enabled": true,
-      "content": {
-        "eyebrow": "A 501(c)(3) Nonprofit",
-        "title": "Sustained by Our Community",
-        "body": "Veterans Healing Farm is a registered 501(c)(3) nonprofit, sustained entirely by volunteers, sponsors, and donors across Western North Carolina."
+        "body": "Every program, workshop, and event is offered completely free — Veterans Healing Farm is a registered 501(c)(3) nonprofit, sustained entirely by volunteers, sponsors, and donors across Western North Carolina."
       }
     },
     {
@@ -258,7 +250,14 @@
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 2 }
+      "content": {}
+    },
+    {
+      "id": "photo-pool-12",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
     },
     {
       "id": "event-pool-6",
@@ -295,7 +294,14 @@
       "type": "photo-pool",
       "duration": 12,
       "enabled": true,
-      "content": { "count": 4 }
+      "content": {}
+    },
+    {
+      "id": "photo-pool-13",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
     }
   ]
 }
