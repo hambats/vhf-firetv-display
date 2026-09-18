@@ -1,0 +1,12 @@
+# The whole project is authored LF and is served verbatim (web/ is copied
+# into dist/ and published as-is), so keep LF in the repo and in the working
+# tree on every platform. Without this, Git's Windows default rewrites every
+# text file to CRLF on checkout and the first diff after a clone is the
+# entire codebase.
+* text=auto eol=lf
+
+# Binary — never touch line endings or try to diff as text.
+*.jar        binary
+*.webp       binary
+*.png        binary
+*.jpg        binary

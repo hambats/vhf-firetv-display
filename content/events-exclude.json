@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "excludeTitleContains": [
+    "FARM CLOSED",
+    "cancel",
+    "Private Event",
+    "Private Workshop",
+    "Board Meeting",
+    "Volunteer Group",
+    "Garden Volunteer",
+    "Garden Group",
+    "Veggie Volunteers",
+    "past students",
+    "prior sessions",
+    "returning students only"
+  ]
+}

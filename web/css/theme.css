@@ -1,0 +1,76 @@
+/*
+ * VHF visual identity as CSS custom properties, matched to the real
+ * veteranshealingfarm.org site rather than an invented palette: cream/
+ * off-white backgrounds, a terracotta-red accent (their "now registering"
+ * banner color), a navy accent (their primary button color), an olive/khaki
+ * secondary (their "Impact" section background), Epilogue for headings and
+ * Work Sans for body text. scene.css consumes these tokens instead of
+ * hardcoding values, so the palette/type can be adjusted here without
+ * touching scene layout rules.
+ */
+:root {
+  /* Brand palette, sampled directly from the live site */
+  --vhf-cream: #f9f7f1;
+  --vhf-charcoal: #2c2c2c;
+  --vhf-terracotta: #c95d59;
+  --vhf-navy: #3f5a78;
+  --vhf-olive: #a59d7a;
+  /* Soft-tan card fill from the site's program cards: oklch(0.95 0.012 70).
+     Approximated in sRGB hex for older WebViews that don't parse oklch(). */
+  --vhf-card-fill: #f2eee5;
+
+  /* Backgrounds (used before a photo loads, where there is no photo, or as
+     the announcement/error scene backdrop) */
+  --vhf-bg-error: #202020;
+  /* Darkened from the site's own #c95d59 terracotta: cream body text on the
+     raw brand color measures 3.78:1, which fails 4.5:1 at 32px body size
+     (it only passes at the 76px title size). See docs/DESIGN_PLAN.md D2.2. */
+  --vhf-bg-announcement: #b34a46;
+  --vhf-bg-scene: var(--vhf-card-fill);
+
+  /* Grounds by scene family — docs/DESIGN_PLAN.md D2.1. Mission/story slides
+     keep the cream card fill above; these are the other three families. */
+  --vhf-bg-events: var(--vhf-navy);
+  --vhf-text-on-events: var(--vhf-cream);
+  --vhf-bg-impact: var(--vhf-olive);
+  --vhf-text-on-impact: var(--vhf-navy);
+  /* The crisis-line slide gets its own calm, high-contrast treatment rather
+     than sharing the terracotta announcement ground — see D5.3. */
+  --vhf-bg-crisis: var(--vhf-charcoal);
+  --vhf-text-on-crisis: var(--vhf-cream);
+
+  /* Program/workshop scenes (information, event, events) show a faint photo
+     "wash" behind their content — the same pattern as the site's own program
+     cards: a photo at low opacity behind the soft-tan fill, reading as a
+     watermark rather than a photo. */
+  --vhf-wash-opacity: 0.16;
+
+  /* Text */
+  --vhf-text-title: var(--vhf-charcoal);
+  --vhf-text-body: var(--vhf-charcoal);
+  --vhf-text-caption: var(--vhf-navy);
+  --vhf-text-eyebrow: var(--vhf-terracotta);
+  --vhf-text-brand: var(--vhf-navy);
+  --vhf-text-events-date: var(--vhf-navy);
+  --vhf-text-error: #a0a0a0;
+  --vhf-text-diag: rgba(255, 255, 255, 0.55);
+
+  /* Announcement scenes sit on the terracotta background, so their text
+     needs to be light instead of the usual dark-on-cream. */
+  --vhf-text-on-terracotta: var(--vhf-cream);
+
+  /* Typography — same families the live site loads */
+  --vhf-font-display: "Epilogue", "Helvetica Neue", Arial, sans-serif;
+  --vhf-font-ui: "Work Sans", "Helvetica Neue", Arial, sans-serif;
+
+  --vhf-size-eyebrow: 28px;
+  --vhf-size-title: 88px;
+  --vhf-size-title-announcement: 76px;
+  --vhf-size-subtitle: 40px;
+  --vhf-size-body: 32px;
+  --vhf-size-caption: 26px;
+  --vhf-size-brand: 24px;
+  --vhf-size-events-date: 30px;
+  --vhf-size-events-title: 44px;
+  --vhf-size-diag: 16px;
+}

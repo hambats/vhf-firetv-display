@@ -1,0 +1,8 @@
+[build]
+  command = "node scripts/build-site.mjs"
+  publish = "dist"
+
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "public, max-age=60, must-revalidate"

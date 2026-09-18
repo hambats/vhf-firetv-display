@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>VHF Display — Admin</title>
+<style>
+  :root {
+    --cream: #f9f7f1;
+    --charcoal: #2c2c2c;
+    --terracotta: #c95d59;
+    --navy: #3f5a78;
+    --olive: #a59d7a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: "Work Sans", "Helvetica Neue", Arial, sans-serif;
+    background: var(--cream);
+    color: var(--charcoal);
+  }
+  header {
+    background: var(--navy);
+    color: var(--cream);
+    padding: 16px 24px;
+    font-family: "Epilogue", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  header span { opacity: 0.7; font-weight: 400; font-size: 14px; margin-left: 12px; }
+  nav { display: flex; gap: 4px; padding: 12px 24px 0; border-bottom: 1px solid #ddd; }
+  nav button {
+    border: none; background: none; padding: 10px 16px; font: inherit; cursor: pointer;
+    border-bottom: 3px solid transparent; color: #666;
+  }
+  nav button.active { color: var(--terracotta); border-bottom-color: var(--terracotta); font-weight: 600; }
+  main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+  .panel { display: none; }
+  .panel.active { display: block; }
+  h2 { font-family: "Epilogue", sans-serif; margin-top: 0; }
+  .row { display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px; flex-wrap: wrap; }
+  .card {
+    background: #fff; border: 1px solid #e5e0d5; border-radius: 8px; padding: 14px;
+    margin-bottom: 12px;
+  }
+  label { font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; color: #888; display: block; margin-bottom: 4px; }
+  input[type=text], input[type=number], select, textarea {
+    font: inherit; padding: 6px 8px; border: 1px solid #ccc; border-radius: 4px; width: 100%;
+  }
+  textarea { min-height: 80px; font-family: monospace; font-size: 12px; }
+  input[type=number] { width: 100px; }
+  button.action {
+    background: var(--terracotta); color: white; border: none; border-radius: 4px;
+    padding: 8px 16px; font: inherit; cursor: pointer; font-weight: 600;
+  }
+  button.action.secondary { background: var(--navy); }
+  button.action.ghost { background: none; color: var(--terracotta); border: 1px solid var(--terracotta); }
+  button.action:disabled { opacity: 0.5; cursor: default; }
+  button.icon { background: none; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; padding: 4px 8px; }
+  .status { font-size: 13px; margin-top: 8px; }
+  .status.ok { color: #2a7a3d; }
+  .status.err { color: var(--terracotta); }
+  pre.output {
+    background: #1e1e1e; color: #ddd; padding: 12px; border-radius: 6px; max-height: 360px;
+    overflow: auto; font-size: 12px; white-space: pre-wrap;
+  }
+  .thumb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+  .thumb { position: relative; border-radius: 6px; overflow: hidden; background: #eee; }
+  .thumb img { width: 100%; height: 110px; object-fit: cover; display: block; }
+  .thumb .id { font-size: 10px; padding: 4px; color: #666; word-break: break-all; }
+  .thumb button { position: absolute; top: 4px; right: 4px; }
+  .field-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .muted { color: #888; font-size: 13px; }
+</style>
+</head>
+<body>
+<header>VHF Display — Admin <span>local only · 127.0.0.1:8787</span></header>
+<nav>
+  <button data-tab="playlist" class="active">Playlist</button>
+  <button data-tab="weights">Gallery Weights</button>
+  <button data-tab="exclude">Gallery Exclude</button>
+  <button data-tab="announcements">Announcements</button>
+  <button data-tab="deploy">Build &amp; Deploy</button>
+</nav>
+<main>
+  <section id="panel-playlist" class="panel active">
+    <h2>Playlist</h2>
+    <p class="muted">Each item's <code>content</code> is edited as raw JSON — shape depends on <code>type</code> (see docs/CONTENT_SCHEMA.md).</p>
+    <div id="playlist-list"></div>
+    <div class="row">
+      <button class="action ghost" id="add-item">+ Add item</button>
+      <button class="action" id="save-playlist">Save Playlist</button>
+    </div>
+    <div id="playlist-status" class="status"></div>
+  </section>
+
+  <section id="panel-weights" class="panel">
+    <h2>Gallery Weights</h2>
+    <p class="muted">Controls <code>sources/gallery/index.mjs</code>'s photo pool selection. Re-run sync after saving for changes to take effect.</p>
+    <div class="card">
+      <div class="field-grid">
+        <div>
+          <label>Max photos in pool</label>
+          <input type="number" id="w-maxPhotos" min="1" />
+        </div>
+        <div>
+          <label>Min dimension (px, long side)</label>
+          <input type="number" id="w-minDimension" min="1" />
+        </div>
+        <div>
+          <label>Recency decay (smaller = more recency bias)</label>
+          <input type="number" id="w-recencyDecay" min="1" />
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <button class="action" id="save-weights">Save Weights</button>
+      <button class="action secondary" id="sync-gallery">Re-run Gallery Sync</button>
+    </div>
+    <div id="weights-status" class="status"></div>
+    <pre class="output" id="weights-output" style="display:none"></pre>
+  </section>
+
+  <section id="panel-exclude" class="panel">
+    <h2>Gallery Exclude</h2>
+    <p class="muted">Current pool (<span id="pool-count">0</span> photos). Click "Exclude" on anything that needs context an unattended TV can't provide, then re-run sync.</p>
+    <div class="thumb-grid" id="pool-grid"></div>
+    <h3>Excluded ids</h3>
+    <div id="excluded-list"></div>
+    <div class="row">
+      <input type="text" id="manual-exclude-id" placeholder="id to exclude manually" style="max-width:260px" />
+      <input type="text" id="manual-exclude-reason" placeholder="reason" style="max-width:360px" />
+      <button class="action ghost" id="manual-exclude-add">+ Add</button>
+    </div>
+    <div id="exclude-status" class="status"></div>
+  </section>
+
+  <section id="panel-announcements" class="panel">
+    <h2>Announcements</h2>
+    <div id="announcements-list"></div>
+    <div class="row">
+      <button class="action ghost" id="add-announcement">+ Add announcement</button>
+      <button class="action" id="save-announcements">Save Announcements</button>
+    </div>
+    <div id="announcements-status" class="status"></div>
+  </section>
+
+  <section id="panel-deploy" class="panel">
+    <h2>Build &amp; Deploy</h2>
+    <p class="muted">Build validates content/ and copies web/+content/ into dist/. Deploy publishes dist/ to the live Netlify site — confirms before running.</p>
+    <div class="row">
+      <button class="action secondary" id="run-build">Run Build</button>
+      <button class="action" id="run-deploy">Deploy to Netlify</button>
+    </div>
+    <pre class="output" id="deploy-output"></pre>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1920, height=1080, user-scalable=no" />
+<title>VHF Display — Viewer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<!-- Same families the live veteranshealingfarm.org site loads: Epilogue for
+     headings, Work Sans for body text. -->
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700&family=Work+Sans:wght@400;500;600&display=swap"
+/>
+<link rel="stylesheet" href="css/theme.css" />
+<link rel="stylesheet" href="css/scene.css" />
+</head>
+<body>
+  <div id="frame" class="frame">
+    <div id="stage" class="stage">
+      <div class="stage__layer" data-layer="a"></div>
+      <div class="stage__layer" data-layer="b"></div>
+    </div>
+  </div>
+  <div id="diag" class="diag" hidden></div>
+  <script src="js/scenes.js"></script>
+  <script src="js/scale-to-fit.js"></script>
+  <script src="js/content-source.js"></script>
+  <script src="js/engine.js"></script>
+</body>
+</html>

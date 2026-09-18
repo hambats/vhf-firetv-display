@@ -1,0 +1,287 @@
+{
+  "version": 1,
+  "playlist": [
+    {
+      "id": "welcome-information",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "lockup": true,
+        "eyebrow": "Veterans Healing Farm",
+        "title": "Welcome",
+        "body": "A place where veterans grow, connect, and heal together."
+      }
+    },
+    {
+      "id": "photo-pool-1",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 3 }
+    },
+    {
+      "id": "announcements",
+      "type": "announcement",
+      "duration": 10,
+      "enabled": true,
+      "content": {}
+    },
+    {
+      "id": "event-pool-1",
+      "type": "event-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
+    },
+    {
+      "id": "photo-pool-2",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 2 }
+    },
+    {
+      "id": "our-mission",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Our Mission",
+        "title": "Why We're Here",
+        "body": "To enhance the mental, emotional, and physical well-being of our nation's Veterans and their families."
+      }
+    },
+    {
+      "id": "our-history",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Our History",
+        "title": "Founded in 2013",
+        "body": "John and Nicole Mahshie founded Veterans Healing Farm with a vision to end the Veteran suicide crisis through nature, connection, and purpose."
+      }
+    },
+    {
+      "id": "event-pool-2",
+      "type": "event-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
+    },
+    {
+      "id": "photo-pool-3",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 4 }
+    },
+    {
+      "id": "program-agritherapy",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Agritherapy",
+        "title": "Growing Together",
+        "body": "Our Garden Group, Beekeeping Squad, and Medicinal Herb Squad have grown over 70,000 lbs of produce for Veterans in need — every harvest donated back to our community."
+      }
+    },
+    {
+      "id": "program-herb-squad",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Medicinal Herb Squad",
+        "title": "Healing from the Ground Up",
+        "body": "Over 70 healing plant species grown on-site, crafted into teas, tinctures, salves, and balms — a plant-based approach to sleep, anxiety, and inflammation."
+      }
+    },
+    {
+      "id": "event-pool-3",
+      "type": "event-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
+    },
+    {
+      "id": "photo-pool-4",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 3 }
+    },
+    {
+      "id": "program-beekeeping",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Beekeeping Squad",
+        "title": "Patience, Focus, Calm",
+        "body": "Veterans build hives and tend colonies together — a quiet practice that builds patience and calm while giving back to the land."
+      }
+    },
+    {
+      "id": "program-workshops",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Workshops",
+        "title": "Designed to Heal",
+        "body": "Equine and art therapy, blacksmithing, herbal medicine, and more — 85 workshops and 795 participants in 2025 alone."
+      }
+    },
+    {
+      "id": "photo-pool-5",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 2 }
+    },
+    {
+      "id": "event-pool-4",
+      "type": "event-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
+    },
+    {
+      "id": "resource-fair",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "family": "impact",
+        "eyebrow": "Annual Veterans Resource Fair",
+        "title": "Connecting Veterans to Support",
+        "body": "Each year we bring together 40+ service organizations, connecting Veterans with resources, benefits, and support all in one place."
+      }
+    },
+    {
+      "id": "memorial-wall",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "family": "impact",
+        "eyebrow": "A Community That Shows Up",
+        "title": "3,856 Visitors, 4 Days",
+        "body": "When the Traveling Vietnam Memorial Wall and 9/11 Memorial came to the farm, 3,856 visitors came through to honor and remember."
+      }
+    },
+    {
+      "id": "photo-pool-6",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 4 }
+    },
+    {
+      "id": "our-impact-2025",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "family": "impact",
+        "eyebrow": "Our Impact — 2025",
+        "title": "13 Years of Healing",
+        "body": "4,474 volunteer hours. 3,500 lbs of produce donated. 450 bouquets shared. 10 gallons of honey harvested. All given back to Veterans and their families."
+      }
+    },
+    {
+      "id": "produce-partners",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Every Harvest, Shared",
+        "title": "Feeding Our Veteran Community",
+        "body": "Our produce goes directly to the Charles George VA Medical Center, Veterans Restoration Quarters, Hendersonville Rescue Mission, SafeLight Women's Shelter, IAM Food Pantry, and The Storehouse."
+      }
+    },
+    {
+      "id": "photo-pool-7",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 3 }
+    },
+    {
+      "id": "event-pool-5",
+      "type": "event-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
+    },
+    {
+      "id": "free-programs",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "No Cost to Veterans",
+        "title": "Every Program, Free",
+        "body": "Every program, workshop, and event at Veterans Healing Farm is offered to Veterans and their families completely free of charge."
+      }
+    },
+    {
+      "id": "nonprofit-status",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "A 501(c)(3) Nonprofit",
+        "title": "Sustained by Our Community",
+        "body": "Veterans Healing Farm is a registered 501(c)(3) nonprofit, sustained entirely by volunteers, sponsors, and donors across Western North Carolina."
+      }
+    },
+    {
+      "id": "photo-pool-8",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 2 }
+    },
+    {
+      "id": "event-pool-6",
+      "type": "event-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {}
+    },
+    {
+      "id": "get-involved",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Get Involved",
+        "title": "Help a Veteran Heal",
+        "body": "Volunteer, sponsor a program, make a donation, or check our Amazon Wish List — every bit of support makes a difference."
+      }
+    },
+    {
+      "id": "crisis-line",
+      "type": "information",
+      "duration": 12,
+      "enabled": true,
+      "content": {
+        "family": "crisis",
+        "eyebrow": "If You Need Support",
+        "title": "You Are Not Alone",
+        "body": "If you or a Veteran you know is in crisis, call the Veterans Crisis Line: 988, then press 1."
+      }
+    },
+    {
+      "id": "photo-pool-9",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": { "count": 4 }
+    }
+  ]
+}

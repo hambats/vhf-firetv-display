@@ -1,0 +1,78 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 1920px;
+  height: 1080px;
+  background: #0d1a10;
+  overflow: hidden;
+  font-family: "Georgia", "Times New Roman", serif;
+}
+
+.scene {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+}
+
+.scene__photo {
+  position: absolute;
+  inset: 0;
+  background-color: #26362b;
+}
+
+.scene__fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.85) 28%,
+    rgba(255, 255, 255, 0.15) 55%,
+    rgba(255, 255, 255, 0) 75%
+  );
+}
+
+.scene__content {
+  position: absolute;
+  left: 120px;
+  bottom: 140px;
+  max-width: 1200px;
+}
+
+.scene__eyebrow {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 28px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #3f5a3f;
+  margin-bottom: 16px;
+}
+
+.scene__title {
+  font-size: 96px;
+  line-height: 1.05;
+  color: #1a2a1a;
+  margin-bottom: 24px;
+}
+
+.scene__body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 34px;
+  line-height: 1.4;
+  color: #2c3b2c;
+  max-width: 900px;
+}
+
+.scene__brand {
+  position: absolute;
+  top: 56px;
+  right: 72px;
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 24px;
+  letter-spacing: 0.2em;
+  color: #4a5a4a;
+}

@@ -1,0 +1,512 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: var(--vhf-font-display);
+}
+
+/* Netlify injects this badge iframe into every deployed (not local-preview)
+   page. It has no config toggle we control from here, so kill it in CSS —
+   see docs/DESIGN_PLAN.md D0.1. */
+#nl-badge-frame {
+  display: none !important;
+}
+
+/*
+ * .frame is the fixed 1920x1080 (16:9) Fire TV canvas. It's scaled to fit
+ * the viewport by js/scale-to-fit.js so the viewer always shows the exact
+ * on-TV composition, letterboxed rather than clipped, at any window size.
+ * On the actual Fire TV WebView (always 1920x1080) this scales to 1:1.
+ */
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1920px;
+  height: 1080px;
+  transform-origin: top left;
+}
+
+.stage {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+}
+
+.stage__layer {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  opacity: 0;
+  transition: opacity 900ms ease-in-out;
+}
+
+.stage__layer--visible {
+  opacity: 1;
+  z-index: 1;
+}
+
+.diag {
+  position: absolute;
+  left: 16px;
+  bottom: 12px;
+  z-index: 10;
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-diag);
+  color: var(--vhf-text-diag);
+}
+
+/* ---- Shared scene primitives ---- */
+
+.scene {
+  position: relative;
+  width: 1920px;
+  height: 1080px;
+  background-color: var(--vhf-bg-scene);
+  color: var(--vhf-text-title);
+  overflow: hidden;
+}
+
+.scene__photo-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-color: var(--vhf-bg-scene);
+}
+
+/* ---- Motion (D4) ----
+   Ambient only: transform/opacity, compositor-driven CSS animation, never
+   more than a couple of animated layers at once. Durations are long enough
+   to read as "alive," not "an animation" — see docs/DESIGN_PLAN.md D4 for
+   the hardware constraints this must respect on the Fire OS 7 WebView. */
+
+@keyframes vhf-ken-burns-in {
+  from { transform: scale(1) translate(0, 0); }
+  to { transform: scale(1.12) translate(-2.5%, -1.8%); }
+}
+
+@keyframes vhf-ken-burns-out {
+  from { transform: scale(1.12) translate(2.5%, 1.8%); }
+  to { transform: scale(1) translate(0, 0); }
+}
+
+.scene__photo-img,
+.photo-grid__img {
+  animation: vhf-ken-burns-in linear both;
+  animation-duration: var(--vhf-scene-duration, 12s);
+  transform-origin: center;
+}
+
+/* Each grid cell drifts independently and in a different direction so the
+   grid never moves as one synchronized block (D4.3). */
+.photo-grid__cell:nth-child(2) .photo-grid__img { animation-name: vhf-ken-burns-out; }
+.photo-grid__cell:nth-child(3) .photo-grid__img { animation-name: vhf-ken-burns-in; }
+.photo-grid__cell:nth-child(4) .photo-grid__img { animation-name: vhf-ken-burns-out; }
+
+@keyframes vhf-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Staggered text entrance (D4.2): eyebrow, then title, then body/subtitle,
+   each ~120ms apart. Costs nothing and makes every information/event scene
+   feel authored instead of just appearing. */
+.scene__eyebrow { animation: vhf-fade-up 400ms ease-out both; }
+.scene__title { animation: vhf-fade-up 400ms ease-out 120ms both; }
+.scene__subtitle,
+.scene__body { animation: vhf-fade-up 400ms ease-out 240ms both; }
+.scene__caption { animation: vhf-fade-up 400ms ease-out 360ms both; }
+
+/* A very slow, near-subliminal breathing scale instead of any blink/pulse —
+   this is a calm organisation (D4.5). */
+@keyframes vhf-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.015); }
+}
+
+.scene--announcement,
+.scene--crisis {
+  animation: vhf-breathe 16s ease-in-out infinite;
+}
+
+/* Faint full-bleed photo behind program/workshop text content — a
+   watermark, not a photo scene. Sits below .scene__fade and .scene__content
+   in DOM order so it always paints underneath them. */
+.scene__wash {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: var(--vhf-wash-opacity);
+  z-index: 0;
+}
+
+.scene__fade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(255, 255, 255, 0.96) 0%,
+    rgba(255, 255, 255, 0.85) 28%,
+    rgba(255, 255, 255, 0.15) 55%,
+    rgba(255, 255, 255, 0) 75%
+  );
+}
+
+/* Events/impact families sit on a dark ground, so their fade needs to be a
+   dark-to-transparent veil instead of white-to-transparent (D2.1 grounds by
+   family). */
+.scene--event .scene__fade,
+.scene--events .scene__fade,
+.scene--impact .scene__fade {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.4) 28%,
+    rgba(0, 0, 0, 0.1) 55%,
+    rgba(0, 0, 0, 0) 75%
+  );
+}
+
+/* Photo scenes have no caption/title overlay, so the fade only needs to be
+   just strong enough to keep the top-right brand mark legible over a bright
+   photo — not a full text-readability veil. Anchored to the top, where the
+   brand mark sits, rather than the bottom. */
+.scene__fade--subtle {
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0.4) 0%,
+    rgba(255, 255, 255, 0) 18%
+  );
+}
+
+.scene__content {
+  position: absolute;
+  left: 120px;
+  bottom: 140px;
+  max-width: 1200px;
+}
+
+/* Events/impact families anchor content top-left instead of bottom-left —
+   D3.4: vary the anchor by family so the loop doesn't read as the same
+   slide with the words swapped, and so the same pixels aren't lit every
+   cycle (the cheapest burn-in mitigation besides D4 motion). */
+.scene--event .scene__content,
+.scene--impact .scene__content {
+  bottom: auto;
+  top: 140px;
+}
+
+.scene__eyebrow {
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-eyebrow);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--vhf-text-eyebrow);
+  margin-bottom: 16px;
+}
+
+.scene__title {
+  font-size: var(--vhf-size-title);
+  line-height: 1.08;
+  color: var(--vhf-text-title);
+  margin-bottom: 20px;
+  max-width: 18ch;
+  /* Progressive enhancement only — too new to rely on in the Fire OS 7
+     WebView, hence the tightened max-width above as the real fix (D3.1). */
+  text-wrap: balance;
+}
+
+.scene__subtitle {
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-subtitle);
+  font-weight: 600;
+  color: var(--vhf-text-body);
+  margin-bottom: 16px;
+}
+
+.scene__body {
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-body);
+  line-height: 1.4;
+  color: var(--vhf-text-body);
+  max-width: 980px;
+}
+
+.scene__caption {
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-caption);
+  color: var(--vhf-text-caption);
+  margin-top: 12px;
+}
+
+/* Corner brand mark (D1.2). The source logo's ring wordmark is illegible
+   below ~280px (see .scene__lockup) — a true mark-only crop without the
+   ring text is still needed for a fully crisp small mark (tracked as a
+   D1 follow-up); until then this renders the full logo at a size chosen to
+   stay readable as a shape rather than mush. */
+.scene__brand {
+  position: absolute;
+  top: 48px;
+  right: 64px;
+  width: 112px;
+  height: auto;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.35));
+  z-index: 2;
+}
+
+/* Event/impact families move the mark to the opposite corner from the
+   content anchor above (D3.4). */
+.scene--event .scene__brand,
+.scene--impact .scene__brand {
+  top: auto;
+  bottom: 48px;
+}
+
+.scene__lockup {
+  position: absolute;
+  left: 50%;
+  top: 96px;
+  transform: translateX(-50%);
+  width: 280px;
+  height: auto;
+  z-index: 2;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.25));
+}
+
+.scene--announcement .scene__lockup {
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.35));
+}
+
+/* ---- Scene families (D2.1) ---- */
+
+.scene--event,
+.scene--events {
+  background-color: var(--vhf-bg-events);
+  color: var(--vhf-text-on-events);
+}
+
+.scene--event .scene__title,
+.scene--events .scene__title,
+.scene--event .scene__subtitle,
+.scene--events .scene__subtitle,
+.scene--event .scene__body,
+.scene--events .scene__body,
+.scene--event .events-list__title,
+.scene--events .events-list__title {
+  color: var(--vhf-text-on-events);
+}
+
+.scene--event .scene__caption,
+.scene--events .scene__caption,
+.scene--event .events-list__date,
+.scene--events .events-list__date,
+.scene--event .events-list__meta,
+.scene--events .events-list__meta {
+  color: var(--vhf-cream);
+  opacity: 0.85;
+}
+
+.scene--impact {
+  background-color: var(--vhf-bg-impact);
+  color: var(--vhf-text-on-impact);
+}
+
+.scene--impact .scene__title,
+.scene--impact .scene__body {
+  color: var(--vhf-text-on-impact);
+}
+
+.scene--event .scene__eyebrow,
+.scene--events .scene__eyebrow {
+  color: var(--vhf-cream);
+}
+
+/* ---- Crisis-line scene (D5.3) — its own calm, high-contrast treatment,
+   never sharing visual weight with an ordinary fact slide. ---- */
+
+.scene--crisis {
+  background-color: var(--vhf-bg-crisis);
+  color: var(--vhf-text-on-crisis);
+}
+
+.scene--crisis .scene__fade {
+  background: none;
+}
+
+.scene--crisis .scene__content {
+  left: 0;
+  right: 0;
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: none;
+  text-align: center;
+  padding: 0 220px;
+}
+
+.scene--crisis .scene__title,
+.scene--crisis .scene__body {
+  color: var(--vhf-text-on-crisis);
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.scene--crisis .scene__eyebrow {
+  color: var(--vhf-terracotta);
+}
+
+/* ---- Photo grid (multi-photo pool) scene ---- */
+
+.scene--photo-grid {
+  display: grid;
+  gap: 6px;
+  background-color: #000;
+}
+
+.scene--photo-grid-2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.scene--photo-grid-3 {
+  grid-template-columns: 2fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.scene--photo-grid-3 .photo-grid__cell:first-child {
+  grid-row: 1 / 3;
+}
+
+.scene--photo-grid-4 {
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+
+.photo-grid__cell {
+  position: relative;
+  overflow: hidden;
+}
+
+.photo-grid__img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 35%;
+}
+
+/* ---- Events (plural) list scene ---- */
+
+.scene--events .scene__content {
+  bottom: auto;
+  top: 220px;
+  max-width: 1500px;
+}
+
+.events-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 32px;
+}
+
+.events-list__item {
+  display: flex;
+  align-items: baseline;
+  gap: 36px;
+}
+
+.events-list__date {
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-events-date);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vhf-text-events-date);
+  min-width: 190px;
+}
+
+.events-list__main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.events-list__title {
+  font-size: var(--vhf-size-events-title);
+  color: var(--vhf-text-title);
+}
+
+.events-list__meta {
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-caption);
+  color: var(--vhf-text-caption);
+}
+
+/* ---- Announcement scene ---- */
+
+.scene--announcement {
+  background-color: var(--vhf-bg-announcement);
+}
+
+/* Solid terracotta background (matches the site's own "Now Registering"
+   banner) needs no photographic fade — just light text directly on it. */
+.scene--announcement .scene__fade {
+  background: none;
+}
+
+.scene--announcement .scene__content {
+  left: 0;
+  right: 0;
+  bottom: auto;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: none;
+  text-align: center;
+  padding: 0 220px;
+}
+
+.scene--announcement .scene__title {
+  font-size: var(--vhf-size-title-announcement);
+  color: var(--vhf-text-on-terracotta);
+  max-width: none;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.scene--announcement .scene__body {
+  color: var(--vhf-text-on-terracotta);
+}
+
+/* ---- Custom artwork scene ---- */
+
+.scene--custom .scene__photo-img {
+  object-fit: contain;
+  background-color: #000;
+}
+
+/* ---- Error / fallback scene ---- */
+
+.scene--error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--vhf-bg-error);
+}
+
+.scene--error .scene__body {
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-body);
+  color: var(--vhf-text-error);
+}

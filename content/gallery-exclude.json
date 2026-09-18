@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "note": "Hand-maintained. Ids here are dropped from content/generated/gallery.json every time sources/gallery/index.mjs re-runs, even though the adapter re-derives the pool from scratch. Add an id here (and why) after spotting a photo in rotation that needs context an unattended TV can't provide, or that's otherwise not a good fit for the auto-pool.",
+  "excluded": [
+    {
+      "id": "20260506-110209",
+      "reason": "Flag retirement ceremony (burning a worn flag) — correct/respectful practice, but reads as alarming out of context with no caption on an unattended public display."
+    },
+    {
+      "id": "20260210-181436",
+      "reason": "Another flag retirement ceremony photo (different date/occasion) — same concern as 20260506-110209: correct practice, alarming-looking with no caption."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "version": 1,
+  "syncIntervalMinutes": 20,
+  "publishUrl": "https://vhf-firetv-display.netlify.app",
+  "gallery": {
+    "maxPhotos": 120,
+    "minDimension": 1200,
+    "recencyDecay": 35
+  },
+  "calendar": {
+    "calendarId": "vhf2023calendar@gmail.com",
+    "windowDays": 120
+  }
+}
