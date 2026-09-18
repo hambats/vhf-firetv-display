@@ -90,16 +90,40 @@ Fixing these is most of what's left.
 - [ ] **version poll** — re-fetch `content/version.json` on `syncIntervalMinutes`; when it changes,
       reload at a scene boundary so the swap is invisible. The manifest already exists and already
       carries a timestamp; nothing new to publish.
-- [ ] **watchdog** — `window.onerror` and `unhandledrejection` handlers, a stall detector (no scene
+- [~] **watchdog** — `window.onerror` and `unhandledrejection` handlers, a stall detector (no scene
       advance in 3× the expected duration), and a periodic full reload (every few hours, at a
       crossfade) to clear any slow leak. A `setTimeout` chain running for weeks is the part most
       likely to quietly drift or die.
+      *Partly done (Sept 18).* `engine.js` now guarantees the loop stays armed: exactly one
+      reschedule per tick, armed before anything that can throw, plus a backstop timer if the
+      scene never resolves. That closes the case where one thrown scene ended the loop
+      permanently — verified by fault injection against the pre-fix build, which froze on a
+      single throw and stayed frozen after the fault was removed. **Still missing: the global
+      error handlers, a stall detector that can see the loop dying some *other* way, and the
+      periodic reload.** The loop can now only be stopped from outside itself, which is exactly
+      what a stall detector is for.
 - [ ] `web/js/diagnostics.js` — `?diag=1` overlay: uptime, last successful sync, content version,
       cache hit/miss, last error. The `#diag` element and the `?diag=1` switch already exist in
       `index.html` and `engine.js`; this makes them useful.
+- [ ] **pin the display timezone.** `events.json` stores UTC; `scenes.js` formats with
+      `getHours()`, i.e. whatever the television believes local time is. If the TV's timezone is
+      wrong or resets, every event time on the display is wrong by a fixed offset and a
+      late-evening event lands on the wrong day — with no visible symptom, because nobody checks
+      a television's clock settings. Format through `toLocaleTimeString` with an explicit
+      `America/New_York`, read from a new `timezone` key in `settings.json` rather than
+      hardcoded. Fold the `Intl` timezone support check into the compat check below.
 - [ ] **browser compat check** against whatever M0 picks — Service Worker, Cache Storage, ES5-vs-ES6
       in `scenes.js`, CSS custom properties. Silk on Fire OS 7 is an older Chromium than the dev
       machine. Cheap to check once, expensive to discover in week three.
+- [x] **image preloading** (Sept 18 — not in the original plan, found in review). Scenes set
+      `img.src` and went straight into the crossfade, so the fade revealed an empty frame while a
+      2500px gallery photo downloaded, and a dead URL rendered as a blank rectangle for the full
+      dwell every time the shuffle bag came back to it, with nothing logged. Scenes are now built
+      and warmed off-DOM one dwell ahead and shown only once they can paint; failed images are
+      hidden and their URLs struck from the rotation for the rest of the run. Measured: content
+      images already loaded at the instant of paint went from 0/3 and 0/2 to 3/3 and 2/2.
+      **Complementary to `sw.js`, not a substitute** — preloading warms an image seconds ahead
+      within a session; the Service Worker is what survives a restart.
 
 **Ship gate:** pull the router. Close the browser. Reopen it. The display still plays, photos
 included. Leave it a week; it's showing this week's events.
@@ -116,6 +140,18 @@ sequence; this makes it atomic.
 - [ ] `tests/engine.test.mjs` — a throwing scene is skipped and the loop advances (still unwritten
       from the old Phase 2, and it matters more now that nothing native restarts the page)
 - [ ] `npm run publish`; skills and the scheduled task call it instead of a step list
+- [ ] **stop publishing the curation files.** `build-site.mjs` copies all of `content/` into
+      `dist/`, so `gallery-exclude.json` and `events-exclude.json` land on the public site —
+      including the free-text `reason` recording why each photo was pulled from rotation. The
+      display reads neither. Copy only the files the viewer actually fetches.
+- [ ] `scripts/lint-content.mjs` — **a display-appropriateness linter, distinct from the schema
+      validator.** `validate-content.mjs` answers "is this well-formed?"; nothing answers "is this
+      fit to put on a television?" Run it as a warning inside `publish.mjs`. Rules worth having,
+      each drawn from something currently live on the display: literal markdown emphasis (`**`)
+      surviving into rendered text; ALL-CAPS runs over ~20 characters; a description that is
+      entirely administrative boilerplate; a description truncated mid-word; the farm's own
+      postal address in a `location`; an enabled announcement slot with an empty announcement
+      pool; a photo pool below some floor.
 
 ### M3 — Proof it lasts, and a runbook
 
@@ -135,7 +171,31 @@ sequence; this makes it atomic.
       real risk. Check `scene.css` for anything that never moves, and nudge static chrome.
 - [ ] decide Instagram: current Meta terms may make it not worth doing. **Write the decision down
       and close it out** rather than leaving `sources/instagram/` an empty directory.
+- [ ] **quiet hours need an input the repo does not have yet:** the farm's open hours. Add an
+      `hours` block to `settings.json` when starting this, so M4 is a rendering change rather
+      than a data-modelling exercise done under time pressure.
+- [ ] **trim event `location`.** Every synced event carries "Veterans Healing Farm, 138 Kimzey
+      Rd, Mills River, NC 28759, USA", rendered on a screen standing at that address.
+      `cleanLocation` should drop the farm's own address and keep only a sub-location
+      ("Greenhouse", "Pavilion"), falling back to omitting the line.
+- [ ] **strip markdown emphasis in `cleanText`.** `stripHtml` removes tags and entities but
+      nothing removes `**`/`__`, so a calendar entry's emphasis renders as literal asterisks on
+      the wall. Unlike the wording itself, this one cannot be fixed by the calendar authors.
+      *(The wording — descriptions that lead with cancellation-fee boilerplate — was raised in
+      the Sept 18 review and deliberately left alone: the calendar authors will fix it at source.
+      Only the code artefact is tracked here.)*
+- [ ] **drop `registrationUrl` from `events.json`.** Generated, never rendered, and identical
+      across every event (a generic regpack builder link), so it carries no information even if
+      something did render it. Remove it, or replace it with something a pointer-less display can
+      actually use.
+- [ ] **rebalance the loop.** 31 enabled items, 5m42s per cycle, **15 `information` text slides
+      against 9 `photo-pool`**. Roughly half the airtime is a reader-mode text card on a screen
+      most people walk past, while the photos — the thing that reads at a glance, and the thing
+      VHF has 120 of — get less. Belongs to the design track as much as to this one.
 - [ ] exclude-list curation is ongoing, not a one-time cleanup — see §6.
+- [ ] **`gallery-exclude.json` is keyed on a lossy id.** `idFromUrl` truncates to 60 characters,
+      so an exclusion is fragile against a Squarespace filename change — a photo removed from
+      rotation for a good reason can silently come back. Key on the full URL.
 
 ### M5 — Admin reaches the display
 
@@ -145,6 +205,49 @@ sequence; this makes it atomic.
       A real heartbeat would need the page to POST somewhere, which needs a server that isn't
       Netlify static — probably not worth it. Say so in the doc rather than leaving it as a TODO.
 - [ ] auth before `admin/` ever leaves 127.0.0.1 — or a written decision that it never does
+- [ ] **`Origin`/`Host` check on the admin API, independent of that decision.** Binding to
+      127.0.0.1 stops the network reaching it; it does not stop a web page open in a browser on
+      the same machine from firing a cross-origin POST at `/api/deploy`, which runs
+      `netlify deploy --prod`. The browser blocks reading the response; the deploy still happens.
+      DNS-rebinding reaches it too. Four lines, and worth having before the auth discussion.
+- [ ] **tighten the static-file guard.** `serveStatic` checks `filePath.startsWith(__dirname)`,
+      which also passes for a sibling directory whose name merely starts with `admin`. Use
+      `path.relative` and reject `..` or absolute results.
+
+---
+
+## 1a. Two recorded decisions worth re-opening
+
+Both are already decided in this document. Neither is being changed unilaterally — they are
+flagged because the reasoning rests on a premise that looks shakier on a second read, and a
+decision is cheaper to revisit now than after M3.
+
+**1. `scripts/fetch-photos.mjs`, dropped on the grounds that "sw.js makes a PC-side photo mirror
+pointless."** The Service Worker does cache the photos, so the offline claim holds. But a mirror
+buys four things it does not:
+
+- Cross-origin images cache as **opaque** responses: they cannot be inspected, a failure cannot be
+  told from a success, and they are charged against quota at a padded size rather than their real
+  one.
+- It does nothing for a **cold start**. The first run after a cache eviction still depends on the
+  Squarespace CDN being reachable at render time.
+- It does not protect against **the URL dying**. A mirror turns "the gallery object was deleted"
+  into a build-time error on the PC instead of a skipped scene on the wall.
+- Photos are fetched at `?format=2500w` and shown on a 1920px panel. Resizing once at publish time
+  cuts the bytes several-fold, permanently, for every device.
+
+It also collapses the "display talks to exactly two hosts" invariant in §3 down to one. Cost is
+roughly 40 lines in the build, plus disk. **Decision needed: keep it dropped, or reinstate it as
+an M2 item.**
+
+**2. "A real heartbeat would need a server that isn't Netlify static — probably not worth it."**
+The premise is not quite right: Netlify Functions run on the same free plan already hosting the
+site, so a page POSTing a timestamp every few minutes needs no new infrastructure and no new host.
+The reason to want one is this project's own logic: the display is built so that nobody has to
+look at it, which also means **nobody will notice when it dies.** A heartbeat plus a scheduled
+check turns "the TV has been frozen since Tuesday" from something a visitor eventually mentions
+into something known within the hour — and it is what makes the M3 soak measurable rather than
+anecdotal. **Decision needed: keep the version-display-only plan, or add a heartbeat to M3.**
 
 ---
 
@@ -172,7 +275,8 @@ VHF_TV/
 │
 ├── content/                             <- source of truth, hand-edited or generated
 │   ├── settings.json                    [x]  syncIntervalMinutes, publishUrl, gallery + calendar
-│   │                                         config; quiet hours / timezone still TODO (M4)
+│   │                                         config; `timezone` (M1) and `hours` for quiet
+│   │                                         hours (M4) both still missing
 │   ├── playlist.json                    [x]  ordered scene list; photo `src` is a direct gallery
 │   │                                         URL by decision (§6)
 │   ├── announcements/announcements.json [x]  dated entries with activation + expiry
@@ -193,7 +297,9 @@ VHF_TV/
 │   │   │                                     wash behind program/workshop scenes (§6)
 │   │   └── theme.css                    [x]  VHF colours/type as CSS custom properties
 │   └── js/
-│       ├── engine.js                    [x]  M1: version poll, watchdog, periodic reload
+│       ├── engine.js                    [x]  loop-liveness guarantee + image preloading done;
+│       │                                     M1 still owes version poll, global error handlers,
+│       │                                     stall detector, periodic reload
 │       ├── scenes.js                    [x]  all renderers in one file — split only if it hurts (§4)
 │       ├── content-source.js            [x]  network-first/cache-fallback for content JSON.
 │       │                                     M1: hand the image policy to sw.js; the header comment
@@ -207,7 +313,8 @@ VHF_TV/
 │   ├── validate-content.mjs             [x]  schema validation, used by build-site + tests
 │   ├── sync-sources.mjs                 [x]  runs the gallery and calendar adapters
 │   ├── publish.mjs                      [ ]  M2
-│   └── fetch-photos.mjs                 [–]  dropped — sw.js makes a PC-side photo mirror pointless
+│   ├── fetch-photos.mjs                 [?]  dropped, re-opened for decision — see §1a
+│   └── lint-content.mjs                 [ ]  M2  display-appropriateness rules, not schema
 │
 ├── sources/                             <- PC-side only; the display never talks to these
 │   ├── gallery/index.mjs                [x]  scrape -> size filter -> exclude list -> gallery.json
@@ -257,6 +364,16 @@ New:
 - **A milestone ends with the television demonstrating a behaviour**, not with a file existing.
 - **Any behaviour that depends on a TV setting must be written down in `DISPLAY_SETUP.md`**, because
   it can't be enforced from the repo and it will be lost the first time the device is reset.
+- **The project is a git repository** (since 18 Sept 2026 — it was not, for its whole life before
+  that). This is what makes "the PC project is the source of truth" true rather than aspirational,
+  and it is what makes `sync-sources.mjs`'s closing instruction — *review the diff in
+  `content/generated/` before publishing* — an instruction that can actually be followed. It
+  matters most for the photo pool, which is randomly resampled on every sync.
+- **An error must never be legible to a viewer.** A scene that cannot render is skipped silently;
+  the technical detail goes to the console and the `?diag=1` overlay. `renderError` is now reached
+  only when the whole playlist or the content load fails — the one case where something on screen
+  beats a black rectangle. Before 18 Sept, an expired announcement would have put
+  `Scene "announcements" (announcement) skipped: ...` on the wall every 5m42s from 9 Nov onward.
 
 ---
 
@@ -266,12 +383,16 @@ New:
   bring it back.
 - **`fetch-photos.mjs`** — a PC-side photo mirror was only ever a workaround for the TV not being
   able to cache images. `sw.js` does it properly, on the device, for whatever the playlist
-  currently references.
+  currently references. **Re-opened for decision (Sept 18) — see §1a:** the offline claim holds,
+  but opaque cross-origin caching, cold starts, dead URLs and serving 2500px images to a 1920px
+  panel are four things a mirror addresses and `sw.js` does not.
 - **Splitting `scenes.js` into `web/js/scenes/*.js`** (old Phase 2, item 1). ~350 lines of renderers
   sharing a one-line `(item, data) -> Node | throw` contract, causing no problems. Splitting it now
   is churn on the one part of the system that already works. Do it when a single scene type earns
   its own file.
 - **A real device heartbeat** — needs a backend the static-site architecture doesn't have.
+  **Re-opened for decision (Sept 18) — see §1a:** that premise is wrong. Netlify Functions run on
+  the plan already hosting this site, so a heartbeat needs no new backend and no new host.
 - **Multi-display, CMS features** — unchanged, still out of scope per CLAUDE.md.
 
 ---
