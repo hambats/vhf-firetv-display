@@ -158,10 +158,45 @@ function stripHtml(text) {
     // to "" runs adjacent words together ("toprovide"); a space plus the later
     // whitespace collapse keeps them apart regardless of which tag it was.
     .replace(/<[^>]+>/g, " ")
-    .replace(/&#\d+;|&[a-z]+;/gi, (m) => HTML_ENTITIES[m.toLowerCase()] || m)
-    // Literal "**bold**" markdown from a form field prints as raw asterisks
-    // on screen — there's no renderer here to turn it into actual emphasis.
-    .replace(/\*\*/g, "");
+    .replace(/&#\d+;|&[a-z]+;/gi, (m) => HTML_ENTITIES[m.toLowerCase()] || m);
+}
+
+// Calendar descriptions are typed into a form field, and people type markdown
+// there out of habit. Nothing downstream renders it — the scene prints the
+// string as-is, so "**Bring a jacket**" arrives on the wall with its asterisks
+// showing. Unwrap the emphasis and keep the words.
+//
+// The single-character forms (*italic*, _italic_) are matched conservatively:
+// the opening marker must follow a space or start-of-line and the closing one
+// must precede a space, punctuation or end-of-line, so an underscore inside a
+// token (regpack's "url_vars=...") can never open a run.
+function stripMarkdown(text) {
+  return String(text)
+    // [label](https://...) -> label. Runs before stripUrls() so the link text
+    // survives instead of leaving an orphaned "[label]( )".
+    .replace(/\[([^\]\n]+)\]\([^)\n]*\)/g, "$1")
+    // ATX headings and list bullets at the start of a line.
+    .replace(/^[ \t]*#{1,6}[ \t]+/gm, "")
+    .replace(/^[ \t]*[-*+][ \t]+/gm, "")
+    // Paired emphasis, longest markers first so "***x***" fully unwraps.
+    .replace(/\*\*\*([^*\n]+)\*\*\*/g, "$1")
+    .replace(/___([^_\n]+)___/g, "$1")
+    .replace(/\*\*([^*\n]+)\*\*/g, "$1")
+    .replace(/__([^_\n]+)__/g, "$1")
+    // Strikethrough is the one marker whose content must go too: "~~5pm~~ 6pm"
+    // is a correction, and unwrapping it would put both times on the wall.
+    .replace(/~~[^~\n]+~~/g, " ")
+    .replace(/`([^`\n]+)`/g, "$1")
+    .replace(/(^|\s)\*([^*\n]+)\*(?=$|[\s.,!?;:)])/g, "$1$2")
+    .replace(/(^|\s)_([^_\n]+)_(?=$|[\s.,!?;:)])/g, "$1$2")
+    // Unbalanced leftovers — emphasis someone opened and never closed, or the
+    // "***" that survives when stripAdminBoilerplate() cuts a boilerplate line
+    // out from between two markers. Every remaining asterisk goes: this prose
+    // has no legitimate use for one, and a lone "*" on the wall is the exact
+    // defect we're fixing. Underscores are left alone unless they were a
+    // matched pair above, so "url_vars" and "a_b_c" survive intact.
+    .replace(/\*/g, "")
+    .replace(/__/g, "");
 }
 
 // A raw URL (frequently a bare `google.com/url?q=...regpack...` redirect) is
@@ -207,14 +242,83 @@ function cleanText(text, maxLen) {
   if (!text) return undefined;
   // Admin boilerplate runs first, while "**cancellations...**" still has its
   // asterisks to match on — stripHtml() below removes any that survive.
-  const collapsed = stripUrls(stripHtml(stripAdminBoilerplate(text))).replace(/\s+/g, " ").trim();
+  const collapsed = stripUrls(stripMarkdown(stripHtml(stripAdminBoilerplate(text))))
+    .replace(/\s+/g, " ")
+    .trim();
   if (collapsed.length === 0) return undefined;
   return truncateText(collapsed, maxLen);
 }
 
+// The farm's own postal address, as Google Calendar stamps it onto every
+// on-site event. Each entry is compared against one comma-separated segment of
+// the location string, lowercased and stripped of punctuation.
+const FARM_ADDRESS_SEGMENTS = [
+  "veterans healing farm",
+  "vhf",
+  "138 kimzey rd",
+  "138 kimzey road",
+  "mills river",
+  "nc 28759",
+  "north carolina 28759",
+  "28759",
+  "usa",
+  "us",
+  "united states"
+];
+
+// Recognises the location as the farm itself, comma-separated or not. Only
+// when this matches do we start deleting parts of the string — an off-site
+// venue ("Mills River Park, 124 Town Center Dr, ...") keeps its full address,
+// which a viewer standing here actually needs.
+const FARM_SIGNATURE = /(veterans\s+healing\s+farm|138\s+kimzey)/i;
+
+function normalizeSegment(segment) {
+  return segment.toLowerCase().replace(/[.,]/g, "").replace(/\s+/g, " ").trim();
+}
+
+// Every synced on-site event carries the farm's full postal address — which is
+// the address the television is standing at. Printing it tells the viewer
+// nothing and crowds out the one thing they might need: which part of the farm
+// to walk to. So drop the farm's own address and keep only a sub-location
+// ("Greenhouse", "Pavilion"); when nothing meaningful is left, return
+// undefined so the scene omits the line entirely.
 function cleanLocation(loc) {
   if (!loc || loc === "undefined") return undefined;
-  return cleanText(loc, 120);
+  const cleaned = cleanText(loc, 120);
+  if (!cleaned) return undefined;
+  if (!FARM_SIGNATURE.test(cleaned)) return cleaned;
+
+  // Comma-separated form: keep the segments that aren't part of the address.
+  let remainder = cleaned
+    .split(",")
+    .filter((segment) => {
+      const norm = normalizeSegment(segment);
+      return norm.length > 0 && !FARM_ADDRESS_SEGMENTS.includes(norm);
+    })
+    .join(", ")
+    .trim();
+
+  // Unpunctuated form ("Greenhouse Veterans Healing Farm 138 Kimzey Rd Mills
+  // River NC 28759 USA") — no commas to split on, so cut the address out of
+  // the run of words instead.
+  if (FARM_SIGNATURE.test(remainder)) {
+    remainder = remainder
+      .replace(/veterans\s+healing\s+farm/gi, " ")
+      .replace(/138\s+kimzey\s+(?:rd|road)\.?/gi, " ")
+      .replace(/mills\s+river/gi, " ")
+      .replace(/\b(?:nc|north\s+carolina)\b\.?\s*28759/gi, " ")
+      .replace(/\b28759\b/g, " ")
+      .replace(/\b(?:usa|united\s+states)\b\.?/gi, " ");
+  }
+
+  remainder = remainder
+    .replace(/\s+/g, " ")
+    .replace(/^[\s,.\-\u2013\u2014]+|[\s,.\-\u2013\u2014]+$/g, "")
+    .trim();
+
+  // A bare house number or a one-character scrap is noise, not a sub-location.
+  if (remainder.length < 2 || /^\d+$/.test(remainder)) return undefined;
+  return remainder;
 }
 
 // Expands a single VEVENT (master or non-recurring) into concrete
