@@ -84,8 +84,7 @@ it overwrites this file.
       "start": "ISO 8601",      // required
       "end": "ISO 8601",        // optional, must be >= start if present
       "location": "string",     // optional
-      "description": "string",  // optional
-      "registrationUrl": "..."  // optional, for reference only — never rendered on-TV
+      "description": "string"   // optional
     }
   ]
 }

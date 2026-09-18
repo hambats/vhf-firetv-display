@@ -246,27 +246,28 @@ sequence; this makes it atomic.
 
 ### M4 — Content that maintains itself
 
-- [ ] **quiet hours** (still TODO from the old Phase 3) — with no native app, this becomes a black
-      scene on a schedule rather than a panel power-down. Worth doing anyway: it cuts burn-in risk
-      and stops an empty building glowing all night.
+- [x] **quiet hours** — `web/js/engine.js` (`isQuietHours`/`VhfQuietHours`) shows a black
+      `scene--blank` frame instead of the playlist on days listed in `settings.json`
+      `hours.closedWeekdays` (currently Sunday/Monday). A short BACK press on the remote
+      (`app/.../DisplayActivity.kt` `onKeyUp`) calls `VhfQuietHours.wake()` to show normal
+      content for 10 minutes so staff can confirm the display is alive without waiting for the
+      next open day. Farm hours vary seasonally (dawn–dusk) so only the closed *days* are
+      encoded, not a fixed daily clock window.
 - [ ] **burn-in review** — a fixed logo or header in the same pixels 24/7 on an LCD for months is a
       real risk. Check `scene.css` for anything that never moves, and nudge static chrome.
 - [ ] decide Instagram: current Meta terms may make it not worth doing. **Write the decision down
       and close it out** rather than leaving `sources/instagram/` an empty directory.
-- [ ] **quiet hours need an input the repo does not have yet:** the farm's open hours. Add an
-      `hours` block to `settings.json` when starting this, so M4 is a rendering change rather
-      than a data-modelling exercise done under time pressure.
-- [ ] **trim event `location`.** Every synced event carries "Veterans Healing Farm, 138 Kimzey
+- [x] **trim event `location`.** Every synced event carries "Veterans Healing Farm, 138 Kimzey
       Rd, Mills River, NC 28759, USA", rendered on a screen standing at that address.
-      `cleanLocation` should drop the farm's own address and keep only a sub-location
-      ("Greenhouse", "Pavilion"), falling back to omitting the line.
-- [ ] **strip markdown emphasis in `cleanText`.** `stripHtml` removes tags and entities but
+      `cleanLocation` (`sources/calendar/index.mjs`) drops the farm's own address and keeps only a
+      sub-location ("Greenhouse", "Pavilion"), falling back to omitting the line.
+- [x] **strip markdown emphasis in `cleanText`.** `stripHtml` removes tags and entities but
       nothing removes `**`/`__`, so a calendar entry's emphasis renders as literal asterisks on
       the wall. Unlike the wording itself, this one cannot be fixed by the calendar authors.
       *(The wording — descriptions that lead with cancellation-fee boilerplate — was raised in
       the Sept 18 review and deliberately left alone: the calendar authors will fix it at source.
       Only the code artefact is tracked here.)*
-- [ ] **drop `registrationUrl` from `events.json`.** Generated, never rendered, and identical
+- [x] **drop `registrationUrl` from `events.json`.** Generated, never rendered, and identical
       across every event (a generic regpack builder link), so it carries no information even if
       something did render it. Remove it, or replace it with something a pointer-less display can
       actually use.
@@ -379,8 +380,8 @@ VHF_TV/
 │
 ├── content/                             <- source of truth, hand-edited or generated
 │   ├── settings.json                    [x]  syncIntervalMinutes, publishUrl, timezone, gallery +
-│   │                                         calendar config; `hours` for quiet hours (M4) is
-│   │                                         the one key still missing
+│   │                                         calendar config; `hours.closedWeekdays` drives
+│   │                                         quiet hours (M4)
 │   ├── playlist.json                    [x]  ordered scene list; photo `src` is a direct gallery
 │   │                                         URL by decision (§6)
 │   ├── announcements/announcements.json [x]  dated entries with activation + expiry

@@ -137,12 +137,6 @@ function dateSlug(date) {
   return date.toISOString().slice(0, 10);
 }
 
-function firstUrl(text) {
-  if (!text) return undefined;
-  const match = text.match(/https?:\/\/[^\s"<>]+/);
-  return match ? match[0] : undefined;
-}
-
 const HTML_ENTITIES = {
   "&amp;": "&",
   "&lt;": "<",
@@ -411,7 +405,6 @@ async function main() {
         end: occ.end ? occ.end.toISOString() : undefined,
         location: cleanLocation(occ.source.location),
         description,
-        registrationUrl: firstUrl(occ.source.description),
         programId: matchProgramId(title)
       }, timeOverrides));
     }
