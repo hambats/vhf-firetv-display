@@ -85,8 +85,18 @@ var VhfScenes = (function () {
     return (id && data && data.curated && data.curated[id]) || [];
   }
 
+  // programId may be a single curated-set id (the common case) or an array
+  // of them — a slide whose text names several programs (e.g. "Designed to
+  // Heal" mentioning equine therapy, art therapy, blacksmithing and herbal
+  // medicine) draws its wash from the union of those sets instead of one
+  // id that can't represent "any of these," so the photo actually matches
+  // what the slide is talking about rather than a generic farm photo.
   function appendWash(scene, data, programId) {
-    var curated = usablePhotos(curatedSet(data, programId));
+    var ids = Array.isArray(programId) ? programId : [programId];
+    var curated = [];
+    for (var i = 0; i < ids.length; i++) {
+      curated = curated.concat(usablePhotos(curatedSet(data, ids[i])));
+    }
     var photos = curated.length > 0 ? curated : usablePhotos((data && data.gallery && data.gallery.photos) || []);
     if (photos.length === 0) return;
     var photo = photos[Math.floor(Math.random() * photos.length)];
@@ -302,7 +312,9 @@ var VhfScenes = (function () {
     // Information slides for a specific program (id "program-agritherapy"
     // etc., matching a content/artwork/curated/ folder 1:1) get that
     // program's own photos as the wash instead of a random farm photo.
-    appendWash(scene, data, item.id);
+    // content.washSources overrides this for a slide that names several
+    // programs in its own text rather than being about just one.
+    appendWash(scene, data, content.washSources || item.id);
     scene.appendChild(el("div", "scene__fade"));
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", content.eyebrow || "Veterans Healing Farm"));

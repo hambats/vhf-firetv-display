@@ -63,7 +63,9 @@ const PROGRAM_KEYWORDS = [
   { programId: "program-agritherapy", patterns: ["agritherapy", "garden group"] },
   { programId: "program-hendersonville-womans-club", patterns: ["hendersonville women", "hendersonville woman"] },
   { programId: "program-equine-therapy", patterns: ["equine therapy", "horse sense"] },
-  { programId: "program-sunset-yoga", patterns: ["sunset yoga"] }
+  { programId: "program-sunset-yoga", patterns: ["sunset yoga"] },
+  { programId: "program-art-therapy", patterns: ["art class", "art workshop", "acrylic pouring", "creative canvas", "botanical sketchbook", "mixed media"] },
+  { programId: "program-blacksmithing", patterns: ["blacksmith"] }
 ];
 
 function matchProgramId(title) {

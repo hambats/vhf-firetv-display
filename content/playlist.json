@@ -153,7 +153,8 @@
       "content": {
         "eyebrow": "Workshops",
         "title": "Designed to Heal",
-        "body": "Equine and art therapy, blacksmithing, herbal medicine, and more — 85 workshops and 795 participants in 2025 alone."
+        "body": "Equine and art therapy, blacksmithing, herbal medicine, and more — 85 workshops and 795 participants in 2025 alone.",
+        "washSources": ["program-equine-therapy", "program-art-therapy", "program-blacksmithing", "program-herb-squad"]
       }
     },
     {
