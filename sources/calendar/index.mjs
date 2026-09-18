@@ -38,6 +38,39 @@ const TIME_OVERRIDES_PATH = path.join(ROOT, "content", "events-time-overrides.js
 const DEFAULT_CALENDAR_ID = "vhf2023calendar@gmail.com";
 const DEFAULT_WINDOW_DAYS = 120;
 
+// Matches an event's title to a hand-curated photo set (see
+// content/artwork/curated/<id>/, built by sources/curated-photos/index.mjs)
+// so its scene shows an actual photo of that program instead of a random
+// farm photo. Case-insensitive substring match, first pattern to hit wins.
+// A program with no populated folder simply matches nothing and the scene
+// falls back to the general gallery pool — this list can stay ahead of
+// which folders are actually filled in.
+const PROGRAM_KEYWORDS = [
+  { programId: "program-pottery", patterns: ["pottery"] },
+  { programId: "program-woodworking", patterns: ["woodworking"] },
+  { programId: "program-soap-making", patterns: ["soap making", "soap pour"] },
+  { programId: "program-chair-massage", patterns: ["chair massage"] },
+  { programId: "program-acupuncture", patterns: ["acupuncture"] },
+  { programId: "program-kitchen-medicine", patterns: ["kitchen medicine", "sourdough", "pasta making", "meal prep", "canning"] },
+  { programId: "program-fishing", patterns: ["trout", "fly casting", "fly tying", "fishing"] },
+  { programId: "program-dog-training", patterns: ["dog training", "canine companions"] },
+  { programId: "program-wellness-retreat", patterns: ["wellness retreat"] },
+  { programId: "program-mushroom-cultivation", patterns: ["mushroom cultivation"] },
+  { programId: "program-quail-hunt", patterns: ["quail hunt"] },
+  { programId: "program-5k-fundraiser", patterns: ["5k", "fun run"] },
+  { programId: "program-beekeeping", patterns: ["beekeeping"] },
+  { programId: "program-herb-squad", patterns: ["herb squad", "medicinal herb"] },
+  { programId: "program-agritherapy", patterns: ["agritherapy", "garden group"] }
+];
+
+function matchProgramId(title) {
+  const lower = (title || "").toLowerCase();
+  for (const { programId, patterns } of PROGRAM_KEYWORDS) {
+    if (patterns.some((p) => lower.includes(p))) return programId;
+  }
+  return undefined;
+}
+
 async function loadCalendarSettings() {
   try {
     const raw = await fs.readFile(SETTINGS_PATH, "utf8");
@@ -274,7 +307,8 @@ async function main() {
         end: occ.end ? occ.end.toISOString() : undefined,
         location: cleanLocation(occ.source.location),
         description,
-        registrationUrl: firstUrl(occ.source.description)
+        registrationUrl: firstUrl(occ.source.description),
+        programId: matchProgramId(title)
       }, timeOverrides));
     }
   }

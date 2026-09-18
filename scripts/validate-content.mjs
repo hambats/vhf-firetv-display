@@ -187,6 +187,26 @@ function validateGallery(doc, errors) {
   }
 }
 
+function validateCuratedPhotos(doc, errors) {
+  const label = "content/generated/curated-photos.json";
+  if (typeof doc.version !== "number") errors.push(`${label}: "version" must be a number`);
+  if (!isPlainObject(doc.sets)) {
+    errors.push(`${label}: "sets" must be an object`);
+    return;
+  }
+  for (const [name, photos] of Object.entries(doc.sets)) {
+    if (!Array.isArray(photos)) {
+      errors.push(`${label} set "${name}": must be an array`);
+      continue;
+    }
+    for (const p of photos) {
+      if (typeof p.src !== "string" || p.src.length === 0) {
+        errors.push(`${label} set "${name}" photo "${p.id ?? "?"}": "src" is required`);
+      }
+    }
+  }
+}
+
 function validateGalleryExclude(doc, errors) {
   const label = "content/gallery-exclude.json";
   if (typeof doc.version !== "number") errors.push(`${label}: "version" must be a number`);
@@ -221,6 +241,7 @@ const KNOWN_FILES = [
   { relPath: path.join("generated", "events.json"), validate: validateEvents },
   { relPath: path.join("announcements", "announcements.json"), validate: validateAnnouncements },
   { relPath: path.join("generated", "gallery.json"), validate: validateGallery },
+  { relPath: path.join("generated", "curated-photos.json"), validate: validateCuratedPhotos },
   { relPath: "gallery-exclude.json", validate: validateGalleryExclude },
   { relPath: "events-exclude.json", validate: validateEventsExclude }
 ];

@@ -2,7 +2,7 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-09-18T19:52:43.850Z",
+  "generatedAt": "2026-09-18T20:31:05.622Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
     {
@@ -12,7 +12,8 @@
       "end": "2026-09-23T19:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-chair-massage"
     },
     {
       "id": "va-donation-day-2026-09-24",
@@ -27,7 +28,8 @@
       "end": "2026-09-26T19:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "Come out to the farm for a full day of wellness! All sessions are free and lunch is provided! Yoga 10-11 Acupuncture or massage Lunch 12-1230 Sound Therapy 1-2 Acupuncture or massage",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-wellness-retreat"
     },
     {
       "id": "kitchen-medicine-series-nourishing-broths-seaweed-medicine-w-2026-10-02",
@@ -35,7 +37,8 @@
       "start": "2026-10-02T17:00:00.000Z",
       "end": "2026-10-02T20:00:00.000Z",
       "description": "Kitchen Medicine Series Nourishing Broths & Seaweed Medicine Herbal broths and soups are one of the most powerful, everyday ways to deliver deep nutrition and medicine to your body with very little effort.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5",
+      "programId": "program-kitchen-medicine"
     },
     {
       "id": "half-day-trout-fishing-with-southern-appalachian-anglers-2026-10-03",
@@ -43,7 +46,8 @@
       "start": "2026-10-03T11:00:00.000Z",
       "end": "2026-10-03T15:00:00.000Z",
       "description": "Half Day Trout Wade: 5 anglers at Southern Appalachian Anglers LLC - Asheville Fly Fishing Guide Service, no previous experience necessary. Location and more information will be available closer to the date.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5",
+      "programId": "program-fishing"
     },
     {
       "id": "pottery-with-resident-potter-sophia-2026-10-03",
@@ -52,7 +56,8 @@
       "end": "2026-10-03T15:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "soap-making-with-grace-2026-10-03",
@@ -61,14 +66,16 @@
       "end": "2026-10-03T18:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "A soap pour workshop (commonly called a melt-and-pour soap making class) is a fun, hands-on, and beginner-friendly crafting class where participants learn to design and create custom soap bars using a pre-made soap base.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5",
+      "programId": "program-soap-making"
     },
     {
       "id": "appalachian-dog-training-observation-only-2026-10-07",
       "title": "Appalachian Dog Training - Observation ONLY",
       "start": "2026-10-07T13:00:00.000Z",
       "end": "2026-10-07T21:00:00.000Z",
-      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA"
+      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
+      "programId": "program-dog-training"
     },
     {
       "id": "woodworking-workshop-with-chris-from-forest-project-woodwork-2026-10-07",
@@ -77,7 +84,8 @@
       "end": "2026-10-07T16:30:00.000Z",
       "location": "forest project woodworking 141 holland rd pisgah forest nc 28768",
       "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5",
+      "programId": "program-woodworking"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-07",
@@ -85,30 +93,24 @@
       "start": "2026-10-07T17:00:00.000Z",
       "end": "2026-10-07T19:00:00.000Z",
       "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "appalachian-dog-training-observation-only-2026-10-08",
       "title": "Appalachian Dog Training - Observation ONLY",
       "start": "2026-10-08T13:00:00.000Z",
       "end": "2026-10-08T21:00:00.000Z",
-      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA"
+      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
+      "programId": "program-dog-training"
     },
     {
       "id": "appalachian-dog-training-observation-only-2026-10-09",
       "title": "Appalachian Dog Training - Observation ONLY",
       "start": "2026-10-09T13:00:00.000Z",
       "end": "2026-10-09T21:00:00.000Z",
-      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA"
-    },
-    {
-      "id": "pottery-with-resident-potter-sophia-2026-10-10",
-      "title": "Pottery with resident potter Sophia",
-      "start": "2026-10-10T14:00:00.000Z",
-      "end": "2026-10-10T15:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
-      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "programId": "program-dog-training"
     },
     {
       "id": "sourdough-101-with-patrina-2026-10-10",
@@ -117,7 +119,18 @@
       "end": "2026-10-10T17:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "Sourdough Baking class Come learn the easiest sourdough bread baking ever! You will learn about the care and feeding of a sourdough starter, how to make a wonderful loaf of bread from start to finish and take home dough to bake at home!",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7201af63bc4278892ee587aa2f9d9419"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7201af63bc4278892ee587aa2f9d9419",
+      "programId": "program-kitchen-medicine"
+    },
+    {
+      "id": "pottery-with-resident-potter-sophia-2026-10-10",
+      "title": "Pottery with resident potter Sophia",
+      "start": "2026-10-10T14:00:00.000Z",
+      "end": "2026-10-10T15:00:00.000Z",
+      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
+      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "hendersonville-women-s-club-meeting-2026-10-13",
@@ -132,7 +145,8 @@
       "start": "2026-10-14T13:30:00.000Z",
       "end": "2026-10-14T16:30:00.000Z",
       "location": "141 Holland Rd, Pisgah Forest, NC 28768, USA",
-      "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing."
+      "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing.",
+      "programId": "program-woodworking"
     },
     {
       "id": "meal-prep-workshop-with-sam-2026-10-14",
@@ -141,7 +155,8 @@
       "end": "2026-10-14T16:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "Simple & Nourishing Meal Prep: prioritizing your health through affordable, seasonal, and local ingredients.Learn simple and cost-effective meal preparation to nourish your body, and support your local community—all while saving time in…",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=06d57f2c266c76d1b12842555aaff1f5",
+      "programId": "program-kitchen-medicine"
     },
     {
       "id": "chair-massage-with-lisa-2026-10-14",
@@ -150,7 +165,8 @@
       "end": "2026-10-14T19:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-chair-massage"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-14",
@@ -158,7 +174,8 @@
       "start": "2026-10-14T17:00:00.000Z",
       "end": "2026-10-14T19:00:00.000Z",
       "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "acupuncture-with-doaist-clinic-2026-10-16",
@@ -167,16 +184,8 @@
       "end": "2026-10-16T17:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "The Daoist Traditions Acupuncture Clinic is located in Asheville NC. Their clinical interns are in the final phase of a rigorous four-year academic program and treat patients under the direct supervision of clinical faculty who are NC…",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805"
-    },
-    {
-      "id": "pottery-with-resident-potter-sophia-2026-10-17",
-      "title": "Pottery with resident potter Sophia",
-      "start": "2026-10-17T14:00:00.000Z",
-      "end": "2026-10-17T15:00:00.000Z",
-      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
-      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805",
+      "programId": "program-acupuncture"
     },
     {
       "id": "pasta-making-101-with-helene-2026-10-17",
@@ -185,7 +194,18 @@
       "end": "2026-10-17T18:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "Pasta is the world’s ultimate comfort food! Please join us for a fun, hands-on class to learn how easy and satisfying it is to make pasta from scratch without the use of fancy equipment.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805",
+      "programId": "program-kitchen-medicine"
+    },
+    {
+      "id": "pottery-with-resident-potter-sophia-2026-10-17",
+      "title": "Pottery with resident potter Sophia",
+      "start": "2026-10-17T14:00:00.000Z",
+      "end": "2026-10-17T15:00:00.000Z",
+      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
+      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-21",
@@ -193,7 +213,8 @@
       "start": "2026-10-21T17:00:00.000Z",
       "end": "2026-10-21T19:00:00.000Z",
       "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "fly-casting-clinic-for-beginners-2026-10-23",
@@ -202,16 +223,8 @@
       "end": "2026-10-23T18:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "Fishing with a fly rod is a special experience that allows the angler to cast a nearly weightless lure that resembles the various insects trout love to eat.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805"
-    },
-    {
-      "id": "vet-for-vets-with-canine-companions-2026-10-24",
-      "title": "Vet for Vets with Canine Companions",
-      "start": "2026-10-24T13:00:00.000Z",
-      "end": "2026-10-24T16:00:00.000Z",
-      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
-      "description": "The staff of Pinnacle Animal Hospital will be here toprovide brief health exams, heartworm tests, as well asvaccines appropriate to your pet(s).",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=f1ce83b6a26731fe21f5c35b702fcc2e"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805",
+      "programId": "program-fishing"
     },
     {
       "id": "beekeeping-101-with-michael-2026-10-24",
@@ -220,7 +233,18 @@
       "end": "2026-10-24T19:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "Ever wondered what it’s like to lift the lid on a beehive, see thousands of bees at work and maybe even harvest your own honey? Beekeeping 101 is a beginner-friendly course that turns curiosity into confidence.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805",
+      "programId": "program-beekeeping"
+    },
+    {
+      "id": "vet-for-vets-with-canine-companions-2026-10-24",
+      "title": "Vet for Vets with Canine Companions",
+      "start": "2026-10-24T13:00:00.000Z",
+      "end": "2026-10-24T16:00:00.000Z",
+      "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
+      "description": "The staff of Pinnacle Animal Hospital will be here toprovide brief health exams, heartworm tests, as well asvaccines appropriate to your pet(s).",
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=f1ce83b6a26731fe21f5c35b702fcc2e",
+      "programId": "program-dog-training"
     },
     {
       "id": "pottery-with-resident-potter-sophia-2026-10-24",
@@ -229,7 +253,8 @@
       "end": "2026-10-24T15:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
       "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-28",
@@ -237,7 +262,8 @@
       "start": "2026-10-28T17:00:00.000Z",
       "end": "2026-10-28T19:00:00.000Z",
       "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "pottery-create-your-ornaments-2-part-series-with-sophia-2026-11-04",
@@ -245,15 +271,8 @@
       "start": "2026-11-04T18:00:00.000Z",
       "end": "2026-11-04T20:00:00.000Z",
       "description": "Nov 4th - Create Your Ornaments Part 1 of 2 We’ll start by working with clay to create your ornaments. No pottery experience is necessary! We’ll use cookie-cutter-style techniques, making it as easy and fun as cutting out sugar cookies.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
-    },
-    {
-      "id": "open-pottery-studio-with-sophia-2026-11-07",
-      "title": "Open Pottery Studio with Sophia",
-      "start": "2026-11-07T15:00:00.000Z",
-      "end": "2026-11-07T17:00:00.000Z",
-      "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "fly-tying-for-beginners-2026-11-07",
@@ -261,7 +280,17 @@
       "start": "2026-11-07T15:00:00.000Z",
       "end": "2026-11-07T17:00:00.000Z",
       "location": "Veterans Healing Farm, 138 Kimzey Rd, Mills River, NC 28759, USA",
-      "description": "Tying fishing flies to imitate various insects that live in our rivers and are favorite foods for trout is a fun hobby. You will feel a special exhilaration when a fish takes a fly you tied."
+      "description": "Tying fishing flies to imitate various insects that live in our rivers and are favorite foods for trout is a fun hobby. You will feel a special exhilaration when a fish takes a fly you tied.",
+      "programId": "program-fishing"
+    },
+    {
+      "id": "open-pottery-studio-with-sophia-2026-11-07",
+      "title": "Open Pottery Studio with Sophia",
+      "start": "2026-11-07T15:00:00.000Z",
+      "end": "2026-11-07T17:00:00.000Z",
+      "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "2026-veterans-day-5k-vhf-fundraiser-2026-11-08",
@@ -270,7 +299,8 @@
       "end": "2026-11-08T17:00:00.000Z",
       "location": "Mills River Park, 124 Town Center Dr, Mills River, NC 28759, USA",
       "description": "The 5k starts at 10AM and the Fun Run Loop starts at 9:45AM. The 5K course follows the family-friendly greenway at Mills River Park, that welcomes runners and walkers of all ages and abilities.",
-      "registrationUrl": "https://kickitevents.com/event/2026-veterans-day-5k/"
+      "registrationUrl": "https://kickitevents.com/event/2026-veterans-day-5k/",
+      "programId": "program-5k-fundraiser"
     },
     {
       "id": "hendersonville-women-s-club-meeting-2026-11-10",
@@ -285,7 +315,8 @@
       "start": "2026-11-11T18:00:00.000Z",
       "end": "2026-11-11T20:00:00.000Z",
       "description": "Nov 4th - Create Your Ornaments Part 1 of 2 We’ll start by working with clay to create your ornaments. No pottery experience is necessary! We’ll use cookie-cutter-style techniques, making it as easy and fun as cutting out sugar cookies.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "oyster-mushroom-cultivation-workshop-2026-11-13",
@@ -293,7 +324,8 @@
       "start": "2026-11-13T15:00:00.000Z",
       "end": "2026-11-13T18:00:00.000Z",
       "description": "Learn about the lifecycle of mushrooms and how to grow oyster mushrooms yourself.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-mushroom-cultivation"
     },
     {
       "id": "veterans-quail-hunt-veterans-only-2026-11-14",
@@ -301,7 +333,8 @@
       "start": "2026-11-14T13:30:00.000Z",
       "end": "2026-11-14T20:30:00.000Z",
       "description": "🦆 Veterans Quail Hunt — November 14! Mountain View Hunting Club in Del Rio, Tennessee, has generously invited our Veterans to join them for a guided quail hunt on Saturday, November 14, from 8:30 AM–3:30 PM.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=7d6e6518d21d5a639bc7df3b04e9c805",
+      "programId": "program-quail-hunt"
     },
     {
       "id": "open-pottery-studio-with-sophia-2026-11-14",
@@ -309,7 +342,8 @@
       "start": "2026-11-14T15:00:00.000Z",
       "end": "2026-11-14T17:00:00.000Z",
       "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "open-pottery-studio-with-sophia-2026-11-21",
@@ -317,7 +351,8 @@
       "start": "2026-11-21T15:00:00.000Z",
       "end": "2026-11-21T17:00:00.000Z",
       "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60"
+      "registrationUrl": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+      "programId": "program-pottery"
     },
     {
       "id": "hendersonville-women-s-club-meeting-2026-12-08",

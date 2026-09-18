@@ -51,6 +51,9 @@
       }),
       fetchJson("content/generated/gallery.json").catch(function () {
         return { version: 1, photos: [] };
+      }),
+      fetchJson("content/generated/curated-photos.json").catch(function () {
+        return { version: 1, sets: {} };
       })
     ]).then(function (results) {
       return {
@@ -58,7 +61,8 @@
         settings: results[1],
         events: results[2],
         announcements: results[3],
-        gallery: results[4]
+        gallery: results[4],
+        curated: results[5].sets || {}
       };
     });
   }

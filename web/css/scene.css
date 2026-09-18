@@ -216,6 +216,19 @@ html, body {
   margin-bottom: 16px;
 }
 
+/* A plain photo/photo-grid scene has no text otherwise — used only to name
+   a standalone curated category (In Uniform, Military Art) so it doesn't
+   read as an unlabeled random photo. */
+.scene__content--photo-label {
+  max-width: none;
+  bottom: 64px;
+}
+.scene__content--photo-label .scene__eyebrow {
+  margin-bottom: 0;
+  color: var(--vhf-cream);
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+}
+
 .scene__title {
   font-size: var(--vhf-size-title);
   line-height: 1.08;

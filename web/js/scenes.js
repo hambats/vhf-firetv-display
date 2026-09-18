@@ -66,10 +66,21 @@ var VhfScenes = (function () {
   // A faint (~16%) full-bleed photo behind text content — a watermark, not a
   // photo scene. Same card pattern as the site's own program cards: a photo
   // wash behind a soft-tan fill, content on top unaffected. Silently does
-  // nothing if the gallery pool isn't loaded yet — this is decoration, never
+  // nothing if no photos are available — this is decoration, never
   // something a scene should fail over.
-  function appendWash(scene, data) {
-    var photos = usablePhotos((data && data.gallery && data.gallery.photos) || []);
+  //
+  // When programId names a hand-curated set (content/artwork/curated/<id>/,
+  // built into content/generated/curated-photos.json), the wash is drawn
+  // from that set instead of the general gallery pool — e.g. the
+  // "program-pottery" information/event scenes show an actual pottery photo
+  // rather than a random farm photo.
+  function curatedSet(data, id) {
+    return (id && data && data.curated && data.curated[id]) || [];
+  }
+
+  function appendWash(scene, data, programId) {
+    var curated = usablePhotos(curatedSet(data, programId));
+    var photos = curated.length > 0 ? curated : usablePhotos((data && data.gallery && data.gallery.photos) || []);
     if (photos.length === 0) return;
     var photo = photos[Math.floor(Math.random() * photos.length)];
     scene.appendChild(img("scene__wash", photo.src, "decoration"));
@@ -155,12 +166,16 @@ var VhfScenes = (function () {
     return upcoming.slice(offset || 0, (offset || 0) + (limit || 5));
   }
 
-  // Cycles through the full gallery pool before any photo repeats, instead of
-  // picking uniformly at random (which can show the same handful of photos
-  // over and over out of a 1000+ photo gallery).
-  var photoPoolShuffled = [];
+  // Cycles through a pool before any photo repeats, instead of picking
+  // uniformly at random (which can show the same handful of photos over and
+  // over out of a 1000+ photo gallery). Kept per pool identity (the general
+  // gallery pool, or each named curated set) rather than one shared bag —
+  // several distinct pools now feed different scenes in the same session
+  // (D2.1/curated-photos), and a single bag would hand back the wrong
+  // pool's photos whenever two different pools' draws interleave.
+  var photoPoolShuffledByKey = {};
 
-  function drawPhotos(photos, count) {
+  function drawPhotos(key, photos, count) {
     // Refill from the live pool minus anything known dead, so a failed URL
     // leaves the rotation permanently instead of returning every cycle.
     var pool = usablePhotos(photos);
@@ -170,22 +185,24 @@ var VhfScenes = (function () {
     // rather than shown. Bounded so neither case can spin.
     var attempts = 0;
     var maxAttempts = pool.length * 2 + count + 10;
+    var bag = photoPoolShuffledByKey[key] || [];
     while (drawn.length < count && pool.length > 0 && attempts < maxAttempts) {
       attempts++;
-      if (photoPoolShuffled.length === 0) {
-        photoPoolShuffled = pool.slice();
-        for (var j = photoPoolShuffled.length - 1; j > 0; j--) {
+      if (bag.length === 0) {
+        bag = pool.slice();
+        for (var j = bag.length - 1; j > 0; j--) {
           var k = Math.floor(Math.random() * (j + 1));
-          var tmp = photoPoolShuffled[j];
-          photoPoolShuffled[j] = photoPoolShuffled[k];
-          photoPoolShuffled[k] = tmp;
+          var tmp = bag[j];
+          bag[j] = bag[k];
+          bag[k] = tmp;
         }
       }
-      var pick = photoPoolShuffled.pop();
+      var pick = bag.pop();
       if (!isUsablePhoto(pick)) continue;
       if (drawn.indexOf(pick) !== -1) continue;
       drawn.push(pick);
     }
+    photoPoolShuffledByKey[key] = bag;
     return drawn;
   }
 
@@ -198,7 +215,10 @@ var VhfScenes = (function () {
     if (content.family === "impact") className += " scene--impact";
     if (content.family === "crisis") className += " scene--crisis";
     var scene = el("div", className);
-    appendWash(scene, data);
+    // Information slides for a specific program (id "program-agritherapy"
+    // etc., matching a content/artwork/curated/ folder 1:1) get that
+    // program's own photos as the wash instead of a random farm photo.
+    appendWash(scene, data, item.id);
     scene.appendChild(el("div", "scene__fade"));
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", content.eyebrow || "Veterans Healing Farm"));
@@ -243,7 +263,7 @@ var VhfScenes = (function () {
     return scene;
   }
 
-  function buildPhotoScene(src, fit, focus) {
+  function buildPhotoScene(src, fit, focus, eyebrow) {
     var scene = el("div", "scene scene--photo");
     var photo = img("scene__photo-img", src, "content");
     photo.style.objectFit = fit === "contain" ? "contain" : "cover";
@@ -253,6 +273,13 @@ var VhfScenes = (function () {
     photo.style.objectPosition = focus || "center 35%";
     scene.appendChild(photo);
     scene.appendChild(el("div", "scene__fade scene__fade--subtle"));
+    // A standalone curated category (In Uniform, Military Art) names itself
+    // so it doesn't just look like an unlabeled random photo.
+    if (eyebrow) {
+      var label = el("div", "scene__content scene__content--photo-label");
+      label.appendChild(el("p", "scene__eyebrow", eyebrow));
+      scene.appendChild(label);
+    }
     brand(scene);
     return scene;
   }
@@ -264,18 +291,29 @@ var VhfScenes = (function () {
   }
 
   function renderPhotoPool(item, data) {
-    var photos = (data.gallery && data.gallery.photos) || [];
-    if (photos.length === 0) throw new Error("photo pool is empty");
     var content = item.content || {};
+    // content.source names a hand-curated set (content/artwork/curated/<id>/)
+    // instead of the general recency-weighted gallery pool — used for
+    // standalone categories like "in-uniform" and "military-art" that aren't
+    // tied to a specific program or event. The default (no source) pool is
+    // the scraped gallery plus "gen-pop-additions" — hand-picked photos
+    // dropped in locally rather than pulled from the website scrape, folded
+    // into the same general rotation rather than given their own scene.
+    var photos = content.source
+      ? curatedSet(data, content.source)
+      : ((data.gallery && data.gallery.photos) || []).concat(curatedSet(data, "gen-pop-additions"));
+    if (photos.length === 0) throw new Error("photo pool '" + (content.source || "gallery") + "' is empty");
     var count = content.count || 1;
 
+    var poolKey = content.source || "gallery";
+
     if (count <= 1 || photos.length < count) {
-      var photo = drawPhotos(photos, 1)[0];
+      var photo = drawPhotos(poolKey, photos, 1)[0];
       if (!photo) throw new Error("photo pool has no usable photos left");
-      return buildPhotoScene(photo.src, "cover", null);
+      return buildPhotoScene(photo.src, "cover", null, content.eyebrow);
     }
 
-    var picks = drawPhotos(photos, count);
+    var picks = drawPhotos(poolKey, photos, count);
     if (picks.length === 0) throw new Error("photo pool has no usable photos left");
     var scene = el("div", "scene scene--photo scene--photo-grid scene--photo-grid-" + picks.length);
     picks.forEach(function (p) {
@@ -284,6 +322,11 @@ var VhfScenes = (function () {
       scene.appendChild(cell);
     });
     scene.appendChild(el("div", "scene__fade scene__fade--subtle"));
+    if (content.eyebrow) {
+      var label = el("div", "scene__content scene__content--photo-label");
+      label.appendChild(el("p", "scene__eyebrow", content.eyebrow));
+      scene.appendChild(label);
+    }
     brand(scene);
     return scene;
   }
@@ -298,7 +341,11 @@ var VhfScenes = (function () {
 
   function buildEventScene(evt, data) {
     var scene = el("div", "scene scene--event");
-    appendWash(scene, data);
+    // evt.programId is set PC-side (sources/calendar/index.mjs) by matching
+    // the event title against a known program's keywords, so a "Pottery
+    // with resident potter Sophia" event shows an actual pottery photo
+    // instead of a random farm photo.
+    appendWash(scene, data, evt.programId);
     scene.appendChild(el("div", "scene__fade"));
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", "What's Happening at the Farm"));

@@ -35,6 +35,13 @@
       "content": {}
     },
     {
+      "id": "in-uniform-pool",
+      "type": "photo-pool",
+      "duration": 10,
+      "enabled": true,
+      "content": { "source": "in-uniform", "count": 1, "eyebrow": "Our Members, In Uniform" }
+    },
+    {
       "id": "photo-pool-2",
       "type": "photo-pool",
       "duration": 12,
@@ -105,6 +112,13 @@
       "duration": 12,
       "enabled": true,
       "content": {}
+    },
+    {
+      "id": "military-art-pool",
+      "type": "photo-pool",
+      "duration": 10,
+      "enabled": true,
+      "content": { "source": "military-art", "count": 1, "eyebrow": "Military Heritage" }
     },
     {
       "id": "photo-pool-4",
