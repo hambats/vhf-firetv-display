@@ -5,7 +5,7 @@ whole file in as the task's instructions.
 
 ## Project
 
-`D:\VHF_TV` — Veterans Healing Farm's Fire TV digital display. A Netlify-hosted static site
+`D:\VHF_TV` — Veterans Healing Farm's Fire TV digital display. A GitHub Pages static site
 (`hambats.github.io/vhf-firetv-display`) that the Fire TV app polls for content. The PC project
 (this repo) is the source of truth; nothing here requires the developer's PC to stay online
 after a deploy.
@@ -20,18 +20,24 @@ after a deploy.
    This re-scrapes the VHF gallery pages (`sources/gallery/index.mjs`) and re-fetches the
    public VHF Google Calendar (`sources/calendar/index.mjs`), rewriting
    `content/generated/gallery.json` and `content/generated/events.json`.
-3. Rebuild and run the test suite — this validates every file under `content/` against
-   `docs/CONTENT_SCHEMA.md`:
+3. Publish:
    ```bash
-   npm run build
-   npm test
+   npm run publish
    ```
-   **If either step fails, stop. Do not deploy.** Report the failure instead (see
-   "What to report" below) and leave the previous production deploy live.
-4. Deploy:
-   ```bash
-   netlify deploy --prod
-   ```
+   One command, and the only supported way to publish. It re-validates every file under
+   `content/` against `docs/CONTENT_SCHEMA.md`, rebuilds, runs the tests, commits the
+   changed content, pushes to `main`, and then polls the live site until the published
+   version actually advances.
+
+   **If it fails at any step, stop.** Report the failure (see "What to report" below).
+   A failed validate/build/test never pushes, so the previously published site stays
+   live and correct.
+
+   The last line is the proof: `published version NNN`. A push only *starts* a
+   publish — GitHub Actions runs the deploy — so a successful push on its own does not
+   mean the display was updated. If the script reports that the version did not advance
+   before the timeout, check the repo's Actions tab and re-check with
+   `npm run publish -- --verify-only`.
 
 Equivalently, all of this is wrapped in the project's own `update-vhf-content` Claude Code
 skill (`.claude/skills/update-vhf-content/SKILL.md`) if running inside Claude Code — invoke
@@ -72,9 +78,9 @@ that skill instead of re-deriving the steps.
   content, etc.): note the photo's `id` from `content/generated/gallery.json` and report it
   rather than editing `content/gallery-exclude.json` directly, unless explicitly asked to
   make that call autonomously.
-- **Build or test failure**: report the exact error. Never deploy on a failed build — the
-  previous production deploy stays live automatically as long as `netlify deploy --prod`
-  is never run against broken content.
+- **Build or test failure**: report the exact error. `npm run publish` refuses to push on a
+  failed validate/build/test, so the previously published site stays live automatically —
+  don't work around it.
 
 ## Suggested cadence
 

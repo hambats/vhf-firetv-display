@@ -123,15 +123,24 @@ async function handleRun(req, res, script, args) {
   }
 }
 
+/*
+ * Publishing lives in scripts/publish.mjs and nowhere else — this handler runs
+ * it rather than spelling out a deploy command, so a change of host never
+ * leaves the admin button quietly deploying to the wrong place. The script
+ * validates, builds, tests, pushes and then verifies the live version actually
+ * advanced, so its exit code is meaningful.
+ */
 async function handleDeploy(req, res) {
   try {
-    const isWin = process.platform === "win32";
-    const { stdout, stderr } = await execFileAsync(isWin ? "netlify.cmd" : "netlify", ["deploy", "--prod"], {
-      cwd: ROOT,
-      timeout: 10 * 60 * 1000,
-      maxBuffer: 32 * 1024 * 1024,
-      shell: isWin
-    });
+    const { stdout, stderr } = await execFileAsync(
+      process.execPath,
+      [path.join(ROOT, "scripts", "publish.mjs")],
+      {
+        cwd: ROOT,
+        timeout: 15 * 60 * 1000,
+        maxBuffer: 32 * 1024 * 1024
+      }
+    );
     send(res, 200, { ok: true, output: stdout + (stderr ? "\n" + stderr : "") });
   } catch (err) {
     send(res, 200, { ok: false, output: (err.stdout || "") + "\n" + (err.stderr || err.message) });

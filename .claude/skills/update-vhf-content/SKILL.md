@@ -5,7 +5,7 @@ description: Refresh everything that changes over time — new gallery photos an
 
 # Update VHF Content
 
-Runs both content-source adapters — gallery and calendar — rebuilds the Netlify site,
+Runs both content-source adapters — gallery and calendar — rebuilds the published site,
 validates, and redeploys. This is the "get everything current" skill, as opposed to
 editing the static mission/program/history slides in `content/playlist.json`, which
 don't come from an external source and should be hand-edited instead.
@@ -66,11 +66,24 @@ calendar mostly means new individual event scenes start appearing in rotation.
    npm test
    ```
    If either fails, stop and investigate — do not deploy on a failed build/test.
+   (Step 4 runs both again; this is the fast local check.)
 
-4. Deploy:
+4. Publish:
    ```bash
-   netlify deploy --prod
+   npm run publish
    ```
+   One command: it re-validates, rebuilds, runs the tests, commits the changed
+   content, pushes to `main`, and then **polls the live site until the published
+   version actually advances**. A push only *starts* a publish — GitHub Actions
+   does the deploy — so treat the final "published version NNN" line as the proof,
+   not the push.
+
+   If it reports that the version did not advance before the timeout, the deploy
+   is either still running or failed: check the repo's Actions tab, then re-check
+   with `npm run publish -- --verify-only`.
+
+   Do not run `netlify deploy`. Netlify is a dormant fallback; the live display
+   is served from GitHub Pages and only a push to `main` updates it.
 
 5. Tell the user: how many events are now upcoming and how many photos are in the
    pool, plus anything that looked off (a spike in excluded events might mean an

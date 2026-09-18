@@ -6,7 +6,7 @@ description: Re-scrape the VHF gallery, rebuild the recency-weighted photo pool 
 # Refresh VHF Photos
 
 Re-runs the VHF gallery adapter to pull in newly-added gallery photos, rebuilds the
-Netlify site, and redeploys — so the Fire TV display's `photo-pool` scenes rotate in
+published site, and redeploys — so the Fire TV display's `photo-pool` scenes rotate in
 fresh content instead of showing the same pool indefinitely.
 
 ## What this actually does
@@ -40,6 +40,8 @@ one-in-several-hundred.
    npm test
    ```
    If either fails, stop and investigate — do not deploy on a failed build/test.
+   (Step 4 runs both again; this is the fast local check before the spot-check
+   below, so a schema break surfaces before you spend time reading counts.)
 
 3. Spot-check the new pool's date spread before deploying (catches an adapter bug
    or a gallery-page URL that moved, faster than eyeballing the TV):
@@ -55,10 +57,22 @@ one-in-several-hundred.
    years, the recency weighting or date parsing may be broken; investigate before
    deploying.
 
-4. Deploy:
+4. Publish:
    ```bash
-   netlify deploy --prod
+   npm run publish
    ```
+   One command: it re-validates, rebuilds, runs the tests, commits the changed
+   content, pushes to `main`, and then **polls the live site until the published
+   version actually advances**. A push only *starts* a publish — GitHub Actions
+   does the deploy — so treat the final "published version NNN" line as the proof,
+   not the push.
+
+   If it reports that the version did not advance before the timeout, the deploy
+   is either still running or failed: check the repo's Actions tab, then re-check
+   with `npm run publish -- --verify-only`.
+
+   Do not run `netlify deploy`. Netlify is a dormant fallback; the live display
+   is served from GitHub Pages and only a push to `main` updates it.
 
 5. Tell the user: how many photos are in the new pool, the year breakdown, and
    whether anything looked off (e.g. a spike in `dateSource: "gallery-page-fallback"`

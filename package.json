@@ -2,13 +2,14 @@
   "name": "vhf-firetv-display",
   "private": true,
   "version": "0.1.0",
-  "description": "VHF digital display — Netlify publish site and browser viewer",
+  "description": "VHF digital display — GitHub Pages publish site and browser viewer",
   "type": "module",
   "scripts": {
     "build": "node scripts/build-site.mjs",
     "preview": "npm run build && npx --yes serve dist -l 8080",
     "validate-content": "node scripts/validate-content.mjs",
     "sync-sources": "node scripts/sync-sources.mjs",
+    "publish": "node scripts/publish.mjs",
     "test": "node --test tests/*.test.mjs",
     "admin": "node admin/server.mjs"
   },

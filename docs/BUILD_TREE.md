@@ -53,21 +53,24 @@ table become setup instructions and a runbook instead of code.**
 
 ## 1. Milestones
 
-### M0 — On the screen
+### M0 — On the screen  *(done — Sept 18, 2026)*
 
-Device-side. No code in this repo except the doc.
+Closed by the `app/` WebView shell rather than by choosing a browser, which is why the shopping
+list below reads as struck through rather than ticked: the shell *is* the fullscreen,
+homepage-pinned, nag-free, auto-starting browser these criteria were describing. §5 records what
+that bought and what it cost. Kept for the record:
 
-- [ ] pick the browser/app on the Fire TV. What actually matters, in priority order:
+- [x] ~~pick the browser/app on the Fire TV~~ — `app/` instead. What actually matters, in priority order:
       1. can be made **fullscreen with no chrome** (an address bar on a 24/7 display is the tell)
       2. **opens to a set homepage** — so recovery after a power cut is one button, not typing a URL
       3. doesn't nag (update prompts, cookie bars, "sign in" interstitials)
       4. recent enough Chromium to run a Service Worker
       5. bonus, if any option offers it: **auto-start on boot** — that alone gets most of the way
          to unattended, and is the single most valuable property to shop for (see §5)
-- [ ] a shorter URL to type on a remote. `hambats.github.io/vhf-firetv-display` is painful on a D-pad;
-      a Netlify custom domain or a short redirect makes first setup and recovery much easier
-- [ ] turn off the TV's screensaver / sleep / auto-power-down, and note every setting changed
-- [ ] `docs/DISPLAY_SETUP.md` [ ] — the whole device procedure, written for someone who is not you
+- [x] ~~a shorter URL to type on a remote~~ — moot: the URL is baked into the shell
+      (`display_url` in `app/src/main/res/values/strings.xml`), so nobody types it on a D-pad.
+- [x] turn off the TV's screensaver / sleep / auto-power-down, and note every setting changed
+- [x] `docs/DISPLAY_SETUP.md` — the whole device procedure, written for someone who is not you
 
 **Ship gate:** the display is on the wall and running.
 
@@ -134,22 +137,36 @@ Fixing these is most of what's left.
 **Ship gate:** pull the router. Close the browser. Reopen it. The display still plays, photos
 included. Leave it a week; it's showing this week's events.
 
-### M2 — Repeatable publish
+### M2 — Repeatable publish  *(core landed Sept 18, 2026)*
 
-Hand-running `netlify deploy --prod` is the one step still living in a human's memory.
+Hand-running a deploy command was the one step still living in a human's memory — and that memory
+went stale the moment the publish endpoint moved to GitHub Pages, leaving both skills and the admin
+button pointed at a host that no longer serves the display. Nothing would have reported it: the
+sync would succeed, the deploy would succeed, and the television would stay stale. That is the
+failure this milestone exists to prevent, and it is why `publish.mjs` is now the *single place the
+transport lives* — skills, the scheduled task and the admin button call it instead of naming a
+host, and the sequence ends by checking the live site rather than trusting the command.
 [SCHEDULED_CONTENT_UPDATE.md](SCHEDULED_CONTENT_UPDATE.md) and the two project skills encode the
 sequence; this makes it atomic.
 
-- [ ] `scripts/publish.mjs` — validate → build → test → deploy → re-fetch `/content/version.json`
-      and assert the version advanced
-- [ ] `tests/publish.test.mjs` — invalid content never reaches `dist/`
+- [x] `scripts/publish.mjs` — validate → build → test → commit → push → re-fetch
+      `/content/version.json` and assert the version advanced. The verify step is the point: a push
+      only *starts* a publish now that Actions runs the deploy, so a green push proves nothing.
+      Untracked files the build would not publish are reported and left uncommitted rather than
+      swept into a content commit.
+- [x] `tests/publish.test.mjs` — invalid content never reaches `dist/`; the published set contains
+      every `content/*.json` the engine fetches (read out of `engine.js`, so adding a fetch without
+      adding it to `PUBLISHED_CONTENT` fails the suite instead of 404ing on the wall); the curation
+      files are absent.
 - [ ] `tests/engine.test.mjs` — a throwing scene is skipped and the loop advances (still unwritten
       from the old Phase 2, and it matters more now that nothing native restarts the page)
-- [ ] `npm run publish`; skills and the scheduled task call it instead of a step list
-- [ ] **stop publishing the curation files.** `build-site.mjs` copies all of `content/` into
-      `dist/`, so `gallery-exclude.json` and `events-exclude.json` land on the public site —
-      including the free-text `reason` recording why each photo was pulled from rotation. The
-      display reads neither. Copy only the files the viewer actually fetches.
+- [x] `npm run publish`; both skills, `SCHEDULED_CONTENT_UPDATE.md` and the admin deploy handler
+      call it instead of a step list
+- [x] **stop publishing the curation files.** `build-site.mjs` copied all of `content/` into
+      `dist/`, so `gallery-exclude.json` and `events-exclude.json` landed on the public site —
+      including the free-text `reason` recording why each photo was pulled from rotation. It now
+      copies an explicit allowlist (`PUBLISHED_CONTENT`), which also keeps the AI artwork
+      candidates in `content/artwork/candidates/` off the public URL and out of the payload.
 - [ ] `scripts/lint-content.mjs` — **a display-appropriateness linter, distinct from the schema
       validator.** `validate-content.mjs` answers "is this well-formed?"; nothing answers "is this
       fit to put on a television?" Run it as a warning inside `publish.mjs`. Rules worth having,
@@ -205,17 +222,21 @@ sequence; this makes it atomic.
 
 ### M5 — Admin reaches the display
 
-- [ ] a publish button that calls `publish.mjs`
-- [ ] display status. Without a native app the honest version is modest: show the live
-      `version.json` and when it was published, so staff can tell whether the TV *should* be current.
-      A real heartbeat would need the page to POST somewhere, which needs a server that isn't
-      Netlify static — probably not worth it. Say so in the doc rather than leaving it as a TODO.
+- [~] a publish button that calls `publish.mjs`. The server side is done — `/api/deploy` runs
+      `scripts/publish.mjs` rather than naming a host — so what is left is the button's own UI and
+      surfacing the verify step's result, which is the part staff would actually read.
+- [ ] display status. The honest version is modest: show the live `version.json` and when it was
+      published, so staff can tell whether the TV *should* be current. A real heartbeat needs the
+      page to POST somewhere, which GitHub Pages cannot serve — see §1a, whose reasoning the host
+      move changed. Say so in the doc rather than leaving it as a TODO.
 - [ ] auth before `admin/` ever leaves 127.0.0.1 — or a written decision that it never does
 - [ ] **`Origin`/`Host` check on the admin API, independent of that decision.** Binding to
       127.0.0.1 stops the network reaching it; it does not stop a web page open in a browser on
-      the same machine from firing a cross-origin POST at `/api/deploy`, which runs
-      `netlify deploy --prod`. The browser blocks reading the response; the deploy still happens.
-      DNS-rebinding reaches it too. Four lines, and worth having before the auth discussion.
+      the same machine from firing a cross-origin POST at `/api/deploy`, which now runs
+      `publish.mjs` — a commit and a push to `main`. The browser blocks reading the response; the
+      publish still happens. DNS-rebinding reaches it too. Note this got *sharper*, not softer,
+      when the transport moved: the old hazard was an unwanted deploy of the current content, the
+      new one writes to the repository. Four lines, and worth having before the auth discussion.
 - [ ] **tighten the static-file guard.** `serveStatic` checks `filePath.startsWith(__dirname)`,
       which also passes for a sibling directory whose name merely starts with `admin`. Use
       `path.relative` and reject `..` or absolute results.
@@ -246,14 +267,29 @@ It also collapses the "display talks to exactly two hosts" invariant in §3 down
 roughly 40 lines in the build, plus disk. **Decision needed: keep it dropped, or reinstate it as
 an M2 item.**
 
-**2. "A real heartbeat would need a server that isn't Netlify static — probably not worth it."**
-The premise is not quite right: Netlify Functions run on the same free plan already hosting the
-site, so a page POSTing a timestamp every few minutes needs no new infrastructure and no new host.
+**2. "A real heartbeat would need a server that isn't static — probably not worth it."**
+*Reasoning revised Sept 18, after the host move.* This was re-opened on the grounds that Netlify
+Functions run on the same free plan already hosting the site, so a heartbeat needed no new
+infrastructure. **That escape hatch closed when publishing moved to GitHub Pages**, which serves
+static files and nothing else. The original premise is therefore correct again — but only about
+the *cost*, not about whether it is wanted.
+
 The reason to want one is this project's own logic: the display is built so that nobody has to
 look at it, which also means **nobody will notice when it dies.** A heartbeat plus a scheduled
 check turns "the TV has been frozen since Tuesday" from something a visitor eventually mentions
 into something known within the hour — and it is what makes the M3 soak measurable rather than
-anecdotal. **Decision needed: keep the version-display-only plan, or add a heartbeat to M3.**
+anecdotal.
+
+So the decision is now a real trade, not a free win. The options, cheapest first:
+
+- **Nothing.** Publish the version and its timestamp in `admin/`, and accept that a dead display is
+  found by a human walking past it.
+- **Push, don't POST.** The shell (`app/`) can already see the page; a native heartbeat from the
+  television to any endpoint avoids needing the *site's* host to run code.
+- **A third host for one endpoint** — a function on some free tier that does nothing but record a
+  timestamp. It breaks the two-hosts invariant in §3 and adds a dependency to guard.
+
+**Decision needed before M3, because the soak is the first thing that would use it.**
 
 ---
 
@@ -264,7 +300,8 @@ VHF_TV/
 ├── CLAUDE.md                            [x]  mission, milestones, guardrails
 ├── README.md                            [x]
 ├── package.json                         [x]  build, preview, validate-content, sync-sources, test, admin
-├── netlify.toml                         [x]  build command + cache headers
+├── netlify.toml                         [-]  dormant Netlify fallback; the live publish path is
+│                                              .github/workflows/deploy-pages.yml
 │
 ├── docs/
 │   ├── ARCHITECTURE.md                  [x]
@@ -273,8 +310,10 @@ VHF_TV/
 │   ├── SCHEDULED_CONTENT_UPDATE.md      [x]  task description for the recurring content refresh
 │   ├── DESIGN_REVIEW.md                 [x]  design/content critique of the live display
 │   ├── DESIGN_PLAN.md                   [x]  the design work track (D0–D5), parallel to M0–M5
-│   ├── DISPLAY_SETUP.md                 [ ]  M0  browser choice, fullscreen, TV settings, recovery
-│   ├── PUBLISHING.md                    [ ]  M2
+│   ├── DISPLAY_SETUP.md                 [x]  sideloading, fullscreen, TV settings, recovery
+│   ├── PUBLISHING.md                    [-]  dropped — README's "Publish" section and the header
+│   │                                         of publish.mjs say it once, in the two places
+│   │                                         someone publishing actually looks
 │   ├── SOURCES.md                       [ ]  M4  adapter contract + the Instagram decision
 │   ├── RELIABILITY.md                   [ ]  M3  failure modes → what handles each, what doesn't
 │   └── RUNBOOK.md                       [ ]  M3  written *after* the soak, not before
@@ -314,11 +353,12 @@ VHF_TV/
 │       └── diagnostics.js               [ ]  M1
 │
 ├── scripts/
-│   ├── build-site.mjs                   [x]  validate content/, copy web/+content/ -> dist/
+│   ├── build-site.mjs                   [x]  validate content/, copy web/ + the PUBLISHED_CONTENT
+│   │                                         subset of content/ -> dist/
 │   │                                         M1: sw.js needs a build-stamped cache version
 │   ├── validate-content.mjs             [x]  schema validation, used by build-site + tests
 │   ├── sync-sources.mjs                 [x]  runs the gallery and calendar adapters
-│   ├── publish.mjs                      [ ]  M2
+│   ├── publish.mjs                      [x]  the only supported publish path; owns the transport
 │   ├── fetch-photos.mjs                 [?]  dropped, re-opened for decision — see §1a
 │   └── lint-content.mjs                 [ ]  M2  display-appropriateness rules, not schema
 │
@@ -332,8 +372,9 @@ VHF_TV/
 │
 ├── tests/
 │   ├── content-schema.test.mjs          [x]  every content file matches its schema
-│   ├── engine.test.mjs                  [ ]  M2
-│   ├── publish.test.mjs                 [ ]  M2
+│   ├── engine.test.mjs                  [ ]  M2  still unwritten — the one M2 gap left
+│   ├── publish.test.mjs                 [x]  bad content never reaches dist/; published set
+│   │                                         matches what engine.js fetches
 │   └── soak/long-run.md                 [ ]  M3
 │
 ├── admin/                               [x]  local-only (127.0.0.1) playlist/weights/exclude/
@@ -346,8 +387,8 @@ VHF_TV/
 └── app/                                 [–]  DORMANT — Kotlin shell, builds clean, never installed.
                                               Not deleted: if unattended power-cut recovery ever
                                               becomes the blocking complaint, this is the answer,
-                                              and it can be sideloaded from the Netlify site with
-                                              the TV remote — no ADB, no PC. See §5.
+                                              and it can be sideloaded from the published site
+                                              with the TV remote — no ADB, no PC. See §5.
 ```
 
 ---
@@ -365,8 +406,8 @@ Carried forward:
 
 New:
 
-- **The display talks to exactly two hosts:** the Netlify `publishUrl` and the Squarespace CDN the
-  gallery photos live on. Nothing else, ever — no analytics, no third-party fonts after M1.
+- **The display talks to exactly two hosts:** the `publishUrl` (GitHub Pages) and the Squarespace
+  CDN the gallery photos live on. Nothing else, ever — no analytics, no third-party fonts after M1.
 - **A milestone ends with the television demonstrating a behaviour**, not with a file existing.
 - **Any behaviour that depends on a TV setting must be written down in `DISPLAY_SETUP.md`**, because
   it can't be enforced from the repo and it will be lost the first time the device is reset.
@@ -398,8 +439,9 @@ New:
   is churn on the one part of the system that already works. Do it when a single scene type earns
   its own file.
 - **A real device heartbeat** — needs a backend the static-site architecture doesn't have.
-  **Re-opened for decision (Sept 18) — see §1a:** that premise is wrong. Netlify Functions run on
-  the plan already hosting this site, so a heartbeat needs no new backend and no new host.
+  **Re-opened for decision (Sept 18) — see §1a.** The "Netlify Functions make this free" argument
+  that re-opened it died with the move to GitHub Pages, which serves static files only. Still
+  wanted, no longer free.
 - **Multi-display, CMS features** — unchanged, still out of scope per CLAUDE.md.
 
 ---
@@ -429,7 +471,7 @@ What the shell buys, against the three costs that made the browser path uncomfor
 Costs the shell adds, so nobody rediscovers them:
 
 4. **Installing it needs ADB once.** The no-PC alternative is the Downloader app from the Fire TV
-   appstore, with the APK published alongside the content on Netlify — worth doing if the television
+   appstore, with the APK published alongside the content — worth doing if the television
    is ever reinstalled by someone without a laptop.
 5. **The APK is signed with the local debug key.** Deliberate: one sideloaded television, no store,
    and a release-key ceremony would only add a secret to guard. The consequence is that a rebuild
@@ -501,7 +543,7 @@ photos alone; `.claude/skills/update-vhf-content/` runs both adapters together, 
 and deploys. [SCHEDULED_CONTENT_UPDATE.md](SCHEDULED_CONTENT_UPDATE.md) is the same sequence written
 as a standalone task description for a recurring scheduled agent.
 
-**Fire TV shell (active).** `app/` is a fullscreen WebView pointed at the published Netlify site,
+**Fire TV shell (active).** `app/` is a fullscreen WebView pointed at the published site,
 with a LEANBACK launcher intent, keep-screen-on, immersive-sticky chrome suppression, same-host
 navigation lock, backoff retry with a local "Reconnecting" card, a stall watchdog, and a boot
 receiver. `./gradlew :app:assembleRelease` produces a signed ~2.6 MB APK. Its launcher icon and Fire TV
