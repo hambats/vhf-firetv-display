@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-18T22:25:03.701Z",
+  "generatedAt": "2026-09-18T22:36:24.602Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -121,12 +121,22 @@
       {
         "id": "program-agritherapy/808008317_1596756888906054_5232756158849350661_n.jpg",
         "src": "content/artwork/curated/program-agritherapy/808008317_1596756888906054_5232756158849350661_n.jpg"
+      },
+      {
+        "id": "program-agritherapy/IMG_5889.jpeg",
+        "src": "content/artwork/curated/program-agritherapy/IMG_5889.jpeg"
       }
     ],
     "program-beekeeping": [
       {
         "id": "program-beekeeping/3941365436047235790_3941363578256282880.jpg",
         "src": "content/artwork/curated/program-beekeeping/3941365436047235790_3941363578256282880.jpg"
+      }
+    ],
+    "program-chair-massage": [
+      {
+        "id": "program-chair-massage/chair-massage-01.jpg",
+        "src": "content/artwork/curated/program-chair-massage/chair-massage-01.jpg"
       }
     ],
     "program-dog-training": [
@@ -199,6 +209,28 @@
         "src": "content/artwork/curated/program-kitchen-medicine/747988310_18597453946062494_7728712236597114737_n.jpg"
       }
     ],
+    "program-mushroom-cultivation": [
+      {
+        "id": "program-mushroom-cultivation/andrew-ridley-6KCS---7jbc-unsplash.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/andrew-ridley-6KCS---7jbc-unsplash.jpg"
+      },
+      {
+        "id": "program-mushroom-cultivation/andrew-ridley-bx0a2yq2hxs-unsplash.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/andrew-ridley-bx0a2yq2hxs-unsplash.jpg"
+      },
+      {
+        "id": "program-mushroom-cultivation/hans-veth--Vp8y5L2fKg-unsplash.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/hans-veth--Vp8y5L2fKg-unsplash.jpg"
+      },
+      {
+        "id": "program-mushroom-cultivation/kylli-kittus-gtdyJQqCzsA-unsplash.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/kylli-kittus-gtdyJQqCzsA-unsplash.jpg"
+      },
+      {
+        "id": "program-mushroom-cultivation/thanh-soledas-Kf1nBG76Xe8-unsplash.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/thanh-soledas-Kf1nBG76Xe8-unsplash.jpg"
+      }
+    ],
     "program-pottery": [
       {
         "id": "program-pottery/0.jpg",
@@ -221,6 +253,30 @@
         "src": "content/artwork/curated/program-pottery/696310506_1010016788360905_2321565728474701281_n.jpg"
       },
       {
+        "id": "program-pottery/IMG_5774.jpeg",
+        "src": "content/artwork/curated/program-pottery/IMG_5774.jpeg"
+      },
+      {
+        "id": "program-pottery/IMG_5775.jpeg",
+        "src": "content/artwork/curated/program-pottery/IMG_5775.jpeg"
+      },
+      {
+        "id": "program-pottery/IMG_5777.jpeg",
+        "src": "content/artwork/curated/program-pottery/IMG_5777.jpeg"
+      },
+      {
+        "id": "program-pottery/IMG_6002.jpeg",
+        "src": "content/artwork/curated/program-pottery/IMG_6002.jpeg"
+      },
+      {
+        "id": "program-pottery/IMG_6169.jpeg",
+        "src": "content/artwork/curated/program-pottery/IMG_6169.jpeg"
+      },
+      {
+        "id": "program-pottery/IMG_6191.jpeg",
+        "src": "content/artwork/curated/program-pottery/IMG_6191.jpeg"
+      },
+      {
         "id": "program-pottery/Screenshot 2026-09-18 134753.png",
         "src": "content/artwork/curated/program-pottery/Screenshot%202026-09-18%20134753.png"
       },
@@ -233,6 +289,20 @@
       {
         "id": "program-quail-hunt/quail-hunt-01.jpg",
         "src": "content/artwork/curated/program-quail-hunt/quail-hunt-01.jpg"
+      }
+    ],
+    "program-soap-making": [
+      {
+        "id": "program-soap-making/aurelia-dubois-6J0MUsmS4fQ-unsplash.jpg",
+        "src": "content/artwork/curated/program-soap-making/aurelia-dubois-6J0MUsmS4fQ-unsplash.jpg"
+      },
+      {
+        "id": "program-soap-making/delaney-van-jbHZ6S8AcaA-unsplash.jpg",
+        "src": "content/artwork/curated/program-soap-making/delaney-van-jbHZ6S8AcaA-unsplash.jpg"
+      },
+      {
+        "id": "program-soap-making/freestocks-DlZD4V2j9oM-unsplash.jpg",
+        "src": "content/artwork/curated/program-soap-making/freestocks-DlZD4V2j9oM-unsplash.jpg"
       }
     ]
   }
