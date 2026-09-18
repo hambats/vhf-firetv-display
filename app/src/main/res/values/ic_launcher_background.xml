@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- VHF brand dark green. Sits behind the seal on launchers that draw an adaptive icon. -->
+    <color name="ic_launcher_background">#1B2E1F</color>
+</resources>

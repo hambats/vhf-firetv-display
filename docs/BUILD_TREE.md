@@ -2,6 +2,7 @@
 
 The planned shape of the project from here. Markers: `[x]` exists · `[~]` partial/stub ·
 `[ ]` not written · `[–]` dormant, deliberately not being worked on.
+(`app/` carried `[–]` until Sept 18, 2026; it is active again — see §5.)
 
 Milestone numbers (M0–M5) refer to §1 below and to the milestone list in
 [../CLAUDE.md](../CLAUDE.md). Nothing here changes the architecture rule: **the PC project is
@@ -24,6 +25,11 @@ on the television.
 **The native app is out of scope.** The display will be shown on the Fire TV in the building
 through some browser or off-the-shelf app, not through a custom Android build. `app/` is dormant —
 kept, not deleted, not worked on.
+
+> **Superseded (Sept 18, 2026).** Keeping it paid off: `app/` came back as a thin WebView shell
+> around the same published site, which is what closed M0. The table below still holds — the
+> behaviours listed under "Now has to be" stayed in `web/`; the shell only added the two rows the
+> page could never own. See §5.
 
 That is a legitimate call, and it is not a downgrade of the mission. But it relocates work rather
 than deleting it. Everything the Kotlin side was going to do still has to happen, and now it has
@@ -379,8 +385,9 @@ New:
 
 ## 4. What this tree deliberately drops or defers
 
-- **The whole `app/` tree** — dormant by decision, not abandoned by neglect. §5 records what would
-  bring it back.
+- **The whole `app/` tree** — *no longer dropped.* Revived Sept 18 as a thin appliance shell; see
+  §5. What stays dropped is everything the old native plan put inside it: `ContentCache.kt`,
+  `VersionPoller.kt`, `WatchdogService.kt` and the Kotlin scene engine. Those live in `web/`.
 - **`fetch-photos.mjs`** — a PC-side photo mirror was only ever a workaround for the TV not being
   able to cache images. `sw.js` does it properly, on the device, for whatever the playlist
   currently references. **Re-opened for decision (Sept 18) — see §1a:** the offline claim holds,
@@ -399,23 +406,36 @@ New:
 
 ## 5. Decisions and honest costs
 
-**The Fire TV app is dormant.** The display runs in a browser on the television. What this genuinely
-costs, stated plainly so nobody rediscovers it in six months:
+**The Fire TV app was revived, and it closed M0 (Sept 18).** The browser path was the plan; the
+three costs recorded below are exactly why it was abandoned. `app/` now ships as a thin WebView
+appliance shell pointed at `display_url` — not a return to the old Phase 1–7 native plan. The
+division of labour is unchanged from §0: the shell owns what a page cannot do for itself, and
+nothing else. **Do not migrate scene, content, caching or refresh logic into `app/`.**
 
-1. **Power-cut recovery is not automatic.** A native app with `BootReceiver` comes back by itself.
-   A browser, in general, does not — after an outage someone has to pick up the remote and open it.
-   Mitigations, in descending order of how much they help: an app with an auto-start option (check
-   during M0); setting the display URL as the browser's homepage so recovery is two button presses;
-   and `DISPLAY_SETUP.md` making those presses obvious to anyone on site. **This is the one mission
-   goal — "turn on the television and walk away" — that this path does not fully reach.**
-2. **Keeping the screen on is a TV setting, not something the page controls.** Wake Lock may not
-   exist in whatever browser M0 picks. Disable sleep and screensaver on the device; record it.
-3. **Browser chrome and prompts are a per-app gamble.** Worth spending M0 on getting this clean; an
-   address bar or an update banner on a public display undoes a lot of polish.
-4. **Reviving `app/` needs no ADB.** The standard no-PC path onto a Fire TV is the Downloader app
-   from the Fire TV appstore: enable "Apps from Unknown Sources", type a short URL, install. The APK
-   can be published to the Netlify site alongside the content. This is why `app/` is kept rather
-   than deleted.
+What the shell buys, against the three costs that made the browser path uncomfortable:
+
+1. **Power-cut recovery.** `BootReceiver` relaunches the display on `BOOT_COMPLETED`. Fire OS does
+   not guarantee this broadcast reaches sideloaded apps and the launcher can win the race, so this
+   is *better, not solved* — `DISPLAY_SETUP.md` keeps the one-press manual fallback. The honest
+   statement of the mission goal is now "turn on the television and walk away, usually," not
+   "never."
+2. **Keeping the screen on.** `FLAG_KEEP_SCREEN_ON` covers the app; the Fire TV's own Screen Saver
+   *Start Delay* and Sleep Timer still have to be set to Never, and `DISPLAY_SETUP.md` says so.
+   Both layers are needed — the screen saver is the one that actually bites.
+3. **Chrome and prompts.** Gone entirely. Immersive-sticky, re-asserted on every focus change, no
+   address bar, no update banner, and `shouldOverrideUrlLoading` refuses any host that is not the
+   display's. Short BACK presses are swallowed so a stray remote press cannot take the display down.
+
+Costs the shell adds, so nobody rediscovers them:
+
+4. **Installing it needs ADB once.** The no-PC alternative is the Downloader app from the Fire TV
+   appstore, with the APK published alongside the content on Netlify — worth doing if the television
+   is ever reinstalled by someone without a laptop.
+5. **The APK is signed with the local debug key.** Deliberate: one sideloaded television, no store,
+   and a release-key ceremony would only add a secret to guard. The consequence is that a rebuild
+   from a different machine's debug keystore will not install over this one without an uninstall.
+6. **A URL change is the only content-shaped change that needs a rebuild.** `display_url` in
+   `app/src/main/res/values/strings.xml`. Everything else publishes.
 
 ---
 
@@ -481,6 +501,11 @@ photos alone; `.claude/skills/update-vhf-content/` runs both adapters together, 
 and deploys. [SCHEDULED_CONTENT_UPDATE.md](SCHEDULED_CONTENT_UPDATE.md) is the same sequence written
 as a standalone task description for a recurring scheduled agent.
 
-**Fire TV shell (dormant).** `app/` is code-complete for what was Phase 1 — fullscreen WebView,
-LEANBACK launcher intent, keep-screen-on, one static bundled scene — and builds cleanly with
-`assembleDebug`. It has never been installed on the television. See §5.
+**Fire TV shell (active).** `app/` is a fullscreen WebView pointed at the published Netlify site,
+with a LEANBACK launcher intent, keep-screen-on, immersive-sticky chrome suppression, same-host
+navigation lock, backoff retry with a local "Reconnecting" card, a stall watchdog, and a boot
+receiver. `./gradlew :app:assembleRelease` produces a signed ~2.6 MB APK. Its launcher icon and Fire TV
+home-row banner are generated from the brand logo by `scripts/generate-app-icons.py` and checked
+in, so the Gradle build has no Python dependency. The bundled
+`assets/web/` scene from Phase 1 is now dead weight and can go whenever someone is in there.
+See §5 and `DISPLAY_SETUP.md`.

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">VHF Display</string>
+
+    <!--
+      The published display. Changing content does NOT require rebuilding this APK —
+      the page is fetched from here at every launch. Only a change of publish endpoint
+      justifies a new build.
+    -->
+    <string name="display_url" translatable="false">https://vhf-firetv-display.netlify.app/</string>
 </resources>

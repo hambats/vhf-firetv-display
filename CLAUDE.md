@@ -43,10 +43,12 @@ it independently. The television must NOT depend on the developer's PC remaining
 - **Publish transport:** a Netlify static site (`vhf-firetv-display.netlify.app`) is the PC →
   television publish endpoint. The page polls a fixed URL for a version manifest and caches
   content locally. No credentials are ever embedded in anything the television loads.
-- **The native Fire TV app (`app/`) is dormant.** A Kotlin WebView shell exists and builds, but is
-  not being developed and has never been installed. It is kept, not deleted — see
-  [docs/BUILD_TREE.md](docs/BUILD_TREE.md) §5 for what would revive it and what running in a
-  browser instead actually costs.
+- **The native Fire TV app (`app/`) is active again (Sept 2026).** It is a thin Kotlin WebView
+  appliance shell that loads the Netlify site fullscreen: it keeps the screen awake, hides all
+  system chrome, blocks the remote from navigating away, retries after a network outage, and
+  relaunches on boot where Fire OS permits. It owns *only* what a web page cannot do for itself —
+  the scene engine, caching and content refresh stay in `web/`. Content changes never require a
+  rebuild. Install steps: [docs/DISPLAY_SETUP.md](docs/DISPLAY_SETUP.md).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full rationale.
 
@@ -62,7 +64,7 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full rationale.
   sync/authoring layer only)
 * hardcode event information or credentials
 * require a reinstall or device reconfiguration for a content-only change
-* resume work on `app/` without an explicit decision to do so
+* move scene, content, caching or refresh logic into `app/` — the shell stays thin
 * over-engineer multi-display support in version 1
 
 ## Milestones
@@ -70,8 +72,9 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full rationale.
 Ordered by risk — what keeps an unattended page alive — not by feature layer. Full detail,
 including ship gates, in [docs/BUILD_TREE.md](docs/BUILD_TREE.md).
 
-0. **On the screen** — choose the browser/app on the television, fullscreen with no chrome, set a
-   homepage, disable sleep/screensaver, and write `docs/DISPLAY_SETUP.md` for whoever is on site.
+0. **On the screen** — *done.* The `app/` WebView shell is the answer: fullscreen, no chrome,
+   screen never sleeps, points at Netlify. `docs/DISPLAY_SETUP.md` covers sideloading and the
+   television's own sleep/screensaver settings.
 1. **Survives being left alone** — Service Worker (app shell + JSON + photos), self-hosted fonts,
    version polling so content actually refreshes, error/stall watchdog, diagnostics overlay,
    browser compatibility check. *This is the heart of the plan; two real gaps live here.*
