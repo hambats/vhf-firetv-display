@@ -61,7 +61,9 @@ const PROGRAM_KEYWORDS = [
   { programId: "program-beekeeping", patterns: ["beekeeping"] },
   { programId: "program-herb-squad", patterns: ["herb squad", "medicinal herb"] },
   { programId: "program-agritherapy", patterns: ["agritherapy", "garden group"] },
-  { programId: "program-hendersonville-womans-club", patterns: ["hendersonville women", "hendersonville woman"] }
+  { programId: "program-hendersonville-womans-club", patterns: ["hendersonville women", "hendersonville woman"] },
+  { programId: "program-equine-therapy", patterns: ["equine therapy", "horse sense"] },
+  { programId: "program-sunset-yoga", patterns: ["sunset yoga"] }
 ];
 
 function matchProgramId(title) {
