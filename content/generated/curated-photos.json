@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-18T23:32:03.476Z",
+  "generatedAt": "2026-09-18T23:34:36.282Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -53,6 +53,12 @@
       {
         "id": "in-uniform/491503397_18494813875062494_1984777543171559801_n.jpg",
         "src": "content/artwork/curated/in-uniform/491503397_18494813875062494_1984777543171559801_n.jpg"
+      }
+    ],
+    "memorial-wall": [
+      {
+        "id": "memorial-wall/traveling-wall-visitors.webp",
+        "src": "content/artwork/curated/memorial-wall/traveling-wall-visitors.webp"
       }
     ],
     "military-art": [
