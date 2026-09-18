@@ -13,6 +13,10 @@
     {
       "id": "20260207-102252",
       "reason": "Near-square (2500x2377) full-body group portrait — the display's default 16:9 wash/photo crop (object-position: center 35%) has to crop roughly 40% of the image's height, which cuts heads or feet off this composition. No per-photo crop-focus override exists for the scraped gallery pool, so excluding rather than shipping a bad crop."
+    },
+    {
+      "id": "photo-jul-10-2026-2c-2-13-19-pm",
+      "reason": "Shows the farm's WiFi password legible in the background (whiteboard/screen) — security concern, flagged 2026-09-18."
     }
   ]
 }
