@@ -26,6 +26,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { PUBLISHED_CONTENT } from "./build-site.mjs";
+import { lintContentDir } from "./lint-content.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
@@ -203,6 +204,15 @@ async function main() {
   }
 
   await preflight();
+
+  console.log("\n[publish] step 0/5 — content lint (advisory, never blocks a publish)");
+  const lintWarnings = await lintContentDir(path.join(ROOT, "content"));
+  if (lintWarnings.length === 0) {
+    console.log("[publish] lint: no display-appropriateness warnings");
+  } else {
+    console.log(`[publish] lint: ${lintWarnings.length} warning(s) — review before/after publishing, but continuing`);
+    for (const w of lintWarnings) console.log(`  - [${w.file}] ${w.id}: ${w.reason}`);
+  }
 
   console.log("\n[publish] step 1/5 — build (validates content/ first)");
   await run("node", ["scripts/build-site.mjs"]);

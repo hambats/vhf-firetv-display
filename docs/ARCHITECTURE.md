@@ -100,3 +100,27 @@ them — see [BUILD_TREE.md](BUILD_TREE.md) §5.
 Minimal Android app: launches, fullscreen, immersive, keeps screen on, loads one static bundled
 HTML scene from assets. Code-complete, builds cleanly with `assembleDebug`, never installed on the
 television.
+
+## `admin/` has no authentication — by design, not oversight
+
+`admin/server.mjs` binds to `127.0.0.1` only and has no login, no session, no shared-secret token.
+That is a deliberate decision (`docs/BUILD_TREE.md` M5), not an unfinished feature, and it depends
+entirely on one rule holding:
+
+**`admin/` must only ever be run by the developer, on the developer's own machine — never on a
+machine VHF staff can log into or reach, and never bound to any network interface other than
+`127.0.0.1`.**
+
+Why this is safe under that rule, and only under that rule: a server on `127.0.0.1` with no auth
+is reachable by anything else running on the same machine as the same or another local user. The
+only realistic way to hit it remotely is a malicious web page open in a browser on that same
+machine (a cross-origin `fetch`/DNS-rebinding attack), and `isTrustedOrigin()` in `admin/server.mjs`
+already closes that door by rejecting any request whose `Host`/`Origin` doesn't match this server.
+What that check does **not** and cannot defend against is a second local user, a compromised shared
+machine, or anyone else who already has a shell or a browser tab on the box running `admin/` — for
+those, the only real fix is authentication, and none is built.
+
+If this ever changes — if VHF staff, a shared office PC, or anything other than the developer's own
+machine needs to run `admin/`, or if it's ever bound to `0.0.0.0` or a LAN address — this decision
+no longer holds and `admin/` needs real auth (a shared-secret token is the minimum bar; see the
+option considered and rejected in `docs/BUILD_TREE.md` M5) before that happens, not after.

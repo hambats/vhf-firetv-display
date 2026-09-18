@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-18T20:31:56.060Z",
+  "generatedAt": "2026-09-18T22:25:03.701Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -91,6 +91,16 @@
         "src": "content/artwork/curated/program-5k-fundraiser/VDF_5k_2026Logo_-598x1030.png"
       }
     ],
+    "program-acupuncture": [
+      {
+        "id": "program-acupuncture/christine-galligan-g2hNOyN18tY-unsplash.jpg",
+        "src": "content/artwork/curated/program-acupuncture/christine-galligan-g2hNOyN18tY-unsplash.jpg"
+      },
+      {
+        "id": "program-acupuncture/katherine-hanlon-QgcdtM9rA5s-unsplash.jpg",
+        "src": "content/artwork/curated/program-acupuncture/katherine-hanlon-QgcdtM9rA5s-unsplash.jpg"
+      }
+    ],
     "program-agritherapy": [
       {
         "id": "program-agritherapy/3941365436047235790_3941363695931774255.jpg",
@@ -127,6 +137,30 @@
       {
         "id": "program-dog-training/745524895_18597454009062494_3261715515351296567_n.jpg",
         "src": "content/artwork/curated/program-dog-training/745524895_18597454009062494_3261715515351296567_n.jpg"
+      }
+    ],
+    "program-fishing": [
+      {
+        "id": "program-fishing/clayton-chase-8ILYwYcSbeg-unsplash.jpg",
+        "src": "content/artwork/curated/program-fishing/clayton-chase-8ILYwYcSbeg-unsplash.jpg"
+      },
+      {
+        "id": "program-fishing/fishing1.png",
+        "src": "content/artwork/curated/program-fishing/fishing1.png"
+      },
+      {
+        "id": "program-fishing/fishing2.png",
+        "src": "content/artwork/curated/program-fishing/fishing2.png"
+      },
+      {
+        "id": "program-fishing/sticker-mule-qNhstTawQrI-unsplash.jpg",
+        "src": "content/artwork/curated/program-fishing/sticker-mule-qNhstTawQrI-unsplash.jpg"
+      }
+    ],
+    "program-hendersonville-womans-club": [
+      {
+        "id": "program-hendersonville-womans-club/hendersonville-womans-club-logo.webp",
+        "src": "content/artwork/curated/program-hendersonville-womans-club/hendersonville-womans-club-logo.webp"
       }
     ],
     "program-herb-squad": [
@@ -193,6 +227,12 @@
       {
         "id": "program-pottery/Screenshot 2026-09-18 134831.png",
         "src": "content/artwork/curated/program-pottery/Screenshot%202026-09-18%20134831.png"
+      }
+    ],
+    "program-quail-hunt": [
+      {
+        "id": "program-quail-hunt/quail-hunt-01.jpg",
+        "src": "content/artwork/curated/program-quail-hunt/quail-hunt-01.jpg"
       }
     ]
   }

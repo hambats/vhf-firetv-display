@@ -11,5 +11,8 @@
   "calendar": {
     "calendarId": "vhf2023calendar@gmail.com",
     "windowDays": 120
+  },
+  "hours": {
+    "closedWeekdays": [0, 1]
   }
 }

@@ -305,6 +305,45 @@
     }
   });
 
+  // ---- Display status ----
+  function fmtTime(iso) {
+    if (!iso) return "unknown time";
+    var d = new Date(iso);
+    if (isNaN(d.getTime())) return iso;
+    return d.toLocaleString();
+  }
+
+  async function refreshStatus() {
+    var liveEl = document.getElementById("status-live");
+    var localEl = document.getElementById("status-local");
+    liveEl.textContent = "Checking published site…";
+    liveEl.style.color = "";
+    try {
+      var res = await fetch("/api/status");
+      var body = await res.json();
+
+      if (body.live && body.live.ok) {
+        liveEl.textContent = "Published: v" + body.live.version + " (built " + fmtTime(body.live.builtAt) + ")";
+        liveEl.style.color = "#2a7a3d";
+      } else {
+        liveEl.textContent = "Couldn't reach the published site" + (body.live && body.live.error ? " (" + body.live.error + ")" : "");
+        liveEl.style.color = "#c95d59";
+      }
+
+      if (body.local && body.local.ok) {
+        localEl.textContent = "Local build: v" + body.local.version + " (built " + fmtTime(body.local.builtAt) + ")";
+      } else {
+        localEl.textContent = (body.local && body.local.error) || "";
+      }
+    } catch (e) {
+      liveEl.textContent = "Status check failed: " + e.message;
+      liveEl.style.color = "#c95d59";
+      localEl.textContent = "";
+    }
+  }
+
+  document.getElementById("status-refresh").addEventListener("click", refreshStatus);
+
   // ---- Build & Deploy ----
   document.getElementById("run-build").addEventListener("click", async function () {
     var out = document.getElementById("deploy-output");
@@ -321,10 +360,13 @@
     var res = await fetch("/api/deploy", { method: "POST" });
     var body = await res.json();
     out.textContent = body.output || "";
+    refreshStatus();
   });
 
   // ---- init ----
   async function init() {
+    refreshStatus();
+
     playlistDoc = await getJson("playlist");
     renderPlaylist();
 

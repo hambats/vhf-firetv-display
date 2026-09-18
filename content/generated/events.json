@@ -2,7 +2,7 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-09-18T21:47:06.409Z",
+  "generatedAt": "2026-09-18T22:25:04.509Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
     {
@@ -98,14 +98,6 @@
       "programId": "program-dog-training"
     },
     {
-      "id": "pottery-with-resident-potter-sophia-2026-10-10",
-      "title": "Pottery with resident potter Sophia",
-      "start": "2026-10-10T14:00:00.000Z",
-      "end": "2026-10-10T15:00:00.000Z",
-      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
-      "programId": "program-pottery"
-    },
-    {
       "id": "sourdough-101-with-patrina-2026-10-10",
       "title": "Sourdough 101 with Patrina",
       "start": "2026-10-10T14:00:00.000Z",
@@ -114,10 +106,19 @@
       "programId": "program-kitchen-medicine"
     },
     {
+      "id": "pottery-with-resident-potter-sophia-2026-10-10",
+      "title": "Pottery with resident potter Sophia",
+      "start": "2026-10-10T14:00:00.000Z",
+      "end": "2026-10-10T15:00:00.000Z",
+      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
+      "programId": "program-pottery"
+    },
+    {
       "id": "hendersonville-women-s-club-meeting-2026-10-13",
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-10-13T14:00:00.000Z",
-      "end": "2026-10-13T16:00:00.000Z"
+      "end": "2026-10-13T16:00:00.000Z",
+      "programId": "program-hendersonville-womans-club"
     },
     {
       "id": "woodworking-workshop-with-chris-from-forest-project-woodwork-2026-10-14",
@@ -161,20 +162,20 @@
       "programId": "program-acupuncture"
     },
     {
-      "id": "pottery-with-resident-potter-sophia-2026-10-17",
-      "title": "Pottery with resident potter Sophia",
-      "start": "2026-10-17T14:00:00.000Z",
-      "end": "2026-10-17T15:00:00.000Z",
-      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
-      "programId": "program-pottery"
-    },
-    {
       "id": "pasta-making-101-with-helene-2026-10-17",
       "title": "Pasta Making 101 with Helene",
       "start": "2026-10-17T14:00:00.000Z",
       "end": "2026-10-17T18:00:00.000Z",
       "description": "Pasta is the world’s ultimate comfort food! Please join us for a fun, hands-on class to learn how easy and satisfying it is to make pasta from scratch without the use of fancy equipment.",
       "programId": "program-kitchen-medicine"
+    },
+    {
+      "id": "pottery-with-resident-potter-sophia-2026-10-17",
+      "title": "Pottery with resident potter Sophia",
+      "start": "2026-10-17T14:00:00.000Z",
+      "end": "2026-10-17T15:00:00.000Z",
+      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
+      "programId": "program-pottery"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-21",
@@ -193,20 +194,20 @@
       "programId": "program-fishing"
     },
     {
-      "id": "vet-for-vets-with-canine-companions-2026-10-24",
-      "title": "Vet for Vets with Canine Companions",
-      "start": "2026-10-24T13:00:00.000Z",
-      "end": "2026-10-24T16:00:00.000Z",
-      "description": "The staff of Pinnacle Animal Hospital will be here toprovide brief health exams, heartworm tests, as well asvaccines appropriate to your pet(s).",
-      "programId": "program-dog-training"
-    },
-    {
       "id": "beekeeping-101-with-michael-2026-10-24",
       "title": "Beekeeping 101 with Michael",
       "start": "2026-10-24T13:00:00.000Z",
       "end": "2026-10-24T19:00:00.000Z",
       "description": "Ever wondered what it’s like to lift the lid on a beehive, see thousands of bees at work and maybe even harvest your own honey? Beekeeping 101 is a beginner-friendly course that turns curiosity into confidence.",
       "programId": "program-beekeeping"
+    },
+    {
+      "id": "vet-for-vets-with-canine-companions-2026-10-24",
+      "title": "Vet for Vets with Canine Companions",
+      "start": "2026-10-24T13:00:00.000Z",
+      "end": "2026-10-24T16:00:00.000Z",
+      "description": "The staff of Pinnacle Animal Hospital will be here toprovide brief health exams, heartworm tests, as well asvaccines appropriate to your pet(s).",
+      "programId": "program-dog-training"
     },
     {
       "id": "pottery-with-resident-potter-sophia-2026-10-24",
@@ -233,20 +234,20 @@
       "programId": "program-pottery"
     },
     {
-      "id": "open-pottery-studio-with-sophia-2026-11-07",
-      "title": "Open Pottery Studio with Sophia",
-      "start": "2026-11-07T15:00:00.000Z",
-      "end": "2026-11-07T17:00:00.000Z",
-      "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "programId": "program-pottery"
-    },
-    {
       "id": "fly-tying-for-beginners-2026-11-07",
       "title": "Fly Tying for Beginners",
       "start": "2026-11-07T15:00:00.000Z",
       "end": "2026-11-07T17:00:00.000Z",
       "description": "Tying fishing flies to imitate various insects that live in our rivers and are favorite foods for trout is a fun hobby. You will feel a special exhilaration when a fish takes a fly you tied.",
       "programId": "program-fishing"
+    },
+    {
+      "id": "open-pottery-studio-with-sophia-2026-11-07",
+      "title": "Open Pottery Studio with Sophia",
+      "start": "2026-11-07T15:00:00.000Z",
+      "end": "2026-11-07T17:00:00.000Z",
+      "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
+      "programId": "program-pottery"
     },
     {
       "id": "2026-veterans-day-5k-vhf-fundraiser-2026-11-08",
@@ -261,7 +262,8 @@
       "id": "hendersonville-women-s-club-meeting-2026-11-10",
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-11-10T15:00:00.000Z",
-      "end": "2026-11-10T17:00:00.000Z"
+      "end": "2026-11-10T17:00:00.000Z",
+      "programId": "program-hendersonville-womans-club"
     },
     {
       "id": "pottery-create-your-ornaments-2-part-series-with-sophia-2026-11-11",
@@ -307,7 +309,8 @@
       "id": "hendersonville-women-s-club-meeting-2026-12-08",
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-12-08T15:00:00.000Z",
-      "end": "2026-12-08T17:00:00.000Z"
+      "end": "2026-12-08T17:00:00.000Z",
+      "programId": "program-hendersonville-womans-club"
     }
   ]
 }

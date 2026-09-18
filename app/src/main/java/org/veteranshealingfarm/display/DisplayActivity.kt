@@ -206,7 +206,12 @@ class DisplayActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    /** Swallow every remote key except a long-press BACK, which is the deliberate way out. */
+    /**
+     * Swallow every remote key except a long-press BACK, which is the deliberate way out.
+     * A short BACK press instead wakes the page from quiet hours (web/js/engine.js,
+     * VhfQuietHours.wake) so staff can confirm the display is alive on a closed day
+     * without waiting for content to come back on its own.
+     */
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if (keyCode == KeyEvent.KEYCODE_BACK && event != null && event.isLongPress) {
             return super.onKeyDown(keyCode, event)
@@ -218,7 +223,16 @@ class DisplayActivity : AppCompatActivity() {
         return true
     }
 
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean = true
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            webView.evaluateJavascript(
+                "window.VhfQuietHours && window.VhfQuietHours.wake();",
+                null
+            )
+            return true
+        }
+        return true
+    }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)

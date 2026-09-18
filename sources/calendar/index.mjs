@@ -60,7 +60,8 @@ const PROGRAM_KEYWORDS = [
   { programId: "program-5k-fundraiser", patterns: ["5k", "fun run"] },
   { programId: "program-beekeeping", patterns: ["beekeeping"] },
   { programId: "program-herb-squad", patterns: ["herb squad", "medicinal herb"] },
-  { programId: "program-agritherapy", patterns: ["agritherapy", "garden group"] }
+  { programId: "program-agritherapy", patterns: ["agritherapy", "garden group"] },
+  { programId: "program-hendersonville-womans-club", patterns: ["hendersonville women", "hendersonville woman"] }
 ];
 
 function matchProgramId(title) {

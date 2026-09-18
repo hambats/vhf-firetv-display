@@ -74,6 +74,12 @@
 </head>
 <body>
 <header>VHF Display — Admin <span>local only · 127.0.0.1:8787</span></header>
+<div id="status-panel" style="background:#fff;border-bottom:1px solid #e5e0d5;padding:10px 24px;font-size:13px;display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+  <strong style="font-family:'Epilogue',sans-serif">Display status</strong>
+  <span id="status-live">Checking published site…</span>
+  <span id="status-local" class="muted"></span>
+  <button class="icon" id="status-refresh" title="Refresh">⟳</button>
+</div>
 <nav>
   <button data-tab="playlist" class="active">Playlist</button>
   <button data-tab="weights">Gallery Weights</button>

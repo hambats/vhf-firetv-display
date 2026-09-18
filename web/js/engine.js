@@ -37,7 +37,66 @@
   // The stall detector's own tick. It is deliberately not tied to the scene
   // loop: its whole job is to notice that the scene loop has stopped.
   var WATCHDOG_INTERVAL_MS = 30 * 1000;
+  // How long the display stays showing normal content after a remote wake
+  // during quiet hours, before falling back to black again. Long enough for
+  // someone to actually look at the screen, short enough that a stray
+  // button press doesn't light up the building overnight.
+  var WAKE_DURATION_MS = 10 * 60 * 1000;
+  // How often quiet hours are re-checked (day rollover, wake expiring)
+  // while the display is black.
+  var QUIET_RECHECK_MS = 60 * 1000;
   var layers = document.querySelectorAll(".stage__layer");
+
+  /*
+   * ---- Quiet hours ----
+   *
+   * The farm is closed some days (settings.json: hours.closedWeekdays,
+   * 0=Sunday..6=Saturday), and there is no reason to keep a television lit
+   * in an empty building. On a closed day the loop shows a black frame
+   * instead of the playlist. The remote's BACK key (app/DisplayActivity.kt)
+   * calls VhfQuietHours.wake() so on-site staff can still check the display
+   * is alive without waiting for the next open day; the override expires on
+   * its own so nobody has to remember to turn it back off.
+   */
+  var wakeUntil = 0;
+  var pendingTimeout = null;
+  var advanceRef = null; // set once runLoop is underway
+
+  function closedWeekdays(settings) {
+    return (settings && settings.hours && settings.hours.closedWeekdays) || [];
+  }
+
+  function currentWeekday(tz) {
+    if (tz && window.VhfCompat && VhfCompat.intlTimeZone) {
+      var parts = new Intl.DateTimeFormat("en-US", { timeZone: tz, weekday: "short" }).format(new Date());
+      var names = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+      if (names.hasOwnProperty(parts)) return names[parts];
+    }
+    return new Date().getDay();
+  }
+
+  function isQuietHours(settings) {
+    if (Date.now() < wakeUntil) return false;
+    var closed = closedWeekdays(settings);
+    if (closed.length === 0) return false;
+    var today = currentWeekday(settings && settings.timezone);
+    for (var i = 0; i < closed.length; i++) {
+      if (closed[i] === today) return true;
+    }
+    return false;
+  }
+
+  window.VhfQuietHours = {
+    wake: function () {
+      wakeUntil = Date.now() + WAKE_DURATION_MS;
+      log("woken from quiet hours for " + Math.round(WAKE_DURATION_MS / 60000) + " min");
+      if (pendingTimeout !== null) {
+        window.clearTimeout(pendingTimeout);
+        pendingTimeout = null;
+      }
+      if (advanceRef) advanceRef();
+    }
+  };
 
   function log(msg) {
     console.log("[VHF] " + msg);
@@ -333,12 +392,20 @@
         scheduled = true;
         state.lastAdvance = Date.now();
         state.currentSceneMs = ms || DEFAULT_DURATION_SECONDS * 1000;
-        window.setTimeout(advance, ms);
+        pendingTimeout = window.setTimeout(advance, ms);
       }
 
       // A scene boundary is the only invisible moment to reload, and this is
       // it — before any work for the next scene has been done.
       if (applyReloadIfPending()) return;
+
+      if (isQuietHours(data.settings)) {
+        upcoming = null;
+        showLayer(VhfScenes.renderBlank());
+        log("quiet hours: showing black scene");
+        scheduleNext(QUIET_RECHECK_MS);
+        return;
+      }
 
       var ready;
       try {
@@ -409,6 +476,7 @@
       });
     }
 
+    advanceRef = advance;
     advance();
   }
 

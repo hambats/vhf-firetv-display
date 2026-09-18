@@ -217,8 +217,14 @@ sequence; this makes it atomic.
       every `content/*.json` the engine fetches (read out of `engine.js`, so adding a fetch without
       adding it to `PUBLISHED_CONTENT` fails the suite instead of 404ing on the wall); the curation
       files are absent.
-- [ ] `tests/engine.test.mjs` — a throwing scene is skipped and the loop advances (still unwritten
-      from the old Phase 2, and it matters more now that nothing native restarts the page)
+- [x] `tests/engine.test.mjs` — a throwing scene is skipped and the loop advances. Loads the real
+      `engine.js` into a `vm` context (same technique as `sw.test.mjs`) with a fake DOM, fake
+      `VhfScenes`/`VhfContentSource`/`VhfDiagnostics`, and a hand-rolled fake clock the test fires
+      one timer at a time, so the assertions don't wait on a real clock. Proves both halves: the
+      scene that throws is never shown, and the scene after it in rotation is — plus, after every
+      tick, exactly one scene-advance timer is pending on top of the three long-lived ones
+      (watchdog interval, version-poll interval, periodic-reload timeout), so a leaked or doubled
+      reschedule would fail the test too.
 - [x] `npm run publish`; both skills, `SCHEDULED_CONTENT_UPDATE.md` and the admin deploy handler
       call it instead of a step list
 - [x] **stop publishing the curation files.** `build-site.mjs` copied all of `content/` into
@@ -226,18 +232,20 @@ sequence; this makes it atomic.
       including the free-text `reason` recording why each photo was pulled from rotation. It now
       copies an explicit allowlist (`PUBLISHED_CONTENT`), which also keeps the AI artwork
       candidates in `content/artwork/candidates/` off the public URL and out of the payload.
-- [ ] `scripts/lint-content.mjs` — **a display-appropriateness linter, distinct from the schema
-      validator.** `validate-content.mjs` answers "is this well-formed?"; nothing answers "is this
-      fit to put on a television?" Run it as a warning inside `publish.mjs`. Rules worth having,
-      each drawn from something currently live on the display: literal markdown emphasis (`**`)
-      surviving into rendered text; ALL-CAPS runs over ~20 characters; a description that is
-      entirely administrative boilerplate; a description truncated mid-word; the farm's own
-      postal address in a `location`; an enabled announcement slot with an empty announcement
-      pool; a photo pool below some floor.
+- [x] `scripts/lint-content.mjs` — **a display-appropriateness linter, distinct from the schema
+      validator.** `validate-content.mjs` answers "is this well-formed?"; this answers "is this
+      fit to put on a television?" Runs as a non-blocking warning step inside `publish.mjs`
+      (exits 0 always). Implements: literal markdown emphasis (`**`/`__`) surviving into rendered
+      text; ALL-CAPS runs over ~20 characters (short acronyms like "VHF"/"5K" excluded);
+      registration/admin boilerplate descriptions with nothing else in the field; descriptions
+      truncated mid-word; the farm's own postal address in a `location`; an enabled announcement
+      slot with an empty announcement pool; a gallery pool below a floor of 20. Covered by
+      `tests/lint-content.test.mjs` (13 cases, positive + negative per rule).
 
 ### M3 — Proof it lasts, and a runbook
 
-- [ ] 72-hour unattended run on the actual TV, `?diag=1` on for the first day
+- [ ] 72-hour unattended run on the actual TV, `?diag=1` on for the first day — procedure to
+      run: [`tests/soak/long-run.md`](../tests/soak/long-run.md)
 - [ ] `docs/RUNBOOK.md` [ ] — written *from what actually broke*, for VHF staff: display is blank,
       display is stale, display is showing an error, power came back and the screen is on the home
       screen. One short recovery procedure each.
@@ -253,10 +261,21 @@ sequence; this makes it atomic.
       content for 10 minutes so staff can confirm the display is alive without waiting for the
       next open day. Farm hours vary seasonally (dawn–dusk) so only the closed *days* are
       encoded, not a fixed daily clock window.
-- [ ] **burn-in review** — a fixed logo or header in the same pixels 24/7 on an LCD for months is a
-      real risk. Check `scene.css` for anything that never moves, and nudge static chrome.
-- [ ] decide Instagram: current Meta terms may make it not worth doing. **Write the decision down
-      and close it out** rather than leaving `sources/instagram/` an empty directory.
+- [x] **burn-in review** — a fixed logo or header in the same pixels 24/7 on an LCD for months is a
+      real risk. Check `scene.css` for anything that never moves, and nudge static chrome. Found
+      two static, fixed-position, opaque marks: `.scene__brand` (112px corner logo, on nearly
+      every scene) and `.scene__lockup` (280px centered logo, on the Welcome + announcement
+      scenes only) — both now drift a few px over a 240s `translate()`-only `@keyframes` cycle
+      (`vhf-pixel-shift` / `vhf-pixel-shift-lockup`), imperceptible but enough to avoid lighting
+      the exact same pixels for months. Left alone as already low-risk: `.scene__wash` (16%
+      opacity, random photo per scene, not fixed content), `.scene__fade` gradients (soft edges,
+      no hard boundary, varies by scene family/anchor), and `.diag` (55% opacity, 16px text,
+      diagnostics-only, not shown in normal operation).
+- [x] **decide Instagram.** Decision: don't build it — scraping violates Meta's ToS and the
+      sanctioned Graph API needs a Business/Creator account plus ongoing App Review, a maintenance
+      burden this project's zero-credential, zero-review architecture is built to avoid, for a
+      photo carousel the gallery adapter already provides. `sources/instagram/` (empty) removed.
+      See [docs/SOURCES.md](SOURCES.md).
 - [x] **trim event `location`.** Every synced event carries "Veterans Healing Farm, 138 Kimzey
       Rd, Mills River, NC 28759, USA", rendered on a screen standing at that address.
       `cleanLocation` (`sources/calendar/index.mjs`) drops the farm's own address and keeps only a
@@ -271,35 +290,81 @@ sequence; this makes it atomic.
       across every event (a generic regpack builder link), so it carries no information even if
       something did render it. Remove it, or replace it with something a pointer-less display can
       actually use.
-- [ ] **rebalance the loop.** 31 enabled items, 5m42s per cycle, **15 `information` text slides
-      against 9 `photo-pool`**. Roughly half the airtime is a reader-mode text card on a screen
-      most people walk past, while the photos — the thing that reads at a glance, and the thing
-      VHF has 120 of — get less. Belongs to the design track as much as to this one.
+- [x] **rebalance the loop.** Was 15 `information` (152s, 42% of loop) vs. 11 `photo-pool` (128s,
+      35%) out of 362s total. Now 13 `information` (118s, 31%) vs. 15 `photo-pool` (176s, 47%) out
+      of 376s — photo-pool leads on both item count and time-share. Changes: added 4 new
+      `photo-pool` entries (`photo-pool-10..13`, count:2 each); merged `nonprofit-status` into
+      `free-programs` (same fact, one slide) and dropped `produce-partners` (a list of partner-org
+      names that reads as noise at a glance, lowest value of the info slides); shortened 7 program/
+      impact-stat slides from 10s to 8s (`program-agritherapy`, `program-herb-squad`,
+      `program-beekeeping`, `program-workshops`, `resource-fair`, `memorial-wall`,
+      `our-impact-2025`) since those are supporting detail, not core identity. Left untouched at
+      10-12s: welcome, mission, history, get-involved, and the crisis line — these carry
+      information nothing else on the display supplies.
 - [ ] exclude-list curation is ongoing, not a one-time cleanup — see §6.
-- [ ] **`gallery-exclude.json` is keyed on a lossy id.** `idFromUrl` truncates to 60 characters,
-      so an exclusion is fragile against a Squarespace filename change — a photo removed from
-      rotation for a good reason can silently come back. Key on the full URL.
+- [x] **`gallery-exclude.json` is keyed on a lossy id — fixed.** `idFromUrl` no longer truncates
+      to 60 characters (it still keys on the URL's filename segment, not the whole URL, since
+      that's the meaningful unique part of a Squarespace CDN URL — but it's no longer capped, so a
+      long filename can no longer collide with another id's shared 60-char prefix). Both existing
+      `gallery-exclude.json` entries (`20260506-110209`, `20260210-181436`) were already well under
+      60 characters, so they were never actually truncated — the fix is a no-op for them and no
+      migration was needed. Re-ran `node sources/gallery/index.mjs`: both ids are still absent from
+      the regenerated `content/generated/gallery.json`, and `npm test` (12/12) still passes.
 
 ### M5 — Admin reaches the display
 
-- [~] a publish button that calls `publish.mjs`. The server side is done — `/api/deploy` runs
-      `scripts/publish.mjs` rather than naming a host — so what is left is the button's own UI and
-      surfacing the verify step's result, which is the part staff would actually read.
-- [ ] display status. The honest version is modest: show the live `version.json` and when it was
-      published, so staff can tell whether the TV *should* be current. A real heartbeat needs the
-      page to POST somewhere, which GitHub Pages cannot serve — see §1a, whose reasoning the host
-      move changed. Say so in the doc rather than leaving it as a TODO.
-- [ ] auth before `admin/` ever leaves 127.0.0.1 — or a written decision that it never does
-- [ ] **`Origin`/`Host` check on the admin API, independent of that decision.** Binding to
+- [x] a publish button that calls `publish.mjs`. `/api/deploy` runs `scripts/publish.mjs` rather
+      than naming a host, and `admin/app.js` wires a click handler to it that writes the result to
+      `#deploy-output` — both sides are done.
+- [x] display status. Built the cheapest option from §1a, not a heartbeat: `admin/server.mjs`
+      adds `GET /api/status` (gated by the same `isTrustedOrigin` Host/Origin check as the other
+      admin endpoints), which fetches the *live* published site's `content/version.json` (from
+      `content/settings.json`'s `publishUrl`) server-side, so no GitHub Pages CORS question, plus
+      the local `dist/content/version.json` for comparison. `admin/index.html`/`app.js` render both
+      in a status bar under the header, refreshed on page load and again after a deploy completes.
+      An unreachable live site shows a clear "couldn't reach the published site" message rather
+      than crashing or going blank — verified by pointing `publishUrl` at a nonexistent host and
+      confirming the error state, then restoring it. This is version-on-load, not a live heartbeat:
+      a real heartbeat still needs a backend GitHub Pages can't provide and remains a separate,
+      undone decision — see §1a.
+- [x] **Written decision: no auth, because `admin/` never leaves 127.0.0.1.** Evidence checked
+      before deciding: `package.json`'s `admin` script is just `node admin/server.mjs` — no host
+      flag, no deploy target, nothing implying it's ever run anywhere but a developer's own machine.
+      `admin/server.mjs`'s own header comment calls it "a small, local, dev-only tool, not a hosted
+      admin product," brought forward early "at the user's explicit request." Nowhere in
+      `docs/ARCHITECTURE.md`, `docs/DISPLAY_SETUP.md`, or this file is VHF staff described as running
+      `admin/` — staff's only documented interaction with the display is *watching* the TV; every
+      authoring/publish action is the developer's. This matches `CLAUDE.md`'s own architecture:
+      "the PC development project is the source of truth... Claude Code runs on the developer's PC,"
+      i.e. developer-only tooling stays developer-only. The one realistic attack surface for a
+      127.0.0.1-bound server run only by its developer is a malicious page open in the same browser
+      (or DNS rebinding) firing a cross-origin request — and that's exactly what the `isTrustedOrigin()`
+      Host/Origin check above already closes. A second local user or a compromised shared machine is
+      not a real threat model here because `admin/` is never run on a shared or staff-accessible
+      machine — see the explicit rule now written into `docs/ARCHITECTURE.md`. No shared-secret token
+      or login system was added; that would be engineering for a threat model this tool is never
+      exposed to.
+- [x] **`Origin`/`Host` check on the admin API, independent of that decision.** Binding to
       127.0.0.1 stops the network reaching it; it does not stop a web page open in a browser on
       the same machine from firing a cross-origin POST at `/api/deploy`, which now runs
       `publish.mjs` — a commit and a push to `main`. The browser blocks reading the response; the
       publish still happens. DNS-rebinding reaches it too. Note this got *sharper*, not softer,
       when the transport moved: the old hazard was an unwanted deploy of the current content, the
       new one writes to the repository. Four lines, and worth having before the auth discussion.
-- [ ] **tighten the static-file guard.** `serveStatic` checks `filePath.startsWith(__dirname)`,
+      **Done:** `isTrustedOrigin()` in `admin/server.mjs` rejects any request (every method, not
+      just POST) whose `Host` header isn't exactly `127.0.0.1:8787` or `localhost:8787`, and, when
+      an `Origin` header is present, requires it to resolve to the same host — 403 otherwise.
+      Verified locally: same-origin GET/POST from `http://127.0.0.1:8787/` succeed; `curl -H
+      "Host: evil.com"` and `curl -H "Origin: http://evil.com"` against `/api/deploy` both get 403.
+- [x] **tighten the static-file guard.** `serveStatic` checks `filePath.startsWith(__dirname)`,
       which also passes for a sibling directory whose name merely starts with `admin`. Use
       `path.relative` and reject `..` or absolute results.
+      **Done:** `isPathInsideDir()` in `admin/server.mjs` computes `path.relative(__dirname,
+      filePath)` and rejects (403) whenever the result is empty, starts with `..`, or is absolute
+      (the Windows cross-drive case). Verified locally: `/`, `/app.js`, `/index.html` still serve
+      normally; a `..%2f..%2f`-encoded traversal request gets 403; a plain `%2e%2e/` request is
+      already collapsed by the URL parser's own dot-segment removal before reaching this code, so
+      it 404s harmlessly rather than escaping `admin/`.
 
 ---
 
@@ -374,7 +439,7 @@ VHF_TV/
 │   ├── PUBLISHING.md                    [-]  dropped — README's "Publish" section and the header
 │   │                                         of publish.mjs say it once, in the two places
 │   │                                         someone publishing actually looks
-│   ├── SOURCES.md                       [ ]  M4  adapter contract + the Instagram decision
+│   ├── SOURCES.md                       [x]  adapter contract + the Instagram decision (M4)
 │   ├── RELIABILITY.md                   [ ]  M3  failure modes → what handles each, what doesn't
 │   └── RUNBOOK.md                       [ ]  M3  written *after* the soak, not before
 │
@@ -388,10 +453,12 @@ VHF_TV/
 │   ├── artwork/                         [x]  custom artwork (local files, not remote URLs)
 │   ├── gallery-exclude.json             [x]  hand-maintained ids dropped from the photo pool
 │   ├── events-exclude.json              [x]  hand-maintained title substrings dropped from sync
+│   ├── artwork/candidates/               [x]  AI-generated stand-in photos awaiting curation into
+│   │                                          artwork/, one subfolder per program; excluded from
+│   │                                          the publish allowlist (M2)
 │   └── generated/                       <- written by sources/, never hand-edited
 │       ├── events.json                  [x]  from the public Google Calendar ICS feed
-│       ├── gallery.json                 [x]  120-photo recency-weighted pool
-│       └── instagram.json               [ ]  M4
+│       └── gallery.json                 [x]  120-photo recency-weighted pool
 │
 ├── web/                                 <- the product now, not a preview of one
 │   ├── index.html                       [x]  registers sw.js, loads self-hosted fonts
@@ -424,8 +491,7 @@ VHF_TV/
 │
 ├── sources/                             <- PC-side only; the display never talks to these
 │   ├── gallery/index.mjs                [x]  scrape -> size filter -> exclude list -> gallery.json
-│   ├── calendar/index.mjs               [x]  public ICS -> expand recurrence -> exclude -> events.json
-│   └── instagram/                       [~]  empty directory — resolve in M4
+│   └── calendar/index.mjs               [x]  public ICS -> expand recurrence -> exclude -> events.json
 │
 ├── dist/                                [x]  build output, git-ignored
 │   └── content/version.json             [x]  manifest the display polls (M1)
@@ -435,10 +501,11 @@ VHF_TV/
 │   ├── content-schema.test.mjs          [x]  every content file matches its schema
 │   ├── sw.test.mjs                      [x]  the offline-restart guarantee, run against the
 │   │                                         stamped sw.js a real build produces
-│   ├── engine.test.mjs                  [ ]  M2  still unwritten — the one M2 gap left
+│   ├── engine.test.mjs                  [x]  a throwing scene is skipped and the loop advances,
+│   │                                         run against the real engine.js via a vm context
 │   ├── publish.test.mjs                 [x]  bad content never reaches dist/; published set
 │   │                                         matches what engine.js fetches
-│   └── soak/long-run.md                 [ ]  M3
+│   └── soak/long-run.md                 [x]  M3
 │
 ├── admin/                               [x]  local-only (127.0.0.1) playlist/weights/exclude/
 │   │                                         announcement editor; every write revalidates via
@@ -506,6 +573,10 @@ New:
   that re-opened it died with the move to GitHub Pages, which serves static files only. Still
   wanted, no longer free.
 - **Multi-display, CMS features** — unchanged, still out of scope per CLAUDE.md.
+- **An Instagram source adapter** — decided against (M4, Sept 2026): scraping violates Meta's ToS,
+  and the sanctioned Graph API needs a Business/Creator account and ongoing App Review, a
+  maintenance burden out of proportion to a photo feature the gallery adapter already covers.
+  `sources/instagram/` (empty) removed. See [docs/SOURCES.md](SOURCES.md).
 
 ---
 
@@ -603,7 +674,10 @@ hand-excluded.
 
 **Project skills.** `.claude/skills/refresh-vhf-photos/` wraps re-scrape → build → test → deploy for
 photos alone; `.claude/skills/update-vhf-content/` runs both adapters together, then rebuilds, tests
-and deploys. [SCHEDULED_CONTENT_UPDATE.md](SCHEDULED_CONTENT_UPDATE.md) is the same sequence written
+and deploys. `.claude/skills/generate-event-artwork/` generates an AI stand-in photo (Stable
+Diffusion / ComfyUI, Juggernaut XL) into `content/artwork/candidates/<program>/` for a program or
+event with no real farm photo yet, and wires the result into the curated-photo pipeline once
+approved. [SCHEDULED_CONTENT_UPDATE.md](SCHEDULED_CONTENT_UPDATE.md) is the same sequence written
 as a standalone task description for a recurring scheduled agent.
 
 **Fire TV shell (active).** `app/` is a fullscreen WebView pointed at the published site,

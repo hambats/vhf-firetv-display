@@ -133,13 +133,20 @@ async function readWebpDimensions(url) {
 }
 
 function idFromUrl(url) {
+  // Previously truncated to 60 chars, which let two different photos (or the
+  // same photo after a Squarespace filename change past position 60) collide
+  // on their id — a gallery-exclude.json entry could then stop matching the
+  // photo it was meant to suppress, or start matching the wrong one. The id
+  // is still derived from the URL's filename segment (Squarespace filenames
+  // are the meaningful unique part; the rest of the URL is a shared CDN path
+  // prefix), but it is no longer truncated, so it stays a full-fidelity,
+  // collision-resistant key for as long as the filename is.
   const segment = url.split("/").filter(Boolean).pop() || "photo";
   return segment
     .replace(/\.[a-z0-9]+$/i, "")
     .replace(/[^a-zA-Z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-    .toLowerCase()
-    .slice(0, 60);
+    .toLowerCase();
 }
 
 async function loadExcludedIds() {

@@ -48,10 +48,19 @@ function readBody(req) {
   });
 }
 
+function isPathInsideDir(dir, filePath) {
+  const rel = path.relative(dir, filePath);
+  return rel !== "" && !rel.startsWith("..") && !path.isAbsolute(rel);
+}
+
 async function serveStatic(req, res, urlPath) {
   const rel = urlPath === "/" ? "/index.html" : urlPath;
+  // Strip any query/hash the URL constructor already removed, and reject
+  // attempts to escape admin/ via ../ or URL-encoded traversal sequences —
+  // path.join + path.relative below is what actually enforces this; decoding
+  // happens via URL parsing before we ever get urlPath.
   const filePath = path.join(__dirname, rel);
-  if (!filePath.startsWith(__dirname)) return send(res, 403, "forbidden");
+  if (!isPathInsideDir(__dirname, filePath)) return send(res, 403, "forbidden");
   try {
     const body = await fs.readFile(filePath);
     const ext = path.extname(filePath);
@@ -124,6 +133,58 @@ async function handleRun(req, res, script, args) {
 }
 
 /*
+ * Display status panel (M5 "display status", cheapest option — see
+ * docs/BUILD_TREE.md §1a): this is NOT a heartbeat. It fetches the LIVE
+ * published site's content/version.json server-side (avoids any GitHub
+ * Pages CORS question) so staff can see what the TV *should* currently be
+ * running, plus the local dist/ build's version.json for comparison if one
+ * exists. Never throws past the caller — an unreachable live site is a
+ * normal, expected state for this endpoint to report, not a server error.
+ */
+async function fetchLiveVersion() {
+  let settings;
+  try {
+    settings = JSON.parse(await fs.readFile(path.join(CONTENT_DIR, "settings.json"), "utf8"));
+  } catch (err) {
+    return { ok: false, error: `couldn't read content/settings.json: ${err.message}` };
+  }
+  const publishUrl = settings.publishUrl;
+  if (!publishUrl) return { ok: false, error: "no publishUrl configured in content/settings.json" };
+
+  const url = `${publishUrl.replace(/\/+$/, "")}/content/version.json?t=${Date.now()}`;
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 8000);
+    let res;
+    try {
+      res = await fetch(url, { cache: "no-store", signal: controller.signal });
+    } finally {
+      clearTimeout(timer);
+    }
+    if (!res.ok) return { ok: false, error: `published site returned HTTP ${res.status}`, url };
+    const manifest = await res.json();
+    return { ok: true, url, version: manifest.version, builtAt: manifest.builtAt };
+  } catch (err) {
+    return { ok: false, error: `couldn't reach the published site: ${err.message}`, url };
+  }
+}
+
+async function fetchLocalVersion() {
+  try {
+    const raw = await fs.readFile(path.join(ROOT, "dist", "content", "version.json"), "utf8");
+    const manifest = JSON.parse(raw);
+    return { ok: true, version: manifest.version, builtAt: manifest.builtAt };
+  } catch {
+    return { ok: false, error: "no local dist/ build found — run Build first" };
+  }
+}
+
+async function handleStatus(req, res) {
+  const [live, local] = await Promise.all([fetchLiveVersion(), fetchLocalVersion()]);
+  send(res, 200, { live, local });
+}
+
+/*
  * Publishing lives in scripts/publish.mjs and nowhere else — this handler runs
  * it rather than spelling out a deploy command, so a change of host never
  * leaves the admin button quietly deploying to the wrong place. The script
@@ -147,8 +208,41 @@ async function handleDeploy(req, res) {
   }
 }
 
+const ALLOWED_HOSTS = new Set([`127.0.0.1:${PORT}`, `localhost:${PORT}`]);
+
+/*
+ * Binding to 127.0.0.1 keeps the network out, but not a malicious page open
+ * in a browser on this same machine — it can still fire a cross-origin POST
+ * at this server (the browser only blocks the page from reading the
+ * response). DNS rebinding can reach it too. Reject anything whose Host
+ * header isn't exactly this server's own address, and, when an Origin header
+ * is present (any browser-initiated cross-origin or same-origin fetch sends
+ * one), require it to match as well. Same-origin requests from
+ * admin/index.html served at http://127.0.0.1:PORT/ always send a Host of
+ * 127.0.0.1:PORT and, when present, an Origin of http://127.0.0.1:PORT, so
+ * legitimate traffic is unaffected.
+ */
+function isTrustedOrigin(req) {
+  const host = req.headers.host;
+  if (!ALLOWED_HOSTS.has(host)) return false;
+  const origin = req.headers.origin;
+  if (origin) {
+    try {
+      const originUrl = new URL(origin);
+      if (!ALLOWED_HOSTS.has(originUrl.host)) return false;
+    } catch {
+      return false;
+    }
+  }
+  return true;
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host}`);
+
+  if (!isTrustedOrigin(req)) {
+    return send(res, 403, { error: "forbidden: bad Host/Origin" });
+  }
 
   try {
     if (url.pathname === "/api/content" && req.method === "GET") {
@@ -165,6 +259,9 @@ const server = http.createServer(async (req, res) => {
     }
     if (url.pathname === "/api/deploy" && req.method === "POST") {
       return await handleDeploy(req, res);
+    }
+    if (url.pathname === "/api/status" && req.method === "GET") {
+      return await handleStatus(req, res);
     }
     if (req.method === "GET") {
       return await serveStatic(req, res, url.pathname);
