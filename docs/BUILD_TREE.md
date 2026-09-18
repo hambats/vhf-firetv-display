@@ -19,7 +19,7 @@ Two things, and the second one is the bigger deal.
 **The work went lopsided.** The original tree was ordered by feature phase (1 shell → 7 admin).
 Actual progress: the web renderer, content schema, validation, JSON cache, gallery and calendar
 adapters, and even the Phase-7 admin UI are all built, and the site is live at
-`vhf-firetv-display.netlify.app`. The Fire TV app was still Phase 1 and had never been installed
+`hambats.github.io/vhf-firetv-display`. The Fire TV app was still Phase 1 and had never been installed
 on the television.
 
 **The native app is out of scope.** The display will be shown on the Fire TV in the building
@@ -64,7 +64,7 @@ Device-side. No code in this repo except the doc.
       4. recent enough Chromium to run a Service Worker
       5. bonus, if any option offers it: **auto-start on boot** — that alone gets most of the way
          to unattended, and is the single most valuable property to shop for (see §5)
-- [ ] a shorter URL to type on a remote. `vhf-firetv-display.netlify.app` is painful on a D-pad;
+- [ ] a shorter URL to type on a remote. `hambats.github.io/vhf-firetv-display` is painful on a D-pad;
       a Netlify custom domain or a short redirect makes first setup and recovery much easier
 - [ ] turn off the TV's screensaver / sleep / auto-power-down, and note every setting changed
 - [ ] `docs/DISPLAY_SETUP.md` [ ] — the whole device procedure, written for someone who is not you

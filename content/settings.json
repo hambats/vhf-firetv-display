@@ -1,7 +1,7 @@
 {
   "version": 1,
   "syncIntervalMinutes": 20,
-  "publishUrl": "https://vhf-firetv-display.netlify.app",
+  "publishUrl": "https://hambats.github.io/vhf-firetv-display",
   "gallery": {
     "maxPhotos": 120,
     "minDimension": 1200,

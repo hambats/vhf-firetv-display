@@ -6,7 +6,7 @@ whole file in as the task's instructions.
 ## Project
 
 `D:\VHF_TV` — Veterans Healing Farm's Fire TV digital display. A Netlify-hosted static site
-(`vhf-firetv-display.netlify.app`) that the Fire TV app polls for content. The PC project
+(`hambats.github.io/vhf-firetv-display`) that the Fire TV app polls for content. The PC project
 (this repo) is the source of truth; nothing here requires the developer's PC to stay online
 after a deploy.
 

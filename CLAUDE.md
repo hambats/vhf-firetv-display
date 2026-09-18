@@ -40,15 +40,21 @@ it independently. The television must NOT depend on the developer's PC remaining
 - **Runtime:** the display is a **web page** — HTML/CSS/JS in `web/`, published as a static site
   and shown on the television through a browser or off-the-shelf app chosen on the device.
   The page itself owns caching, content refresh, and crash recovery.
-- **Publish transport:** a Netlify static site (`vhf-firetv-display.netlify.app`) is the PC →
-  television publish endpoint. The page polls a fixed URL for a version manifest and caches
-  content locally. No credentials are ever embedded in anything the television loads.
+- **Publish transport:** a GitHub Pages static site (`hambats.github.io/vhf-firetv-display`) is
+  the PC → television publish endpoint. A push to the repo's `main` branch triggers a GitHub
+  Actions workflow ([.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml)) that
+  builds and republishes automatically — free, no deploy-credit limit. (Netlify was the original
+  host; it was dropped 2026-09-18 after its free-tier deploy credits ran out mid-development. The
+  Netlify project is left in place as a dormant fallback, not actively used.) The page polls a
+  fixed URL for a version manifest and caches content locally. No credentials are ever embedded in
+  anything the television loads.
 - **The native Fire TV app (`app/`) is active again (Sept 2026).** It is a thin Kotlin WebView
-  appliance shell that loads the Netlify site fullscreen: it keeps the screen awake, hides all
+  appliance shell that loads the published site fullscreen: it keeps the screen awake, hides all
   system chrome, blocks the remote from navigating away, retries after a network outage, and
   relaunches on boot where Fire OS permits. It owns *only* what a web page cannot do for itself —
   the scene engine, caching and content refresh stay in `web/`. Content changes never require a
-  rebuild. Install steps: [docs/DISPLAY_SETUP.md](docs/DISPLAY_SETUP.md).
+  rebuild — only a change of publish endpoint does. Install steps:
+  [docs/DISPLAY_SETUP.md](docs/DISPLAY_SETUP.md).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full rationale.
 

@@ -7,7 +7,7 @@ television on their own — **changing content never requires reinstalling this 
 ## What gets installed
 
 `VHF Display` — an app whose entire job is to show
-`https://vhf-firetv-display.netlify.app/` fullscreen, forever.
+`https://hambats.github.io/vhf-firetv-display/` fullscreen, forever.
 
 It is not a browser. There is no address bar, no menu, and the remote cannot navigate away
 from the display. It keeps the screen awake, and it puts itself back together after a

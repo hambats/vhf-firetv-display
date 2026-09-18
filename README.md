@@ -41,9 +41,12 @@ This validates every JSON file under `content/`, copies `web/` and `content/` in
 serves `dist/` at `http://localhost:8080`. Add `?diag=1` to the URL for an on-screen debug line
 naming the current scene.
 
-**Live site:** https://vhf-firetv-display.netlify.app (Netlify project `vhf-firetv-display`, linked
-in `.netlify/state.json`). `publishUrl` in [content/settings.json](content/settings.json) points at
-it, and the display polls `<publishUrl>/content/version.json` to detect new content.
+**Live site:** https://hambats.github.io/vhf-firetv-display (GitHub Pages, deployed by
+[.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) on every push to `main`).
+`publishUrl` in [content/settings.json](content/settings.json) points at it, and the display polls
+`<publishUrl>/content/version.json` to detect new content. A Netlify project (`vhf-firetv-display`)
+still exists as a dormant fallback but isn't the active publish target — GitHub Pages replaced it
+2026-09-18 after Netlify's free-tier deploy credits ran out mid-development.
 
 ## Refresh content from VHF sources
 
@@ -60,13 +63,14 @@ a standalone task for a recurring scheduled agent.
 ## Deploy
 
 ```bash
-netlify deploy --prod
+git push origin main
 ```
 
-This runs the build command in [netlify.toml](netlify.toml) (`node scripts/build-site.mjs`), which
-validates every `content/*.json` file first, and publishes `dist/`. The build never publishes
-half-edited content: if anything fails validation the build fails and the previous deploy stays
-live. (M2 replaces this hand-run command with `npm run publish`, which also verifies the deployed
+A push to `main` triggers [.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml),
+which runs `node scripts/build-site.mjs` (validating every `content/*.json` file first) and
+publishes `dist/` to GitHub Pages. The build never publishes half-edited content: if anything fails
+validation the workflow fails and the previous deploy stays live. (M2 replaces this with
+`npm run publish`, which also verifies the deployed
 version actually advanced.)
 
 ## Admin tool (local only)

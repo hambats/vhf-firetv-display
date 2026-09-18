@@ -1,6 +1,6 @@
 # VHF Display — Design & Content Review
 
-Reviewed against the **live deploy** (`vhf-firetv-display.netlify.app`) on a 16:9 canvas, not
+Reviewed against the **live deploy** (`hambats.github.io/vhf-firetv-display`) on a 16:9 canvas, not
 against the CSS. Several of the worst findings are invisible in the source — they only appear once
 real gallery photos and real calendar text land in the layout.
 
