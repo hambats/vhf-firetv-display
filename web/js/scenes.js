@@ -126,6 +126,12 @@ var VhfScenes = (function () {
   // always showing the same one.
   var GRAPHIC_PROGRAM_IDS = ["program-5k-fundraiser"];
 
+  // Maps an announcement's own id (announcements.json) to the curated-set
+  // id it should show its designed graphic from — see renderAnnouncement.
+  var ANNOUNCEMENT_GRAPHIC_SOURCES = {
+    "veterans-day-5k-registration-open": "program-5k-fundraiser"
+  };
+
   function appendEventGraphic(scene, data, programId) {
     var photos = usablePhotos(curatedSet(data, programId));
     if (photos.length === 0) return false;
@@ -350,6 +356,13 @@ var VhfScenes = (function () {
     if (!announcement || !announcement.title) throw new Error("announcement scene missing announcement data");
 
     var scene = el("div", "scene scene--announcement");
+    // An announcement about a specific program can show that program's
+    // designed graphic (the same badge/medal/shirt card the event scene
+    // uses) rather than the plain solid-color ground every other
+    // announcement gets — reuses appendEventGraphic since the treatment
+    // (contained card, portrait print asset) is identical.
+    var graphicSource = ANNOUNCEMENT_GRAPHIC_SOURCES[announcement.id];
+    if (graphicSource) appendEventGraphic(scene, data, graphicSource);
     scene.appendChild(el("div", "scene__fade"));
     lockup(scene);
     var body = el("div", "scene__content");
