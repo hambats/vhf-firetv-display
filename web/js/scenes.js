@@ -86,9 +86,42 @@ var VhfScenes = (function () {
     scene.appendChild(img("scene__wash", photo.src, "decoration"));
   }
 
+  /*
+   * Event times are the one thing on this display that can be wrong without
+   * looking wrong.
+   *
+   * events.json stores UTC. Formatting it with getHours()/getDay() means
+   * "whatever this television believes local time is" — and nobody checks a
+   * television's clock settings. A wrong or reset time zone shifts every event
+   * time by a fixed offset, and a late-evening event lands on the wrong day,
+   * with no visible symptom at all. So the display pins its own zone, read
+   * from `timezone` in settings.json rather than hardcoded here, and the
+   * engine hands it over before the first scene renders.
+   */
+  var displayTimeZone = null;
+
+  function setTimeZone(tz) {
+    displayTimeZone = tz || null;
+  }
+
+  /* Falls back to device-local formatting where Intl cannot do time zones —
+     wrong-but-rendered beats a blank line. compat.js records when this
+     happens, so the degradation is at least visible somewhere. */
+  function zoneSupported() {
+    return displayTimeZone && window.VhfCompat && VhfCompat.intlTimeZone;
+  }
+
   function formatEventDate(startIso) {
     var d = new Date(startIso);
     if (isNaN(d.getTime())) return "";
+    if (zoneSupported()) {
+      return d.toLocaleDateString("en-US", {
+        timeZone: displayTimeZone,
+        weekday: "short",
+        month: "short",
+        day: "numeric"
+      });
+    }
     var days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     var months = [
       "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -101,6 +134,18 @@ var VhfScenes = (function () {
     function fmt(iso) {
       var d = new Date(iso);
       if (isNaN(d.getTime())) return "";
+      if (zoneSupported()) {
+        /* "4:00 PM" -> "4 PM": an on-the-hour start reads better without the
+           zeroes at television distance, which is what the manual formatter
+           below did and what the rest of the display expects. */
+        return d
+          .toLocaleTimeString("en-US", {
+            timeZone: displayTimeZone,
+            hour: "numeric",
+            minute: "2-digit"
+          })
+          .replace(":00 ", " ");
+      }
       var h = d.getHours();
       var m = d.getMinutes();
       var ampm = h >= 12 ? "PM" : "AM";
@@ -453,6 +498,7 @@ var VhfScenes = (function () {
   return {
     render: render,
     renderError: renderError,
-    markImageFailed: markImageFailed
+    markImageFailed: markImageFailed,
+    setTimeZone: setTimeZone
   };
 })();

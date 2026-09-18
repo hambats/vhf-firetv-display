@@ -1,6 +1,7 @@
 {
   "version": 1,
   "syncIntervalMinutes": 20,
+  "timezone": "America/New_York",
   "publishUrl": "https://hambats.github.io/vhf-firetv-display",
   "gallery": {
     "maxPhotos": 120,

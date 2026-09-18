@@ -12,49 +12,12 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
 import { promises as fs } from "node:fs";
-import os from "node:os";
-import { spawn } from "node:child_process";
-import { fileURLToPath } from "node:url";
 import { PUBLISHED_CONTENT } from "../scripts/build-site.mjs";
-
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-
-function runBuild(buildRoot) {
-  return new Promise((resolve) => {
-    const child = spawn(process.execPath, [path.join(ROOT, "scripts", "build-site.mjs")], {
-      env: { ...process.env, VHF_BUILD_ROOT: buildRoot },
-      stdio: ["ignore", "pipe", "pipe"]
-    });
-    let out = "";
-    child.stdout.on("data", (d) => (out += d));
-    child.stderr.on("data", (d) => (out += d));
-    child.on("close", (code) => resolve({ code, out }));
-  });
-}
-
-/*
- * A fixture repo: the real content/ and web/, minus the artwork payload (tens
- * of megabytes of photos that make the copy slow and prove nothing). The two
- * published artwork directories still have to exist, because the build treats
- * a missing entry in its allowlist as an error.
- */
-async function makeFixture() {
-  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "vhf-publish-"));
-  await fs.cp(path.join(ROOT, "content"), path.join(dir, "content"), {
-    recursive: true,
-    filter: (src) => !path.relative(ROOT, src).replace(/\\/g, "/").startsWith("content/artwork/")
-  });
-  await fs.cp(path.join(ROOT, "web"), path.join(dir, "web"), { recursive: true });
-  await fs.mkdir(path.join(dir, "content", "artwork", "brand"), { recursive: true });
-  await fs.mkdir(path.join(dir, "content", "artwork", "curated"), { recursive: true });
-  return dir;
-}
-
-const exists = (p) => fs.access(p).then(() => true, () => false);
+import { ROOT, runBuild, makeFixture, exists, cleanup } from "./helpers/build-fixture.mjs";
 
 test("a successful build publishes every file the engine fetches", async (t) => {
   const dir = await makeFixture();
-  t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  t.after(() => cleanup(dir));
 
   const { code, out } = await runBuild(dir);
   assert.equal(code, 0, "build should succeed on valid content:\n" + out);
@@ -81,7 +44,7 @@ test("a successful build publishes every file the engine fetches", async (t) => 
 
 test("curation notes and candidate artwork never reach dist/", async (t) => {
   const dir = await makeFixture();
-  t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  t.after(() => cleanup(dir));
 
   const { code } = await runBuild(dir);
   assert.equal(code, 0);
@@ -103,7 +66,7 @@ test("curation notes and candidate artwork never reach dist/", async (t) => {
 
 test("invalid content fails the build and leaves dist/ untouched", async (t) => {
   const dir = await makeFixture();
-  t.after(() => fs.rm(dir, { recursive: true, force: true }));
+  t.after(() => cleanup(dir));
 
   assert.equal((await runBuild(dir)).code, 0, "fixture should build cleanly first");
   const good = await fs.readFile(path.join(dir, "dist", "content", "playlist.json"), "utf8");

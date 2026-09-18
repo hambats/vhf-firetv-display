@@ -44,7 +44,9 @@ this project already use.
 ```jsonc
 {
   "version": 1,
-  "syncIntervalMinutes": 20,   // positive number, required
+  "syncIntervalMinutes": 20,   // positive number, required — how often the display re-checks
+                               //   content/version.json and reloads if it changed
+  "timezone": "America/New_York", // required, valid IANA zone name
   "publishUrl": "https://...", // required, must be a valid absolute URL
   "gallery": {                 // optional; read by sources/gallery/index.mjs, editable via admin/
     "maxPhotos": 120,          // optional, positive number, default 120
@@ -57,6 +59,12 @@ this project already use.
   }
 }
 ```
+
+**`timezone` is required, not defaulted.** `events.json` stores UTC, and the display formats every
+event time through this zone rather than the television's own clock setting. A wrong or reset TV
+time zone would otherwise shift every event by a fixed offset and push a late-evening event onto
+the wrong day — with nothing on screen looking wrong. A default applied at render time would
+recreate that silently, so its absence is a build error instead.
 
 ## `content/generated/events.json`
 

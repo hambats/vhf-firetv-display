@@ -28,14 +28,20 @@
   // this many in a row we show the next scene regardless and let the
   // display degrade at normal pace instead of thrashing.
   var MAX_CONSECUTIVE_SKIPS = 5;
+  // How long the page may run before it reloads itself at a scene boundary.
+  // Nothing is known to leak; that is exactly why this exists. A setTimeout
+  // chain and a DOM that have been running for weeks are the parts most
+  // likely to drift or accumulate something nobody predicted, and a reload at
+  // a crossfade is invisible. Cheap insurance against an unknown.
+  var PERIODIC_RELOAD_MS = 6 * 60 * 60 * 1000;
+  // The stall detector's own tick. It is deliberately not tied to the scene
+  // loop: its whole job is to notice that the scene loop has stopped.
+  var WATCHDOG_INTERVAL_MS = 30 * 1000;
   var layers = document.querySelectorAll(".stage__layer");
-  var diag = document.getElementById("diag");
-  var showDiag = /[?&]diag=1/.test(location.search);
-  if (showDiag) diag.hidden = false;
 
   function log(msg) {
     console.log("[VHF] " + msg);
-    if (showDiag) diag.textContent = msg;
+    VhfDiagnostics.set("scene", msg);
   }
 
   function loadContent() {
@@ -102,6 +108,7 @@
             // A broken-image glyph is worse than nothing on a television.
             image.style.display = "none";
             VhfScenes.markImageFailed(image.src);
+            VhfDiagnostics.bump("imageFailed");
             console.warn("[VHF] image failed to load: " + image.src);
           }
           resolve();
@@ -131,6 +138,113 @@
     });
   }
 
+  /*
+   * ---- Staying current, and staying alive ----
+   *
+   * Two failures this section exists to prevent, neither of which is visible
+   * in a five-minute preview:
+   *
+   *   1. A page opened on Monday is still showing Monday's events on Friday.
+   *      Nothing in the loop ever re-reads content, so without a poll the
+   *      display silently becomes a photograph of a past week.
+   *   2. The loop stops. engine.js guarantees exactly one reschedule per tick
+   *      and arms it before anything that can throw, so the loop can no longer
+   *      stop *itself* — but it can still be stopped from outside (a throwing
+   *      timer, a WebView suspending, something nobody has thought of). Only
+   *      something outside the loop can notice that, which is what the
+   *      watchdog is.
+   *
+   * Both recover the same way: reload the page. A reload at a crossfade is
+   * invisible on screen and clears whatever state went wrong.
+   */
+  var reloadPending = null; // reason string, or null
+
+  function requestReload(reason) {
+    if (reloadPending) return;
+    reloadPending = reason;
+    log("reload queued (" + reason + "); will apply at the next scene boundary");
+  }
+
+  function applyReloadIfPending() {
+    if (!reloadPending) return false;
+    console.log("[VHF] reloading: " + reloadPending);
+    location.reload();
+    return true;
+  }
+
+  function fetchVersion() {
+    return fetch("content/version.json?t=" + Date.now(), { cache: "no-store" })
+      .then(function (res) {
+        if (!res.ok) throw new Error("version.json -> HTTP " + res.status);
+        return res.json();
+      });
+  }
+
+  function startVersionPoll(settings) {
+    var minutes = (settings && settings.syncIntervalMinutes) || 20;
+    var known = null;
+
+    function poll() {
+      fetchVersion().then(
+        function (manifest) {
+          VhfDiagnostics.set("contentVersion", manifest.version);
+          VhfDiagnostics.set("lastSync", new Date().toISOString().slice(11, 19));
+          if (known === null) {
+            known = manifest.version;
+            return;
+          }
+          if (manifest.version !== known) {
+            known = manifest.version;
+            /*
+             * Content is re-read on reload, so this covers new events and new
+             * photos immediately. Changed *code* can take one further reload:
+             * the Service Worker serves the shell from cache while fetching
+             * the new build in the background. That is the right trade for a
+             * display — booting instantly from cache matters more than
+             * picking up a CSS change on the first try.
+             */
+            requestReload("content version " + manifest.version);
+          }
+        },
+        function (err) {
+          /* A failed poll is not an error worth counting: the network being
+             down is the normal condition this whole milestone is about. The
+             cached content keeps playing and the next poll tries again. */
+          VhfDiagnostics.set("lastSync", "failed " + new Date().toISOString().slice(11, 19));
+          console.warn("[VHF] version poll failed", err);
+        }
+      );
+    }
+
+    poll();
+    window.setInterval(poll, minutes * 60 * 1000);
+    window.setTimeout(function () {
+      requestReload("periodic refresh");
+    }, PERIODIC_RELOAD_MS);
+  }
+
+  /*
+   * Watches the one number that proves the display is alive: when a scene last
+   * changed. Anything longer than several times the current scene's dwell means
+   * the loop is not coming back on its own.
+   *
+   * This can only catch a dead loop in a live page. A WebView that has crashed
+   * outright takes this timer with it — that case belongs to the native shell's
+   * own watchdog (app/, BUILD_TREE §5), which is why both layers exist.
+   */
+  function startWatchdog(state) {
+    window.setInterval(function () {
+      var expected = Math.max(state.currentSceneMs * 3, 60000);
+      var idle = Date.now() - state.lastAdvance;
+      if (idle < expected) return;
+      VhfDiagnostics.error(
+        new Error("no scene change in " + Math.round(idle / 1000) + "s"),
+        "watchdog"
+      );
+      location.reload();
+    }, WATCHDOG_INTERVAL_MS);
+  }
+
   var currentLayerIndex = 0;
 
   function showLayer(node) {
@@ -150,6 +264,11 @@
   }
 
   function runLoop(data) {
+    // Before any scene renders: event times must never be formatted in the
+    // television's own idea of local time. See scenes.js setTimeZone.
+    VhfScenes.setTimeZone(data.settings && data.settings.timezone);
+    startVersionPoll(data.settings);
+
     var items = activeItems(data.playlist);
     if (items.length === 0) {
       log("playlist has no enabled items");
@@ -161,6 +280,9 @@
     var upcoming = null; // a scene already built and warmed, ready to show
     var consecutiveSkips = 0;
     var firstPaint = true;
+    // Shared with the watchdog, which reads it from outside the loop.
+    var state = { lastAdvance: Date.now(), currentSceneMs: DEFAULT_DURATION_SECONDS * 1000 };
+    startWatchdog(state);
 
     function nextItem() {
       var item = items[index % items.length];
@@ -209,8 +331,14 @@
       function scheduleNext(ms) {
         if (scheduled) return;
         scheduled = true;
+        state.lastAdvance = Date.now();
+        state.currentSceneMs = ms || DEFAULT_DURATION_SECONDS * 1000;
         window.setTimeout(advance, ms);
       }
+
+      // A scene boundary is the only invisible moment to reload, and this is
+      // it — before any work for the next scene has been done.
+      if (applyReloadIfPending()) return;
 
       var ready;
       try {
@@ -288,7 +416,7 @@
     loadContent()
       .then(runLoop)
       .catch(function (err) {
-        console.error("[VHF] failed to load content", err);
+        VhfDiagnostics.error(err, "content load");
         log("failed to load content: " + err.message);
         showLayer(
           VhfScenes.renderError(

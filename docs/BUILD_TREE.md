@@ -74,56 +74,104 @@ that bought and what it cost. Kept for the record:
 
 **Ship gate:** the display is on the wall and running.
 
-### M1 — The page survives being left alone *(the heart of this plan)*
+### M1 — The page survives being left alone  *(code complete Sept 18, 2026; ship gate pending)*
 
-The page has two gaps that only show up after it has been running a while — neither is visible in
-a five-minute preview:
+The two gaps this milestone existed to close, both of which only showed up after the page had
+been running a while, and neither of which is visible in a five-minute preview:
 
-- **`engine.js` loads content once at startup and then loops forever.** A page opened Monday is
-  still showing Monday's events on Friday. With no native poller, nothing ever updates it.
-- **There is no Service Worker, so `content-source.js` caching doesn't actually buy offline.**
-  It caches the JSON, but if the browser is closed and reopened while the network is down,
-  `index.html`, the CSS and the JS can't load at all and the page is blank. The cached JSON is
-  unreachable behind a shell that never boots.
+- **`engine.js` loaded content once at startup and then looped forever.** A page opened Monday was
+  still showing Monday's events on Friday. With no native poller, nothing ever updated it.
+- **There was no Service Worker, so `content-source.js` caching didn't actually buy offline.**
+  It cached the JSON, but if the browser was closed and reopened while the network was down,
+  `index.html`, the CSS and the JS couldn't load at all and the page was blank. The cached JSON
+  was unreachable behind a shell that never booted.
 
-Fixing these is most of what's left.
+Both are now closed, along with three failures found while closing them: fonts loaded from a
+third-party host, event times formatted in the television's own idea of local time, and no way to
+tell a dead loop from a quiet one. **What is not done is the ship gate** — everything below was
+verified on a desktop browser and in tests; none of it has run for a week on the actual television,
+which is the only thing that can close this milestone. See M3.
 
-- [ ] `web/sw.js` — cache the app shell (HTML/CSS/JS), the content JSON, **and the photos**.
-      Gallery images are cross-origin (Squarespace CDN), so they cache as opaque `no-cors`
-      responses: they render fine, they just can't be inspected and they cost more quota. Cap the
-      image cache and evict oldest. **This closes the photo tradeoff recorded in §6 without any
-      native code** — authoring still pastes gallery URLs, the display still runs with the network
-      down.
-- [ ] **self-host the fonts.** `index.html` pulls Epilogue and Work Sans from Google Fonts. Offline
-      that silently falls back to system fonts and the display visibly stops looking like VHF.
-- [ ] **version poll** — re-fetch `content/version.json` on `syncIntervalMinutes`; when it changes,
-      reload at a scene boundary so the swap is invisible. The manifest already exists and already
-      carries a timestamp; nothing new to publish.
-- [~] **watchdog** — `window.onerror` and `unhandledrejection` handlers, a stall detector (no scene
-      advance in 3× the expected duration), and a periodic full reload (every few hours, at a
-      crossfade) to clear any slow leak. A `setTimeout` chain running for weeks is the part most
-      likely to quietly drift or die.
-      *Partly done (Sept 18).* `engine.js` now guarantees the loop stays armed: exactly one
-      reschedule per tick, armed before anything that can throw, plus a backstop timer if the
-      scene never resolves. That closes the case where one thrown scene ended the loop
-      permanently — verified by fault injection against the pre-fix build, which froze on a
-      single throw and stayed frozen after the fault was removed. **Still missing: the global
-      error handlers, a stall detector that can see the loop dying some *other* way, and the
-      periodic reload.** The loop can now only be stopped from outside itself, which is exactly
-      what a stall detector is for.
-- [ ] `web/js/diagnostics.js` — `?diag=1` overlay: uptime, last successful sync, content version,
-      cache hit/miss, last error. The `#diag` element and the `?diag=1` switch already exist in
-      `index.html` and `engine.js`; this makes them useful.
-- [ ] **pin the display timezone.** `events.json` stores UTC; `scenes.js` formats with
-      `getHours()`, i.e. whatever the television believes local time is. If the TV's timezone is
-      wrong or resets, every event time on the display is wrong by a fixed offset and a
-      late-evening event lands on the wrong day — with no visible symptom, because nobody checks
-      a television's clock settings. Format through `toLocaleTimeString` with an explicit
-      `America/New_York`, read from a new `timezone` key in `settings.json` rather than
-      hardcoded. Fold the `Intl` timezone support check into the compat check below.
-- [ ] **browser compat check** against whatever M0 picks — Service Worker, Cache Storage, ES5-vs-ES6
-      in `scenes.js`, CSS custom properties. Silk on Fire OS 7 is an older Chromium than the dev
-      machine. Cheap to check once, expensive to discover in week three.
+- [x] `web/sw.js` — caches the app shell (HTML/CSS/JS/fonts) and the images. **Not** the content
+      JSON: `content-source.js` already owns that policy, and version.json must never be served
+      stale or the display could never learn it is out of date, so the worker passes
+      `content/*.json` straight through. **This closes the photo tradeoff recorded in §6 without
+      any native code** — authoring still pastes gallery URLs, the display still runs with the
+      network down.
+
+      Two image caches, not one, and the reason is a bug that was nearly shipped: the brand mark
+      and the curated artwork are local and appear on almost every scene, while the gallery photos
+      are cross-origin, opaque and effectively unbounded. Sharing one oldest-first cache between
+      them meant the logo — cached first, therefore evicted first — would be thrown away to keep a
+      photo shown once an hour. Local artwork now has its own unbounded cache; only the remote
+      pool is capped.
+
+      The cap is 60, far below the 120-photo pool, because opaque cross-origin responses are
+      charged against the storage quota at a heavily padded size rather than their real one, and a
+      quota error takes the *shell* cache down with it. That padding, plus serving 2500px files to
+      a 1920px panel, is the live argument for the publish-time photo mirror in §1a.
+
+      The precache list is generated by `build-site.mjs` rather than hand-written, and the cache
+      name is build-stamped: a hand-maintained precache list goes stale silently, and a cache-first
+      worker with a fixed cache name is a display that can never be updated again.
+- [x] **self-host the fonts.** `index.html` pulled Epilogue and Work Sans from Google Fonts;
+      offline that silently fell back to system fonts and the display visibly stopped looking like
+      VHF — a failure nobody would report as an outage. Both are now in `web/fonts/` as the
+      variable-font woff2 files (one file per family per subset, spanning the whole weight axis),
+      declared in `web/css/fonts.css`. Both faces are SIL Open Font License. This is also what
+      makes the two-hosts invariant in §3 true rather than aspirational.
+- [x] **version poll** — `engine.js` re-fetches `content/version.json` on `syncIntervalMinutes`
+      and reloads at a scene boundary when it changes, so the swap is invisible. Verified end to
+      end against a running display: bumping the manifest logged `reload queued (content version
+      N); will apply at the next scene boundary`, then the reload, and the page came back on the
+      new version with uptime reset.
+
+      One honest limit: content is re-read on reload, but changed *code* can take a second reload,
+      because the Service Worker serves the shell from cache while fetching the new build behind
+      it. That is the right trade for a display — booting instantly from cache matters more than
+      picking up a CSS change on the first try.
+- [x] **watchdog** — now all three layers.
+      *(Sept 18, first pass.)* `engine.js` guarantees the loop stays armed: exactly one reschedule
+      per tick, armed before anything that can throw, plus a backstop timer if the scene never
+      resolves. That closed the case where one thrown scene ended the loop permanently — verified
+      by fault injection against the pre-fix build, which froze on a single throw and stayed frozen
+      after the fault was removed.
+      *(Sept 18, second pass.)* Global `error` and `unhandledrejection` handlers in
+      `diagnostics.js`, installed before any other script loads so nothing can throw ahead of them.
+      A stall detector outside the loop watching the one number that proves the display is alive —
+      when a scene last changed — which reloads the page if nothing has advanced in several times
+      the current dwell. And a periodic reload every six hours at a scene boundary: nothing is
+      known to leak, which is exactly why it is there.
+      **The limit worth writing down:** this catches a dead loop in a live page. A WebView that has
+      crashed outright takes the timer with it, and that case belongs to the native shell's own
+      watchdog (§5). Both layers are needed; neither covers the other.
+- [x] `web/js/diagnostics.js` — `?diag=1` overlay: uptime, content version, last sync, Service
+      Worker state, cache hit/miss, failed images, error count, current scene, last error. Without
+      the switch it still records everything and simply draws nothing, because an error legible to
+      a viewer is a bug (§3); the recording is what the stall detector and anyone reading the
+      console actually use. Uptime is the number that earns its place: it is how you tell a display
+      that has been quietly restarting all night from one that has genuinely been up since Friday.
+- [x] **pin the display timezone.** `scenes.js` formatted with `getHours()`/`getDay()` — whatever
+      the television believed local time was. It now formats through `toLocaleTimeString` /
+      `toLocaleDateString` with an explicit zone read from `timezone` in `settings.json`, handed
+      over by the engine before the first scene renders, and the `Intl` support check is in
+      `compat.js`.
+
+      `timezone` is **required** by `validate-content.mjs`, not defaulted. The whole point is that
+      the absence of a zone is invisible on screen: the times are simply wrong by a fixed offset.
+      A default applied at render time would have recreated the bug quietly, so the absence is a
+      build error instead.
+
+      Measured on the real events: a 9:30 PM Wednesday event renders as "Wed, Sep 23 9:30 PM"
+      pinned, and would have rendered as "Thu, Sep 24 1:30 AM" — the wrong day — on a television
+      whose clock had reset to UTC.
+- [x] **browser compat check** — `web/js/compat.js` checks Promise, fetch, Service Worker, Cache
+      Storage, CSS custom properties, `object-fit` and `Intl` time-zone support at startup, records
+      the result for the overlay and logs anything missing. It never blocks: refusing to start
+      would replace a degraded display with no display at all. Every one of these degrades
+      *silently* when absent, which is the only reason the check is worth having.
+      **Still owed on the device:** running it once on the actual Fire OS 7 WebView. Everything
+      here has only been seen passing on a desktop Chromium.
 - [x] **image preloading** (Sept 18 — not in the original plan, found in review). Scenes set
       `img.src` and went straight into the crossfade, so the fade revealed an empty frame while a
       2500px gallery photo downloaded, and a dead URL rendered as a blank rectangle for the full
@@ -134,8 +182,19 @@ Fixing these is most of what's left.
       **Complementary to `sw.js`, not a substitute** — preloading warms an image seconds ahead
       within a session; the Service Worker is what survives a restart.
 
-**Ship gate:** pull the router. Close the browser. Reopen it. The display still plays, photos
-included. Leave it a week; it's showing this week's events.
+**Ship gate — not yet met.** Pull the router. Close the browser. Reopen it. The display still
+plays, photos included. Leave it a week; it's showing this week's events.
+
+What has been verified so far, and how, so the gap is honest:
+
+- The offline-restart path is covered by `tests/sw.test.mjs`, which runs the worker's fetch handler
+  directly with a `fetch` that fails the way a dead network fails, and asserts a navigation is
+  answered from the cached shell. Mutation-checked: disabling the navigate branch fails that test.
+  This exists because the browser preview *cannot* be taken offline — stopping the dev server makes
+  the pane refuse the navigation before the page is ever reached — and by the time this fails on a
+  television it is a blank screen in an empty building.
+- The version poll, the fonts, the compat check and the overlay were verified in a live browser.
+- **Nothing has been verified on the Fire TV, and nothing has run for a week.** That is M3.
 
 ### M2 — Repeatable publish  *(core landed Sept 18, 2026)*
 
@@ -319,9 +378,9 @@ VHF_TV/
 │   └── RUNBOOK.md                       [ ]  M3  written *after* the soak, not before
 │
 ├── content/                             <- source of truth, hand-edited or generated
-│   ├── settings.json                    [x]  syncIntervalMinutes, publishUrl, gallery + calendar
-│   │                                         config; `timezone` (M1) and `hours` for quiet
-│   │                                         hours (M4) both still missing
+│   ├── settings.json                    [x]  syncIntervalMinutes, publishUrl, timezone, gallery +
+│   │                                         calendar config; `hours` for quiet hours (M4) is
+│   │                                         the one key still missing
 │   ├── playlist.json                    [x]  ordered scene list; photo `src` is a direct gallery
 │   │                                         URL by decision (§6)
 │   ├── announcements/announcements.json [x]  dated entries with activation + expiry
@@ -334,28 +393,28 @@ VHF_TV/
 │       └── instagram.json               [ ]  M4
 │
 ├── web/                                 <- the product now, not a preview of one
-│   ├── index.html                       [x]  M1: register sw.js, self-hosted font links
-│   ├── sw.js                            [ ]  M1  shell + JSON + image caching — the offline story
-│   ├── fonts/                           [ ]  M1  self-hosted Epilogue + Work Sans
+│   ├── index.html                       [x]  registers sw.js, loads self-hosted fonts
+│   ├── sw.js                            [x]  shell + image caching — the offline story. Content
+│   │                                         JSON passes through to content-source.js.
+│   ├── fonts/                           [x]  self-hosted Epilogue + Work Sans (OFL, variable)
 │   ├── css/
 │   │   ├── scene.css                    [x]  stage, layers, crossfade, shared scene chrome, photo
 │   │   │                                     wash behind program/workshop scenes (§6)
 │   │   └── theme.css                    [x]  VHF colours/type as CSS custom properties
 │   └── js/
-│       ├── engine.js                    [x]  loop-liveness guarantee + image preloading done;
-│       │                                     M1 still owes version poll, global error handlers,
+│       ├── engine.js                    [x]  loop liveness, image preloading, version poll,
 │       │                                     stall detector, periodic reload
 │       ├── scenes.js                    [x]  all renderers in one file — split only if it hurts (§4)
-│       ├── content-source.js            [x]  network-first/cache-fallback for content JSON.
-│       │                                     M1: hand the image policy to sw.js; the header comment
-│       │                                     still points at ContentCache.kt and needs updating
+│       ├── content-source.js            [x]  network-first/cache-fallback for content JSON; the
+│       │                                     single decision point for content, images excluded
 │       ├── scale-to-fit.js              [x]  1080p design space -> any panel
-│       └── diagnostics.js               [ ]  M1
+│       ├── compat.js                    [x]  startup capability check; never blocks
+│       └── diagnostics.js               [x]  ?diag=1 overlay + the global error handlers
 │
 ├── scripts/
 │   ├── build-site.mjs                   [x]  validate content/, copy web/ + the PUBLISHED_CONTENT
-│   │                                         subset of content/ -> dist/
-│   │                                         M1: sw.js needs a build-stamped cache version
+│   │                                         subset of content/ -> dist/, stamp sw.js with the
+│   │                                         build version and a generated precache list
 │   ├── validate-content.mjs             [x]  schema validation, used by build-site + tests
 │   ├── sync-sources.mjs                 [x]  runs the gallery and calendar adapters
 │   ├── publish.mjs                      [x]  the only supported publish path; owns the transport
@@ -371,7 +430,10 @@ VHF_TV/
 │   └── content/version.json             [x]  manifest the display polls (M1)
 │
 ├── tests/
+│   ├── helpers/build-fixture.mjs        [x]  throwaway repo copy for VHF_BUILD_ROOT builds
 │   ├── content-schema.test.mjs          [x]  every content file matches its schema
+│   ├── sw.test.mjs                      [x]  the offline-restart guarantee, run against the
+│   │                                         stamped sw.js a real build produces
 │   ├── engine.test.mjs                  [ ]  M2  still unwritten — the one M2 gap left
 │   ├── publish.test.mjs                 [x]  bad content never reaches dist/; published set
 │   │                                         matches what engine.js fetches

@@ -101,6 +101,59 @@ async function unpublishedUnder(dir, prefix) {
   return out;
 }
 
+/*
+ * Rewrites the two stamped lines in dist/sw.js.
+ *
+ * BUILD names the shell cache, so a publish invalidates the previous build's
+ * HTML/CSS/JS rather than serving it forever — a cache-first Service Worker
+ * with a fixed cache name is a display that can never be updated again.
+ *
+ * SHELL is generated rather than hand-listed for the same reason
+ * PUBLISHED_CONTENT is checked by a test: a precache list maintained by hand
+ * goes stale silently, and the symptom appears weeks later as a display that
+ * boots offline into a page missing its stylesheet.
+ */
+async function stampServiceWorker(distDir, buildVersion) {
+  const swPath = path.join(distDir, "sw.js");
+  let source;
+  try {
+    source = await fs.readFile(swPath, "utf8");
+  } catch {
+    console.log("[build-site] no sw.js to stamp");
+    return;
+  }
+
+  const shell = ["./", ...(await shellFiles(distDir, ""))];
+  const stamped = source
+    .replace(/^var BUILD = .*$/m, `var BUILD = ${JSON.stringify(String(buildVersion))};`)
+    .replace(/^var SHELL = .*$/m, `var SHELL = ${JSON.stringify(shell)};`);
+
+  if (stamped === source) {
+    throw new Error("sw.js has no BUILD/SHELL lines to stamp — did its header change?");
+  }
+  await fs.writeFile(swPath, stamped);
+  console.log(`[build-site] stamped sw.js: build ${buildVersion}, ${shell.length} shell files`);
+}
+
+/*
+ * The app shell: everything the page needs to boot, and nothing that only
+ * matters once it has. Content JSON is excluded because content-source.js
+ * owns it; photos and artwork are excluded because they are cached on demand
+ * at their real cost rather than all 22MB of them at install.
+ */
+async function shellFiles(distDir, prefix) {
+  const skip = new Set(["content", "sw.js"]);
+  const entries = await fs.readdir(path.join(distDir, prefix), { withFileTypes: true });
+  const out = [];
+  for (const entry of entries) {
+    const rel = prefix ? prefix + "/" + entry.name : entry.name;
+    if (skip.has(rel)) continue;
+    if (entry.isDirectory()) out.push(...(await shellFiles(distDir, rel)));
+    else out.push(rel);
+  }
+  return out;
+}
+
 async function copyDir(src, dest) {
   await fs.mkdir(dest, { recursive: true });
   const entries = await fs.readdir(src, { withFileTypes: true });
@@ -140,6 +193,8 @@ async function main() {
     version: Date.now(),
     builtAt: new Date().toISOString()
   };
+
+  await stampServiceWorker(DIST_DIR, version.version);
   await fs.writeFile(
     path.join(DIST_DIR, "content", "version.json"),
     JSON.stringify(version, null, 2) + "\n"

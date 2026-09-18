@@ -39,6 +39,18 @@ function isValidUrl(v) {
   }
 }
 
+function isValidTimeZone(v) {
+  if (typeof v !== "string" || v.length === 0) return false;
+  try {
+    // Intl throws RangeError on an unknown zone, which is the only reliable
+    // way to tell "America/New_York" from "America/New York" or a typo.
+    new Intl.DateTimeFormat("en-US", { timeZone: v });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 async function readJson(filePath) {
   const raw = await fs.readFile(filePath, "utf8");
   return JSON.parse(raw); // throws with a useful message on bad JSON
@@ -91,6 +103,16 @@ function validateSettings(doc, errors) {
   }
   if (!isValidUrl(doc.publishUrl)) {
     errors.push(`${label}: "publishUrl" must be a valid absolute URL`);
+  }
+  // Required, not optional: events.json stores UTC, and without an explicit
+  // zone the display formats every event time in whatever the television
+  // believes local time is. That failure is invisible on screen — the times
+  // are simply wrong by a fixed offset — so the absence of this key has to be
+  // an error at build time rather than a default applied at render time.
+  if (typeof doc.timezone !== "string" || !isValidTimeZone(doc.timezone)) {
+    errors.push(
+      `${label}: "timezone" must be a valid IANA time zone name (e.g. "America/New_York")`
+    );
   }
   if (doc.gallery !== undefined) {
     if (!isPlainObject(doc.gallery)) {

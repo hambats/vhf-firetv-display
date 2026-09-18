@@ -4,14 +4,13 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=1920, height=1080, user-scalable=no" />
 <title>VHF Display — Viewer</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <!-- Same families the live veteranshealingfarm.org site loads: Epilogue for
-     headings, Work Sans for body text. -->
-<link
-  rel="stylesheet"
-  href="https://fonts.googleapis.com/css2?family=Epilogue:wght@400;600;700&family=Work+Sans:wght@400;500;600&display=swap"
-/>
+     headings, Work Sans for body text. Self-hosted, not pulled from Google
+     Fonts — a remote font link fails silently offline and the television
+     quietly stops looking like VHF. See css/fonts.css. -->
+<link rel="preload" href="fonts/epilogue-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="fonts/worksans-latin.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="css/fonts.css" />
 <link rel="stylesheet" href="css/theme.css" />
 <link rel="stylesheet" href="css/scene.css" />
 </head>
@@ -23,9 +22,36 @@
     </div>
   </div>
   <div id="diag" class="diag" hidden></div>
+  <script src="js/diagnostics.js"></script>
+  <script src="js/compat.js"></script>
   <script src="js/scenes.js"></script>
   <script src="js/scale-to-fit.js"></script>
   <script src="js/content-source.js"></script>
   <script src="js/engine.js"></script>
+  <script>
+    /*
+     * The Service Worker is what makes the display survive a restart with the
+     * network down: without it the cached JSON is unreachable behind an app
+     * shell that can't load. Registration failing is not fatal — the page
+     * still runs, just without offline resilience — so it is recorded for the
+     * diagnostics overlay rather than thrown.
+     */
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", function () {
+        navigator.serviceWorker.register("sw.js").then(
+          function (reg) {
+            VhfDiagnostics.set("sw", "registered");
+            if (reg.waiting) VhfDiagnostics.set("sw", "registered (update waiting)");
+          },
+          function (err) {
+            VhfDiagnostics.set("sw", "FAILED: " + err.message);
+            console.error("[VHF] service worker registration failed", err);
+          }
+        );
+      });
+    } else {
+      VhfDiagnostics.set("sw", "unsupported");
+    }
+  </script>
 </body>
 </html>

@@ -9,10 +9,12 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the architecture rationale 
 
 **Status:** the scene engine, playlist, content schema and validator, local admin editor, and the
 gallery and calendar adapters are all built, and the site is live on the television (M0 done).
-`npm run publish` is the one supported way to publish (M2). Current work is M1: making the page
-survive being left alone for weeks — offline caching via a Service Worker, content refresh, crash
-recovery. **The Fire TV app under `app/` is active again** as a thin WebView appliance shell; the
-scene, caching and refresh logic stays in `web/`. See [docs/BUILD_TREE.md](docs/BUILD_TREE.md) §5.
+`npm run publish` is the one supported way to publish (M2). The survival work is code complete
+(M1): a Service Worker so the display boots offline, self-hosted fonts, a content version poll, a
+stall watchdog, a `?diag=1` overlay, and event times pinned to an explicit time zone. **What is
+left is proof** — none of it has run for a week on the actual television, which is M3.
+**The Fire TV app under `app/` is active again** as a thin WebView appliance shell; the scene,
+caching and refresh logic stays in `web/`. See [docs/BUILD_TREE.md](docs/BUILD_TREE.md) §5.
 
 ## Project layout
 
@@ -37,9 +39,10 @@ No Fire TV or Android tooling needed.
 npm run preview
 ```
 
-This validates every JSON file under `content/`, copies `web/` and `content/` into `dist/`, and
-serves `dist/` at `http://localhost:8080`. Add `?diag=1` to the URL for an on-screen debug line
-naming the current scene.
+This validates every JSON file under `content/`, copies `web/` and the published subset of
+`content/` into `dist/`, and serves `dist/` at `http://localhost:8080`. Add `?diag=1` for the
+diagnostics overlay: uptime, content version, last sync, Service Worker state, cache hits, failed
+images, error count and the current scene.
 
 **Live site:** https://hambats.github.io/vhf-firetv-display (GitHub Pages, deployed by
 [.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml) on every push to `main`).
