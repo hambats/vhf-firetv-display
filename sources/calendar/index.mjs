@@ -33,6 +33,7 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const OUTPUT_PATH = path.join(ROOT, "content", "generated", "events.json");
 const EXCLUDE_PATH = path.join(ROOT, "content", "events-exclude.json");
 const SETTINGS_PATH = path.join(ROOT, "content", "settings.json");
+const TIME_OVERRIDES_PATH = path.join(ROOT, "content", "events-time-overrides.json");
 
 const DEFAULT_CALENDAR_ID = "vhf2023calendar@gmail.com";
 const DEFAULT_WINDOW_DAYS = 120;
@@ -59,6 +60,31 @@ async function loadExcludeList() {
   } catch {
     return [];
   }
+}
+
+// Hand-maintained corrections for events whose source calendar entry has a
+// wrong time (confirmed against the farm's actual registration system).
+// Keyed by the same id the sync generates, so a fix survives every re-sync
+// until the underlying Google Calendar entry itself gets corrected — at
+// which point the override becomes a no-op and should be deleted.
+async function loadTimeOverrides() {
+  try {
+    const raw = await fs.readFile(TIME_OVERRIDES_PATH, "utf8");
+    const doc = JSON.parse(raw);
+    return doc.overrides && typeof doc.overrides === "object" ? doc.overrides : {};
+  } catch {
+    return {};
+  }
+}
+
+function applyTimeOverride(event, overrides) {
+  const o = overrides[event.id];
+  if (!o) return event;
+  return {
+    ...event,
+    start: o.start || event.start,
+    end: o.end !== undefined ? o.end : event.end
+  };
 }
 
 function isExcluded(title, excludeTerms) {
@@ -99,7 +125,10 @@ function stripHtml(text) {
     // to "" runs adjacent words together ("toprovide"); a space plus the later
     // whitespace collapse keeps them apart regardless of which tag it was.
     .replace(/<[^>]+>/g, " ")
-    .replace(/&#\d+;|&[a-z]+;/gi, (m) => HTML_ENTITIES[m.toLowerCase()] || m);
+    .replace(/&#\d+;|&[a-z]+;/gi, (m) => HTML_ENTITIES[m.toLowerCase()] || m)
+    // Literal "**bold**" markdown from a form field prints as raw asterisks
+    // on screen — there's no renderer here to turn it into actual emphasis.
+    .replace(/\*\*/g, "");
 }
 
 // A raw URL (frequently a bare `google.com/url?q=...regpack...` redirect) is
@@ -107,6 +136,27 @@ function stripHtml(text) {
 // into it.
 function stripUrls(text) {
   return String(text).replace(/https?:\/\/\S+/g, " ");
+}
+
+// Sentence-level admin boilerplate that shows up verbatim in some calendar
+// descriptions — written for whoever is filling out a registration form, not
+// for someone watching an unattended display. Matched and removed whole
+// (not just flagged) so it never reaches the screen; see the "Admin text
+// leaking onto the public screen" review, 2026-09-18.
+const ADMIN_PHRASE_PATTERNS = [
+  // "All participants need to register through the regpack system and pay
+  // the $1 system charge." (and minor wording variants of the same line)
+  /all participants need to register[^.]*\.\s*/gi,
+  /register(?:ing)? through the regpack system[^.]*\.?\s*/gi,
+  // The shouted cancellation / no-show fee policy, asterisk-wrapped for bold
+  // in the source form field.
+  /\*\*\s*cancellations must be done[^*]*\*\*\s*/gi,
+  // A note meant for the instructor processing sign-ups, not the viewer.
+  /please provide me with[^.]*\.\s*/gi
+];
+
+function stripAdminBoilerplate(text) {
+  return ADMIN_PHRASE_PATTERNS.reduce((acc, re) => acc.replace(re, " "), String(text));
 }
 
 // Prefers cutting at a sentence boundary so the fragment reads as a complete
@@ -122,7 +172,9 @@ function truncateText(text, maxLen) {
 
 function cleanText(text, maxLen) {
   if (!text) return undefined;
-  const collapsed = stripUrls(stripHtml(text)).replace(/\s+/g, " ").trim();
+  // Admin boilerplate runs first, while "**cancellations...**" still has its
+  // asterisks to match on — stripHtml() below removes any that survive.
+  const collapsed = stripUrls(stripHtml(stripAdminBoilerplate(text))).replace(/\s+/g, " ").trim();
   if (collapsed.length === 0) return undefined;
   return truncateText(collapsed, maxLen);
 }
@@ -178,6 +230,7 @@ function expandEvent(evt, windowStart, windowEnd) {
 async function main() {
   const { calendarId, windowDays } = await loadCalendarSettings();
   const excludeTerms = await loadExcludeList();
+  const timeOverrides = await loadTimeOverrides();
   const icsUrl = `https://calendar.google.com/calendar/ical/${encodeURIComponent(calendarId)}/public/basic.ics`;
 
   console.log(`[calendar] fetching ${icsUrl}`);
@@ -214,7 +267,7 @@ async function main() {
       if (description && description.toLowerCase().startsWith(String(title).toLowerCase())) {
         description = description.slice(title.length).replace(/^[\s.:—-]+/, "").trim() || undefined;
       }
-      events.push({
+      events.push(applyTimeOverride({
         id,
         title: cleanText(title, 120),
         start: occ.start.toISOString(),
@@ -222,7 +275,7 @@ async function main() {
         location: cleanLocation(occ.source.location),
         description,
         registrationUrl: firstUrl(occ.source.description)
-      });
+      }, timeOverrides));
     }
   }
 

@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "note": "Hand-maintained time corrections confirmed against the farm's Regpack registration listing on 2026-09-18, flagged to Megan (veteranshealingfarm@gmail.com) the same day. The Google Calendar entries carry a stale/wrong start time for these pottery sessions. Each override is a no-op once the source calendar entry is fixed — delete the entry here when that happens rather than leaving a redundant override in place.",
+  "overrides": {
+    "open-studio-pottery-with-sophia-2026-10-07": { "start": "2026-10-07T17:00:00.000Z", "end": "2026-10-07T19:00:00.000Z" },
+    "open-studio-pottery-with-sophia-2026-10-14": { "start": "2026-10-14T17:00:00.000Z", "end": "2026-10-14T19:00:00.000Z" },
+    "open-studio-pottery-with-sophia-2026-10-21": { "start": "2026-10-21T17:00:00.000Z", "end": "2026-10-21T19:00:00.000Z" },
+    "open-studio-pottery-with-sophia-2026-10-28": { "start": "2026-10-28T17:00:00.000Z", "end": "2026-10-28T19:00:00.000Z" },
+    "pottery-create-your-ornaments-2-part-series-with-sophia-2026-11-04": { "start": "2026-11-04T18:00:00.000Z", "end": "2026-11-04T20:00:00.000Z" },
+    "pottery-create-your-ornaments-2-part-series-with-sophia-2026-11-11": { "start": "2026-11-11T18:00:00.000Z", "end": "2026-11-11T20:00:00.000Z" }
+  }
+}

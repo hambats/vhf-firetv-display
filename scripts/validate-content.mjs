@@ -14,6 +14,13 @@ import { fileURLToPath } from "node:url";
 
 const SCENE_TYPES = ["photo", "photo-pool", "event", "event-pool", "events", "information", "announcement", "custom"];
 
+// Registration/billing boilerplate that has leaked from the calendar source
+// into public descriptions before (regpack sign-up instructions, the
+// all-caps no-show fee warning). sources/calendar/index.mjs strips these at
+// sync time; this is the safety net that fails the build if one slips back
+// in through a future calendar edit worded slightly differently.
+const ADMIN_PHRASE_RE = /regpack system|system charge|cancellations must be done|please provide me with/i;
+
 function isPlainObject(v) {
   return typeof v === "object" && v !== null && !Array.isArray(v);
 }
@@ -129,6 +136,9 @@ function validateEvents(doc, errors) {
     if (typeof evt.title !== "string" || evt.title.length === 0) errors.push(`${tag}: "title" is required`);
     if (typeof evt.description === "string" && /https?:\/\//i.test(evt.description)) {
       errors.push(`${tag}: "description" must not contain a raw URL (unreadable on a television)`);
+    }
+    if (typeof evt.description === "string" && ADMIN_PHRASE_RE.test(evt.description)) {
+      errors.push(`${tag}: "description" contains internal registration/billing text meant for a form, not a public display (see docs — admin leakage review, 2026-09-18)`);
     }
     if (!isIsoDate(evt.start)) errors.push(`${tag}: "start" must be a parseable ISO date`);
     if (evt.end !== undefined) {
