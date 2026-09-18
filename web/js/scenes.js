@@ -17,21 +17,50 @@ var VhfScenes = (function () {
     return node;
   }
 
+  // Every <img> declares whether it carries the scene or merely decorates
+  // it. The engine preloads both, but only a "content" image failing makes
+  // a scene worth skipping — a photo scene with no photo is an empty
+  // frame, whereas a missing watermark or corner mark is invisible.
+  function img(className, src, role) {
+    var node = el("img", className);
+    node.src = src;
+    node.alt = "";
+    node.setAttribute("data-vhf-role", role);
+    return node;
+  }
+
+  // URLs that definitively failed to load during this run: a 404, a
+  // gallery object deleted after gallery.json was published, a CDN that
+  // refused the request. The engine reports them here so a dead photo is
+  // drawn once and then never again — without this, one dead URL in the
+  // pool costs a skipped scene every time the bag comes back around to it.
+  var failedSrc = {};
+
+  function markImageFailed(src) {
+    if (src) failedSrc[src] = true;
+  }
+
+  function isUsablePhoto(photo) {
+    return !!(photo && photo.src && !failedSrc[photo.src]);
+  }
+
+  function usablePhotos(photos) {
+    var out = [];
+    for (var i = 0; i < photos.length; i++) {
+      if (isUsablePhoto(photos[i])) out.push(photos[i]);
+    }
+    return out;
+  }
+
   function brand(container) {
-    var img = el("img", "scene__brand");
-    img.src = "content/artwork/brand/vhf-logo.webp";
-    img.alt = "Veterans Healing Farm";
-    container.appendChild(img);
+    container.appendChild(img("scene__brand", "content/artwork/brand/vhf-logo.webp", "decoration"));
   }
 
   // Full logo + wordmark at ~280px, used on the two scenes with room to
   // spare and the highest chance of being read (D1.3): the opening Welcome
   // scene and the announcement scene.
   function lockup(container) {
-    var img = el("img", "scene__lockup");
-    img.src = "content/artwork/brand/vhf-logo.webp";
-    img.alt = "Veterans Healing Farm";
-    container.appendChild(img);
+    container.appendChild(img("scene__lockup", "content/artwork/brand/vhf-logo.webp", "decoration"));
   }
 
   // A faint (~16%) full-bleed photo behind text content — a watermark, not a
@@ -40,13 +69,10 @@ var VhfScenes = (function () {
   // nothing if the gallery pool isn't loaded yet — this is decoration, never
   // something a scene should fail over.
   function appendWash(scene, data) {
-    var photos = (data && data.gallery && data.gallery.photos) || [];
+    var photos = usablePhotos((data && data.gallery && data.gallery.photos) || []);
     if (photos.length === 0) return;
     var photo = photos[Math.floor(Math.random() * photos.length)];
-    var wash = el("img", "scene__wash");
-    wash.src = photo.src;
-    wash.alt = "";
-    scene.appendChild(wash);
+    scene.appendChild(img("scene__wash", photo.src, "decoration"));
   }
 
   function formatEventDate(startIso) {
@@ -135,10 +161,19 @@ var VhfScenes = (function () {
   var photoPoolShuffled = [];
 
   function drawPhotos(photos, count) {
+    // Refill from the live pool minus anything known dead, so a failed URL
+    // leaves the rotation permanently instead of returning every cycle.
+    var pool = usablePhotos(photos);
     var drawn = [];
-    for (var i = 0; i < count && photos.length > 0; i++) {
+    // The bag can still hold entries that died after it was filled, and a
+    // refill mid-draw can hand back one already drawn; both are skipped
+    // rather than shown. Bounded so neither case can spin.
+    var attempts = 0;
+    var maxAttempts = pool.length * 2 + count + 10;
+    while (drawn.length < count && pool.length > 0 && attempts < maxAttempts) {
+      attempts++;
       if (photoPoolShuffled.length === 0) {
-        photoPoolShuffled = photos.slice();
+        photoPoolShuffled = pool.slice();
         for (var j = photoPoolShuffled.length - 1; j > 0; j--) {
           var k = Math.floor(Math.random() * (j + 1));
           var tmp = photoPoolShuffled[j];
@@ -146,7 +181,10 @@ var VhfScenes = (function () {
           photoPoolShuffled[k] = tmp;
         }
       }
-      drawn.push(photoPoolShuffled.pop());
+      var pick = photoPoolShuffled.pop();
+      if (!isUsablePhoto(pick)) continue;
+      if (drawn.indexOf(pick) !== -1) continue;
+      drawn.push(pick);
     }
     return drawn;
   }
@@ -207,15 +245,13 @@ var VhfScenes = (function () {
 
   function buildPhotoScene(src, fit, focus) {
     var scene = el("div", "scene scene--photo");
-    var img = el("img", "scene__photo-img");
-    img.src = src;
-    img.alt = "";
-    img.style.objectFit = fit === "contain" ? "contain" : "cover";
+    var photo = img("scene__photo-img", src, "content");
+    photo.style.objectFit = fit === "contain" ? "contain" : "cover";
     // A generic photo of unknown composition crops slightly better favoring
     // the upper-middle by default (avoids cutting off heads more often than
     // it cuts off feet/ground) than a dead-center crop would.
-    img.style.objectPosition = focus || "center 35%";
-    scene.appendChild(img);
+    photo.style.objectPosition = focus || "center 35%";
+    scene.appendChild(photo);
     scene.appendChild(el("div", "scene__fade scene__fade--subtle"));
     brand(scene);
     return scene;
@@ -234,18 +270,17 @@ var VhfScenes = (function () {
     var count = content.count || 1;
 
     if (count <= 1 || photos.length < count) {
-      var photo = drawPhotos(photos, 1)[0] || photos[Math.floor(Math.random() * photos.length)];
+      var photo = drawPhotos(photos, 1)[0];
+      if (!photo) throw new Error("photo pool has no usable photos left");
       return buildPhotoScene(photo.src, "cover", null);
     }
 
     var picks = drawPhotos(photos, count);
+    if (picks.length === 0) throw new Error("photo pool has no usable photos left");
     var scene = el("div", "scene scene--photo scene--photo-grid scene--photo-grid-" + picks.length);
     picks.forEach(function (p) {
       var cell = el("div", "photo-grid__cell");
-      var img = el("img", "photo-grid__img");
-      img.src = p.src;
-      img.alt = "";
-      cell.appendChild(img);
+      cell.appendChild(img("photo-grid__img", p.src, "content"));
       scene.appendChild(cell);
     });
     scene.appendChild(el("div", "scene__fade scene__fade--subtle"));
@@ -257,10 +292,7 @@ var VhfScenes = (function () {
     var content = item.content || {};
     if (!content.src) throw new Error("custom scene missing content.src");
     var scene = el("div", "scene scene--custom");
-    var img = el("img", "scene__photo-img");
-    img.src = content.src;
-    img.alt = "";
-    scene.appendChild(img);
+    scene.appendChild(img("scene__photo-img", content.src, "content"));
     return scene;
   }
 
@@ -373,6 +405,7 @@ var VhfScenes = (function () {
 
   return {
     render: render,
-    renderError: renderError
+    renderError: renderError,
+    markImageFailed: markImageFailed
   };
 })();
