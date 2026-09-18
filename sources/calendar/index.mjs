@@ -37,17 +37,33 @@ const SETTINGS_PATH = path.join(ROOT, "content", "settings.json");
 const DEFAULT_CALENDAR_ID = "vhf2023calendar@gmail.com";
 const DEFAULT_WINDOW_DAYS = 120;
 
+// The display physically stands at this address, so printing it back is noise.
+// Kept in settings.json rather than hardcoded here; these are the fallback.
+const DEFAULT_VENUE = {
+  name: "Veterans Healing Farm",
+  address: "138 Kimzey Rd, Mills River, NC 28759, USA"
+};
+
 async function loadCalendarSettings() {
   try {
     const raw = await fs.readFile(SETTINGS_PATH, "utf8");
     const settings = JSON.parse(raw);
     const c = settings.calendar || {};
+    const v = c.venue || {};
     return {
       calendarId: c.calendarId || DEFAULT_CALENDAR_ID,
-      windowDays: c.windowDays || DEFAULT_WINDOW_DAYS
+      windowDays: c.windowDays || DEFAULT_WINDOW_DAYS,
+      venue: {
+        name: v.name || DEFAULT_VENUE.name,
+        address: v.address || DEFAULT_VENUE.address
+      }
     };
   } catch {
-    return { calendarId: DEFAULT_CALENDAR_ID, windowDays: DEFAULT_WINDOW_DAYS };
+    return {
+      calendarId: DEFAULT_CALENDAR_ID,
+      windowDays: DEFAULT_WINDOW_DAYS,
+      venue: { ...DEFAULT_VENUE }
+    };
   }
 }
 
@@ -76,12 +92,6 @@ function slugify(text) {
 
 function dateSlug(date) {
   return date.toISOString().slice(0, 10);
-}
-
-function firstUrl(text) {
-  if (!text) return undefined;
-  const match = text.match(/https?:\/\/[^\s"<>]+/);
-  return match ? match[0] : undefined;
 }
 
 const HTML_ENTITIES = {
@@ -127,9 +137,51 @@ function cleanText(text, maxLen) {
   return truncateText(collapsed, maxLen);
 }
 
-function cleanLocation(loc) {
+// Comparison form: case- and punctuation-insensitive, so "138 Kimzey Rd." and
+// "138 kimzey rd" are the same string to us.
+function normalizeForMatch(text) {
+  return String(text).toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+}
+
+// Matches one address component anywhere in the location, tolerating whatever
+// punctuation and spacing the calendar author used between its words.
+function componentPattern(component) {
+  const tokens = normalizeForMatch(component).split(" ").filter(Boolean);
+  if (tokens.length === 0) return null;
+  const escaped = tokens.map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  return new RegExp(`(?<![a-z0-9])${escaped.join("[^a-z0-9]+")}(?![a-z0-9])`, "gi");
+}
+
+// Every synced event carries the farm's own postal address, rendered on a
+// screen standing at that address. Drop it and keep only a sub-location
+// ("Greenhouse", "Pavilion"); with nothing left, omit the line entirely.
+//
+// Off-site locations are left alone — an event at Mills River Park still needs
+// to say so, and dropping the line there would be actively misleading.
+function cleanLocation(loc, venue) {
   if (!loc || loc === "undefined") return undefined;
-  return cleanText(loc, 120);
+
+  const street = String(venue.address).split(",")[0];
+  const normalized = normalizeForMatch(loc);
+  const onSite =
+    normalized.includes(normalizeForMatch(venue.name)) ||
+    normalized.includes(normalizeForMatch(street));
+  if (!onSite) return cleanText(loc, 120);
+
+  // Strip the venue name and each comma-separated piece of its address; what
+  // survives is the sub-location, if the author gave one.
+  const components = [venue.name, ...String(venue.address).split(",")];
+  let remainder = String(loc);
+  for (const component of components) {
+    const pattern = componentPattern(component);
+    if (pattern) remainder = remainder.replace(pattern, " ");
+  }
+  remainder = remainder
+    .replace(/\s+/g, " ")
+    .replace(/(\s*[,;]\s*)+/g, ", ")
+    .replace(/^[\s,;.-]+|[\s,;.-]+$/g, "");
+
+  return remainder.length > 0 ? cleanText(remainder, 120) : undefined;
 }
 
 // Expands a single VEVENT (master or non-recurring) into concrete
@@ -176,7 +228,7 @@ function expandEvent(evt, windowStart, windowEnd) {
 }
 
 async function main() {
-  const { calendarId, windowDays } = await loadCalendarSettings();
+  const { calendarId, windowDays, venue } = await loadCalendarSettings();
   const excludeTerms = await loadExcludeList();
   const icsUrl = `https://calendar.google.com/calendar/ical/${encodeURIComponent(calendarId)}/public/basic.ics`;
 
@@ -219,9 +271,8 @@ async function main() {
         title: cleanText(title, 120),
         start: occ.start.toISOString(),
         end: occ.end ? occ.end.toISOString() : undefined,
-        location: cleanLocation(occ.source.location),
-        description,
-        registrationUrl: firstUrl(occ.source.description)
+        location: cleanLocation(occ.source.location, venue),
+        description
       });
     }
   }
@@ -229,7 +280,7 @@ async function main() {
   events.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
   const output = {
-    version: 3,
+    version: 4,
     source: "google-calendar-ics",
     calendarId,
     generatedAt: new Date().toISOString(),

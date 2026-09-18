@@ -9,10 +9,12 @@
     "preview": "npm run build && npx --yes serve dist -l 8080",
     "validate-content": "node scripts/validate-content.mjs",
     "sync-sources": "node scripts/sync-sources.mjs",
+    "fetch-photos": "node scripts/fetch-photos.mjs",
     "test": "node --test tests/*.test.mjs",
     "admin": "node admin/server.mjs"
   },
   "dependencies": {
-    "node-ical": "^0.27.2"
+    "node-ical": "^0.27.2",
+    "sharp": "^0.35.4"
   }
 }

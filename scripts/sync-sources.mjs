@@ -4,7 +4,8 @@
  * to content/generated/ — this script never touches anything a human hand-
  * edits (playlist.json, settings.json, announcements.json).
  *
- * Currently: gallery and calendar. Instagram is still not started; add it
+ * Currently: gallery (then the photo mirror, which rewrites the pool's `src`
+ * to the local copies) and calendar. Instagram is still not started; add it
  * here once its adapter lands.
  */
 import { fileURLToPath } from "node:url";
@@ -20,6 +21,7 @@ async function run(label, modulePath) {
 
 async function main() {
   await run("gallery", path.join(ROOT, "sources", "gallery", "index.mjs"));
+  await run("photos", path.join(ROOT, "scripts", "fetch-photos.mjs"));
   await run("calendar", path.join(ROOT, "sources", "calendar", "index.mjs"));
   console.log("\n[sync-sources] done. Review the diff in content/generated/ before publishing.");
 }

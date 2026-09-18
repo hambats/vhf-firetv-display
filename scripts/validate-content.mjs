@@ -22,6 +22,10 @@ function isIsoDate(v) {
   return typeof v === "string" && !isNaN(Date.parse(v));
 }
 
+function isSiteRootPath(v) {
+  return typeof v === "string" && v.startsWith("/") && !v.startsWith("//");
+}
+
 function isValidUrl(v) {
   if (typeof v !== "string") return false;
   try {
@@ -99,6 +103,18 @@ function validateSettings(doc, errors) {
       if (g.recencyDecay !== undefined && (typeof g.recencyDecay !== "number" || g.recencyDecay <= 0)) {
         errors.push(`${label}: "gallery.recencyDecay" must be a positive number`);
       }
+      if (g.mirror !== undefined) {
+        if (!isPlainObject(g.mirror)) {
+          errors.push(`${label}: "gallery.mirror" must be an object if present`);
+        } else {
+          for (const key of ["frameWidth", "frameHeight", "maxZoom", "quality"]) {
+            const value = g.mirror[key];
+            if (value !== undefined && (typeof value !== "number" || value <= 0)) {
+              errors.push(`${label}: "gallery.mirror.${key}" must be a positive number`);
+            }
+          }
+        }
+      }
     }
   }
   if (doc.calendar !== undefined) {
@@ -111,6 +127,18 @@ function validateSettings(doc, errors) {
       }
       if (c.windowDays !== undefined && (typeof c.windowDays !== "number" || c.windowDays <= 0)) {
         errors.push(`${label}: "calendar.windowDays" must be a positive number`);
+      }
+      if (c.venue !== undefined) {
+        if (!isPlainObject(c.venue)) {
+          errors.push(`${label}: "calendar.venue" must be an object if present`);
+        } else {
+          for (const key of ["name", "address"]) {
+            const value = c.venue[key];
+            if (value !== undefined && (typeof value !== "string" || value.length === 0)) {
+              errors.push(`${label}: "calendar.venue.${key}" must be a non-empty string`);
+            }
+          }
+        }
       }
     }
   }
@@ -171,7 +199,15 @@ function validateGallery(doc, errors) {
   checkUniqueIds(doc.photos, label, errors);
   for (const p of doc.photos) {
     const tag = `${label} photo "${p.id ?? "?"}"`;
-    if (!isValidUrl(p.src)) errors.push(`${tag}: "src" must be a valid absolute URL`);
+    // After scripts/fetch-photos.mjs has run, `src` is a site-root-relative
+    // path to the local mirror and `remoteSrc` holds the gallery URL it came
+    // from; before that it is the gallery URL itself.
+    if (!isValidUrl(p.src) && !isSiteRootPath(p.src)) {
+      errors.push(`${tag}: "src" must be a valid absolute URL or a site-root-relative path`);
+    }
+    if (p.remoteSrc !== undefined && !isValidUrl(p.remoteSrc)) {
+      errors.push(`${tag}: "remoteSrc" must be a valid absolute URL`);
+    }
     if (typeof p.width !== "number" || p.width <= 0) errors.push(`${tag}: "width" must be a positive number`);
     if (typeof p.height !== "number" || p.height <= 0) errors.push(`${tag}: "height" must be a positive number`);
   }

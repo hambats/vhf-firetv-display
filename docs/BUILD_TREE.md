@@ -144,6 +144,16 @@ sequence; this makes it atomic.
       `dist/`, so `gallery-exclude.json` and `events-exclude.json` land on the public site —
       including the free-text `reason` recording why each photo was pulled from rotation. The
       display reads neither. Copy only the files the viewer actually fetches.
+- [x] **`scripts/fetch-photos.mjs` — the PC-side photo mirror** (Sept 18, reinstated from §1a).
+      Runs after the gallery adapter (`sync-sources` does both), downloads each pool photo once,
+      resizes it to 2150px across (the panel width times the Ken Burns zoom, not the panel width),
+      writes `content/photos/<id>.webp`, and rewrites the pool's `src` to that local path with the
+      gallery URL kept as `remoteSrc`. Dead gallery URLs are named and dropped here rather than
+      appearing as a blank scene; more than 10% failing aborts without touching `gallery.json`,
+      because that is a network problem and not 12 dead photos. Photos no longer in the pool are
+      pruned. `content/photos/` is git-ignored — 57MB that is fully rebuildable from `remoteSrc`,
+      and the pool resamples on every sync. **This adds `sharp` as the project's second runtime
+      dependency.**
 - [ ] `scripts/lint-content.mjs` — **a display-appropriateness linter, distinct from the schema
       validator.** `validate-content.mjs` answers "is this well-formed?"; nothing answers "is this
       fit to put on a television?" Run it as a warning inside `publish.mjs`. Rules worth having,
@@ -174,20 +184,26 @@ sequence; this makes it atomic.
 - [ ] **quiet hours need an input the repo does not have yet:** the farm's open hours. Add an
       `hours` block to `settings.json` when starting this, so M4 is a rendering change rather
       than a data-modelling exercise done under time pressure.
-- [ ] **trim event `location`.** Every synced event carries "Veterans Healing Farm, 138 Kimzey
-      Rd, Mills River, NC 28759, USA", rendered on a screen standing at that address.
-      `cleanLocation` should drop the farm's own address and keep only a sub-location
-      ("Greenhouse", "Pavilion"), falling back to omitting the line.
+- [x] **trim event `location`** (Sept 18). Every synced event carried "Veterans Healing Farm, 138
+      Kimzey Rd, Mills River, NC 28759, USA", rendered on a screen standing at that address.
+      `cleanLocation` now strips the venue name and each component of its address and keeps only
+      what survives — a sub-location ("Greenhouse", "Pavilion") — omitting the line when nothing
+      does. The address comes from a new `calendar.venue` block in `settings.json` rather than
+      being hardcoded in the adapter. **Off-site locations are passed through untouched**: an
+      event at Mills River Park still has to say so, and dropping that line would be actively
+      misleading. On the current feed, 36 of 39 events lose the line and the 3 off-site ones keep
+      it.
 - [ ] **strip markdown emphasis in `cleanText`.** `stripHtml` removes tags and entities but
       nothing removes `**`/`__`, so a calendar entry's emphasis renders as literal asterisks on
       the wall. Unlike the wording itself, this one cannot be fixed by the calendar authors.
       *(The wording — descriptions that lead with cancellation-fee boilerplate — was raised in
       the Sept 18 review and deliberately left alone: the calendar authors will fix it at source.
       Only the code artefact is tracked here.)*
-- [ ] **drop `registrationUrl` from `events.json`.** Generated, never rendered, and identical
-      across every event (a generic regpack builder link), so it carries no information even if
-      something did render it. Remove it, or replace it with something a pointer-less display can
-      actually use.
+- [x] **drop `registrationUrl` from `events.json`** (Sept 18). Generated, never rendered, and
+      identical across every event (a generic regpack builder link), so it carried no information
+      even if something did render it. The field and the `firstUrl` helper that produced it are
+      gone; `events.json` is now schema version 4. Nothing replaced it — a pointer-less display
+      has no use for a link.
 - [ ] **rebalance the loop.** 31 enabled items, 5m42s per cycle, **15 `information` text slides
       against 9 `photo-pool`**. Roughly half the airtime is a reader-mode text card on a screen
       most people walk past, while the photos — the thing that reads at a glance, and the thing
@@ -216,29 +232,34 @@ sequence; this makes it atomic.
 
 ---
 
-## 1a. Two recorded decisions worth re-opening
+## 1a. Recorded decisions that were re-opened
 
 Both are already decided in this document. Neither is being changed unilaterally — they are
 flagged because the reasoning rests on a premise that looks shakier on a second read, and a
 decision is cheaper to revisit now than after M3.
 
-**1. `scripts/fetch-photos.mjs`, dropped on the grounds that "sw.js makes a PC-side photo mirror
-pointless."** The Service Worker does cache the photos, so the offline claim holds. But a mirror
-buys four things it does not:
+**1. `scripts/fetch-photos.mjs` — REOPENED AND REINSTATED (Sept 18), now an M2 item.** It was
+dropped on the grounds that "`sw.js` makes a PC-side photo mirror pointless." The offline claim
+held, but the mirror buys four things `sw.js` does not, and measurement while reinstating it made
+the fourth sharper than the original note:
 
 - Cross-origin images cache as **opaque** responses: they cannot be inspected, a failure cannot be
-  told from a success, and they are charged against quota at a padded size rather than their real
-  one.
+  told from a success, and they are charged against quota at a padded size. Mirrored photos are
+  same-origin and ordinary.
 - It does nothing for a **cold start**. The first run after a cache eviction still depends on the
   Squarespace CDN being reachable at render time.
 - It does not protect against **the URL dying**. A mirror turns "the gallery object was deleted"
-  into a build-time error on the PC instead of a skipped scene on the wall.
-- Photos are fetched at `?format=2500w` and shown on a 1920px panel. Resizing once at publish time
-  cuts the bytes several-fold, permanently, for every device.
+  into a build-time warning on the PC instead of a skipped scene on the wall.
+- **Bytes — and the original framing of this was wrong twice over.** It said photos are fetched at
+  `?format=2500w` and shown on a 1920px panel. First, Squarespace serves a *fixed size ladder*:
+  `?format=1920w` and `?format=2000w` silently return the 2500w original, and the next rung down is
+  1500w, which would be an upscale. The CDN cannot produce the right size at all. Second, 1920 is
+  not the target: photos are drawn `object-fit: cover` and Ken Burns-zoomed to `scale(1.12)`, so a
+  full-bleed photo needs **2150** pixels across at peak zoom. Resizing on the PC is the only way to
+  hit that. Measured over the live 120-photo pool: **98.8MB fetched -> 57.0MB stored**, with 63 of
+  the 120 already at or below target and so re-encoded rather than resized.
 
-It also collapses the "display talks to exactly two hosts" invariant in §3 down to one. Cost is
-roughly 40 lines in the build, plus disk. **Decision needed: keep it dropped, or reinstate it as
-an M2 item.**
+It also collapses the "display talks to exactly two hosts" invariant in §3 down to one.
 
 **2. "A real heartbeat would need a server that isn't Netlify static — probably not worth it."**
 The premise is not quite right: Netlify Functions run on the same free plan already hosting the
@@ -275,12 +296,13 @@ VHF_TV/
 │
 ├── content/                             <- source of truth, hand-edited or generated
 │   ├── settings.json                    [x]  syncIntervalMinutes, publishUrl, gallery + calendar
-│   │                                         config; `timezone` (M1) and `hours` for quiet
-│   │                                         hours (M4) both still missing
+│   │                                         config incl. `calendar.venue`; `timezone` (M1) and
+│   │                                         `hours` for quiet hours (M4) both still missing
 │   ├── playlist.json                    [x]  ordered scene list; photo `src` is a direct gallery
 │   │                                         URL by decision (§6)
 │   ├── announcements/announcements.json [x]  dated entries with activation + expiry
 │   ├── artwork/                         [x]  custom artwork (local files, not remote URLs)
+│   ├── photos/                          [x]  git-ignored mirror written by fetch-photos.mjs
 │   ├── gallery-exclude.json             [x]  hand-maintained ids dropped from the photo pool
 │   ├── events-exclude.json              [x]  hand-maintained title substrings dropped from sync
 │   └── generated/                       <- written by sources/, never hand-edited
@@ -313,7 +335,7 @@ VHF_TV/
 │   ├── validate-content.mjs             [x]  schema validation, used by build-site + tests
 │   ├── sync-sources.mjs                 [x]  runs the gallery and calendar adapters
 │   ├── publish.mjs                      [ ]  M2
-│   ├── fetch-photos.mjs                 [?]  dropped, re-opened for decision — see §1a
+│   ├── fetch-photos.mjs                 [x]  M2  photo mirror: download, resize to 2150px, prune
 │   └── lint-content.mjs                 [ ]  M2  display-appropriateness rules, not schema
 │
 ├── sources/                             <- PC-side only; the display never talks to these
@@ -359,8 +381,9 @@ Carried forward:
 
 New:
 
-- **The display talks to exactly two hosts:** the Netlify `publishUrl` and the Squarespace CDN the
-  gallery photos live on. Nothing else, ever — no analytics, no third-party fonts after M1.
+- **The display talks to exactly one host:** the Netlify `publishUrl`. Nothing else, ever — no
+  analytics, no third-party fonts after M1, and since the photo mirror landed (§1a) no gallery CDN
+  either. Every byte the television fetches comes from the site the PC published.
 - **A milestone ends with the television demonstrating a behaviour**, not with a file existing.
 - **Any behaviour that depends on a TV setting must be written down in `DISPLAY_SETUP.md`**, because
   it can't be enforced from the repo and it will be lost the first time the device is reset.
@@ -381,11 +404,8 @@ New:
 
 - **The whole `app/` tree** — dormant by decision, not abandoned by neglect. §5 records what would
   bring it back.
-- **`fetch-photos.mjs`** — a PC-side photo mirror was only ever a workaround for the TV not being
-  able to cache images. `sw.js` does it properly, on the device, for whatever the playlist
-  currently references. **Re-opened for decision (Sept 18) — see §1a:** the offline claim holds,
-  but opaque cross-origin caching, cold starts, dead URLs and serving 2500px images to a 1920px
-  panel are four things a mirror addresses and `sw.js` does not.
+- **~~`fetch-photos.mjs`~~ — no longer dropped.** Re-opened and reinstated Sept 18; it is an M2
+  item and is built. See §1a.
 - **Splitting `scenes.js` into `web/js/scenes/*.js`** (old Phase 2, item 1). ~350 lines of renderers
   sharing a one-line `(item, data) -> Node | throw` contract, causing no problems. Splitting it now
   is churn on the one part of the system that already works. Do it when a single scene type earns
@@ -421,7 +441,10 @@ costs, stated plainly so nobody rediscovers it in six months:
 
 ## 6. What's already built *(carried forward — these decisions are still current)*
 
-**Photos are direct links to the VHF gallery (Squarespace CDN), not local files.** An explicit
+**Photos were direct links to the VHF gallery (Squarespace CDN)** — superseded Sept 18 by the
+photo mirror (§1a, M2). The authoring simplicity below is unchanged: the adapter still reads
+gallery URLs and nobody downloads or renames anything by hand. What changed is that the build now
+localises them. The original reasoning, kept because it explains why it was ever a tradeoff: An explicit
 choice: simpler authoring (paste a gallery URL into `playlist.json`, no download/rename/resize step)
 beats a locally-mirrored photo cache. The tradeoff it accepted was no offline fallback for photos,
 because caching arbitrary `<img>` tags needs a Service Worker. **M1 builds that Service Worker, which

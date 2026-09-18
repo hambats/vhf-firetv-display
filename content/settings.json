@@ -5,10 +5,20 @@
   "gallery": {
     "maxPhotos": 120,
     "minDimension": 1200,
-    "recencyDecay": 35
+    "recencyDecay": 35,
+    "mirror": {
+      "frameWidth": 1920,
+      "frameHeight": 1080,
+      "maxZoom": 1.12,
+      "quality": 80
+    }
   },
   "calendar": {
     "calendarId": "vhf2023calendar@gmail.com",
-    "windowDays": 120
+    "windowDays": 120,
+    "venue": {
+      "name": "Veterans Healing Farm",
+      "address": "138 Kimzey Rd, Mills River, NC 28759, USA"
+    }
   }
 }

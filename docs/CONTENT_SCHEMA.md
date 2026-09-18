@@ -49,11 +49,21 @@ this project already use.
   "gallery": {                 // optional; read by sources/gallery/index.mjs, editable via admin/
     "maxPhotos": 120,          // optional, positive number, default 120
     "minDimension": 1200,      // optional, positive number, default 1200
-    "recencyDecay": 35         // optional, positive number, default 35 (smaller = more recency bias)
+    "recencyDecay": 35,        // optional, positive number, default 35 (smaller = more recency bias)
+    "mirror": {                // optional; read by scripts/fetch-photos.mjs
+      "frameWidth": 1920,      // optional, positive number, default 1920
+      "frameHeight": 1080,     // optional, positive number, default 1080
+      "maxZoom": 1.12,         // optional, must match the Ken Burns keyframes in web/css/scene.css
+      "quality": 80            // optional, WebP quality, default 80
+    }
   },
   "calendar": {                 // optional; read by sources/calendar/index.mjs
     "calendarId": "...@gmail.com", // optional, default "vhf2023calendar@gmail.com"
-    "windowDays": 120             // optional, positive number, default 120
+    "windowDays": 120,            // optional, positive number, default 120
+    "venue": {                    // optional; the address the display itself stands at,
+      "name": "string",           //   stripped from every synced event `location`
+      "address": "string"
+    }
   }
 }
 ```
@@ -75,13 +85,18 @@ it overwrites this file.
       "title": "string",        // required
       "start": "ISO 8601",      // required
       "end": "ISO 8601",        // optional, must be >= start if present
-      "location": "string",     // optional
-      "description": "string",  // optional
-      "registrationUrl": "..."  // optional, for reference only — never rendered on-TV
+      "location": "string",     // optional; sub-location only (see below)
+      "description": "string"   // optional
     }
   ]
 }
 ```
+
+`location` carries only a *sub-location* — "Greenhouse", "Pavilion". The adapter strips the
+farm's own name and postal address (`calendar.venue` in `settings.json`), because the display
+stands at that address and printing it back says nothing; an on-site event with no sub-location
+omits the field entirely. Off-site locations are passed through untouched — an event at Mills
+River Park still has to say where it is.
 
 ### `content/events-exclude.json` (hand-maintained, not validated the same way)
 
@@ -119,9 +134,11 @@ filtered out). Re-run it any time to refresh the pool; it overwrites this file.
   "photos": [
     {
       "id": "string",        // required, unique, derived from the source filename
-      "src": "https://...",  // required, absolute URL (direct link to the gallery CDN)
-      "width": 2500,         // required, positive number, actual source pixel width
-      "height": 1875,        // required, positive number, actual source pixel height
+      "src": "/content/photos/<id>.webp", // required; the local mirror after fetch-photos.mjs
+                             //   has run, otherwise the gallery CDN URL
+      "remoteSrc": "https://...", // present once mirrored: the gallery URL it came from
+      "width": 2151,         // required, positive number, pixel width of whatever `src` points at
+      "height": 1613,        // required, positive number, pixel height of the same
       "sourcePage": "https://...veteranshealingfarm.org/gallery-2025", // which gallery it came from
       "takenAt": "ISO 8601",  // best-effort: parsed from the filename if it looks like a camera
                               // timestamp (YYYYMMDD_HHMMSS), else Jan 1 of the gallery's year
@@ -130,6 +147,14 @@ filtered out). Re-run it any time to refresh the pool; it overwrites this file.
   ]
 }
 ```
+
+`src` and the photo files are written by [`scripts/fetch-photos.mjs`](../scripts/fetch-photos.mjs),
+which runs after the adapter (`npm run sync-sources` does both). It downloads each photo once,
+resizes it to what the display can actually show, and writes `content/photos/<id>.webp`. The
+target is **not** the 1920x1080 panel: photos are drawn `object-fit: cover` and Ken Burns-zoomed to
+`scale(1.12)`, so a full-bleed photo needs 2150 pixels across at peak zoom. Photos whose source is
+already at or below that are re-encoded, never upscaled. `content/photos/` is git-ignored and
+rebuilt from `remoteSrc`.
 
 `takenAt` drives selection, not just display: the adapter samples which photos make the pool with a
 strong recency bias (see `RECENCY_DECAY` in the adapter) rather than uniformly at random, so
