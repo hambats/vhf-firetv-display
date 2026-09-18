@@ -82,25 +82,40 @@
     function advance() {
       var item = items[index % items.length];
       index += 1;
-
-      var node;
-      try {
-        node = VhfScenes.render(item, data);
-        log("showing " + item.id + " (" + item.type + ")");
-      } catch (err) {
-        console.error("[VHF] scene render failed", item, err);
-        node = VhfScenes.renderError(item, err);
-      }
-
       var seconds = item.duration || DEFAULT_DURATION_SECONDS;
-      // Ken Burns (scene.css) reads this to match its animation length to
-      // this scene's actual dwell time instead of a fixed guess — otherwise
-      // an 8s scene would crossfade out mid-animation while a 14s scene
-      // would sit still after the animation finished early.
-      if (node && node.style) node.style.setProperty("--vhf-scene-duration", seconds + "s");
-      showLayer(node);
 
+      // Re-arm the loop BEFORE rendering anything. Everything below this
+      // line runs inside a try/catch, but the timer is what keeps an
+      // unattended display alive, so it must not be reachable by any throw
+      // at all — previously showLayer() and this setTimeout sat outside the
+      // try, and a single throw from either (a null node, a DOM exception,
+      // a failure deep in a weeks-long run) ended the setTimeout chain for
+      // good: the television would hold its last frame forever, with no
+      // error on screen and nothing to restart it.
       window.setTimeout(advance, seconds * 1000);
+
+      try {
+        var node;
+        try {
+          node = VhfScenes.render(item, data);
+          log("showing " + item.id + " (" + item.type + ")");
+        } catch (err) {
+          console.error("[VHF] scene render failed", item, err);
+          node = VhfScenes.renderError(item, err);
+        }
+
+        // Ken Burns (scene.css) reads this to match its animation length to
+        // this scene's actual dwell time instead of a fixed guess — otherwise
+        // an 8s scene would crossfade out mid-animation while a 14s scene
+        // would sit still after the animation finished early.
+        if (node && node.style) node.style.setProperty("--vhf-scene-duration", seconds + "s");
+        showLayer(node);
+      } catch (err) {
+        // Showing the scene failed, not just building it. Leave whatever is
+        // currently on screen up rather than blanking the display, and let
+        // the already-scheduled next scene try again.
+        console.error("[VHF] scene display failed, holding previous scene", item, err);
+      }
     }
 
     advance();
