@@ -98,6 +98,37 @@
     }
   };
 
+  /*
+   * Skips the current scene's remaining dwell and shows the next one right
+   * away — a curation tool, not a viewer feature: reviewing new content
+   * against every scene means sitting through 8-14s dwell times per scene
+   * otherwise. Same mechanism as VhfQuietHours.wake() (clear the pending
+   * timer, call the same advance() the loop itself uses), so it can never
+   * double-advance or desync the loop's own scheduling.
+   *
+   * Gated to ?diag=1 for both the exposed function and the key binding —
+   * this has no business being reachable on the unattended television.
+   */
+  window.VhfEngine = {
+    advanceNow: function () {
+      if (!VhfDiagnostics.visible) return;
+      if (pendingTimeout !== null) {
+        window.clearTimeout(pendingTimeout);
+        pendingTimeout = null;
+      }
+      if (advanceRef) advanceRef();
+    }
+  };
+
+  if (VhfDiagnostics.visible) {
+    window.addEventListener("keydown", function (ev) {
+      if (ev.key === "ArrowRight" || ev.key === " " || ev.key === "n") {
+        ev.preventDefault();
+        window.VhfEngine.advanceNow();
+      }
+    });
+  }
+
   function log(msg) {
     console.log("[VHF] " + msg);
     VhfDiagnostics.set("scene", msg);
