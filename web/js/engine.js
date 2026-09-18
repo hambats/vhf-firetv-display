@@ -251,11 +251,19 @@
             return;
           }
           if (!scene.usable) {
-            console.error("[VHF] " + consecutiveSkips + " scenes skipped in a row; showing anyway to keep pace");
+            console.error("[VHF] " + consecutiveSkips + " scenes skipped in a row; keeping pace instead of skipping further");
           }
           consecutiveSkips = 0;
-          showLayer(scene.node);
-          log("showing " + scene.item.id + " (" + scene.item.type + ")");
+          // A scene that never built has no node to show. Hold the current
+          // frame for one dwell rather than blanking the screen; the point of
+          // breaking the skip streak is to stop spinning, not to display
+          // nothing.
+          if (scene.node) {
+            showLayer(scene.node);
+            log("showing " + scene.item.id + " (" + scene.item.type + ")");
+          } else {
+            log("holding: " + scene.item.id + " (" + scene.item.type + ") could not be built");
+          }
         } catch (err) {
           // Displaying failed, not just building. Leave whatever is on
           // screen up rather than blanking it, and let the next scene try.
