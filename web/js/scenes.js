@@ -59,8 +59,9 @@ var VhfScenes = (function () {
   // Full logo + wordmark at ~280px, used on the two scenes with room to
   // spare and the highest chance of being read (D1.3): the opening Welcome
   // scene and the announcement scene.
-  function lockup(container) {
-    container.appendChild(img("scene__lockup", "content/artwork/brand/vhf-logo.webp", "decoration"));
+  function lockup(container, extraClass) {
+    var className = extraClass ? "scene__lockup " + extraClass : "scene__lockup";
+    container.appendChild(img(className, "content/artwork/brand/vhf-logo.webp", "decoration"));
   }
 
   // A faint (~16%) full-bleed photo behind text content — a watermark, not a
@@ -96,6 +97,25 @@ var VhfScenes = (function () {
     var photos = usablePhotos(curatedSet(data, programId));
     if (photos.length === 0) return false;
     scene.appendChild(img("scene__partner-logo", photos[0].src, "decoration"));
+    return true;
+  }
+
+  // Curated sets that hold designed graphics (an event badge, a medal or
+  // shirt mockup) rather than candid photos: same unreadable-wash problem as
+  // LOGO_PROGRAM_IDS, but these are portrait print assets on a white ground,
+  // not a small round mark, so they get a bigger contained card
+  // (.scene__event-graphic) instead of the circular treatment. Cycles
+  // through whichever of the set's assets is on deck via drawPhotos so a
+  // folder with several designs (logo, medal, shirt) rotates instead of
+  // always showing the same one.
+  var GRAPHIC_PROGRAM_IDS = ["program-5k-fundraiser"];
+
+  function appendEventGraphic(scene, data, programId) {
+    var photos = usablePhotos(curatedSet(data, programId));
+    if (photos.length === 0) return false;
+    var pick = drawPhotos(programId, photos, 1)[0];
+    if (!pick) return false;
+    scene.appendChild(img("scene__event-graphic", pick.src, "decoration"));
     return true;
   }
 
@@ -287,7 +307,7 @@ var VhfScenes = (function () {
     // mark — it's the slide with the most room and the highest chance of
     // being read (D1.3).
     if (content.lockup) {
-      lockup(scene);
+      lockup(scene, "scene__lockup--welcome");
     } else {
       brand(scene);
     }
@@ -385,6 +405,8 @@ var VhfScenes = (function () {
     // instead of a random farm photo.
     if (LOGO_PROGRAM_IDS.indexOf(evt.programId) !== -1) {
       if (!appendPartnerLogo(scene, data, evt.programId)) appendWash(scene, data, evt.programId);
+    } else if (GRAPHIC_PROGRAM_IDS.indexOf(evt.programId) !== -1) {
+      if (!appendEventGraphic(scene, data, evt.programId)) appendWash(scene, data, evt.programId);
     } else {
       appendWash(scene, data, evt.programId);
     }

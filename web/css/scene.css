@@ -189,6 +189,27 @@ html, body {
   z-index: 1;
 }
 
+/* A designed print asset (event badge, medal or shirt mockup) on a white
+   ground: same reasoning as .scene__partner-logo, but these are tall
+   portrait graphics rather than a small round mark, so they get a bigger
+   contained card on the side opposite the text content instead of a corner
+   badge — .scene--event anchors .scene__content top-left, so this sits
+   top-right. */
+.scene__event-graphic {
+  position: absolute;
+  top: 140px;
+  right: 100px;
+  bottom: 140px;
+  width: 380px;
+  max-height: 760px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 20px;
+  padding: 28px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  z-index: 1;
+}
+
 .scene__fade {
   position: absolute;
   inset: 0;
@@ -345,6 +366,13 @@ html, body {
      centering is folded into the keyframes so the mark stays centered
      while it drifts. */
   animation: vhf-pixel-shift-lockup 240s ease-in-out infinite;
+}
+
+/* Welcome is the very first thing a viewer sees and has the most empty
+   space to spend on it, so its mark runs noticeably larger than the
+   shared .scene__lockup default used elsewhere (announcement scene). */
+.scene__lockup--welcome {
+  width: 480px;
 }
 
 .scene--announcement .scene__lockup {
