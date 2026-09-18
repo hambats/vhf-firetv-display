@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-18T23:30:01.211Z",
+  "generatedAt": "2026-09-18T23:32:03.476Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -217,6 +217,10 @@
       {
         "id": "program-kitchen-medicine/747988310_18597453946062494_7728712236597114737_n.jpg",
         "src": "content/artwork/curated/program-kitchen-medicine/747988310_18597453946062494_7728712236597114737_n.jpg"
+      },
+      {
+        "id": "program-kitchen-medicine/pasta-varieties.jpg",
+        "src": "content/artwork/curated/program-kitchen-medicine/pasta-varieties.jpg"
       }
     ],
     "program-mushroom-cultivation": [
