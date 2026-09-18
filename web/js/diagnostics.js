@@ -93,6 +93,7 @@ var VhfDiagnostics = (function () {
       line("err", String(errorCount))
     ];
     if (fields.scene) parts.push(fields.scene);
+    if (fields.photoId) parts.push("photo " + fields.photoId);
     if (lastError) parts.push("! " + lastError.where + ": " + lastError.message);
     el.textContent = parts.join("  ·  ");
   }

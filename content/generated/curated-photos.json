@@ -1,13 +1,9 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-18T22:39:17.161Z",
+  "generatedAt": "2026-09-18T23:30:01.211Z",
   "sets": {
     "gen-pop-additions": [
-      {
-        "id": "gen-pop-additions/20260506_110209.webp",
-        "src": "content/artwork/curated/gen-pop-additions/20260506_110209.webp"
-      },
       {
         "id": "gen-pop-additions/481342530_660857999943454_792166771420538192_n.jpg",
         "src": "content/artwork/curated/gen-pop-additions/481342530_660857999943454_792166771420538192_n.jpg"
@@ -51,6 +47,10 @@
     ],
     "in-uniform": [
       {
+        "id": "in-uniform/10308717_1157753160901665_2774371496969394029_n.jpg",
+        "src": "content/artwork/curated/in-uniform/10308717_1157753160901665_2774371496969394029_n.jpg"
+      },
+      {
         "id": "in-uniform/491503397_18494813875062494_1984777543171559801_n.jpg",
         "src": "content/artwork/curated/in-uniform/491503397_18494813875062494_1984777543171559801_n.jpg"
       }
@@ -77,6 +77,12 @@
         "src": "content/artwork/curated/military-art/thumb-1920-374856.jpg"
       }
     ],
+    "our-history": [
+      {
+        "id": "our-history/founders-john-nicole-mahshie.webp",
+        "src": "content/artwork/curated/our-history/founders-john-nicole-mahshie.webp"
+      }
+    ],
     "program-5k-fundraiser": [
       {
         "id": "program-5k-fundraiser/VD-Medal-Reveal-980x1030.jpg",
@@ -92,6 +98,10 @@
       }
     ],
     "program-acupuncture": [
+      {
+        "id": "program-acupuncture/20260506_110209.webp",
+        "src": "content/artwork/curated/program-acupuncture/20260506_110209.webp"
+      },
       {
         "id": "program-acupuncture/christine-galligan-g2hNOyN18tY-unsplash.jpg",
         "src": "content/artwork/curated/program-acupuncture/christine-galligan-g2hNOyN18tY-unsplash.jpg"

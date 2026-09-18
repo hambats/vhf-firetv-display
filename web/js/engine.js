@@ -460,6 +460,11 @@
           if (scene.node) {
             showLayer(scene.node);
             log("showing " + scene.item.id + " (" + scene.item.type + ")");
+            // Surfaced only through ?diag=1 — lets a photo/graphic that's
+            // poorly cropped or composed on the wall be pointed straight
+            // back at its source file/folder instead of guessed at.
+            var photoEl = scene.node.querySelector ? scene.node.querySelector("[data-vhf-photo-id]") : null;
+            VhfDiagnostics.set("photoId", photoEl ? photoEl.getAttribute("data-vhf-photo-id") : null);
           } else {
             log("holding: " + scene.item.id + " (" + scene.item.type + ") could not be built");
           }

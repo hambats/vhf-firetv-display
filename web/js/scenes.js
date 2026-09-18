@@ -21,11 +21,17 @@ var VhfScenes = (function () {
   // it. The engine preloads both, but only a "content" image failing makes
   // a scene worth skipping — a photo scene with no photo is an empty
   // frame, whereas a missing watermark or corner mark is invisible.
-  function img(className, src, role) {
+  // photoId, when given, is the id gallery.json/curated-photos.json already
+  // carries per photo (e.g. "military-art/thumb-1920-374856.jpg" or a
+  // gallery scrape id) — surfaced only through ?diag=1 (diagnostics.js), so
+  // a bad crop or composition found on the wall can be pointed back at the
+  // exact source file without guessing from the rendered src.
+  function img(className, src, role, photoId) {
     var node = el("img", className);
     node.src = src;
     node.alt = "";
     node.setAttribute("data-vhf-role", role);
+    if (photoId) node.setAttribute("data-vhf-photo-id", photoId);
     return node;
   }
 
@@ -84,7 +90,7 @@ var VhfScenes = (function () {
     var photos = curated.length > 0 ? curated : usablePhotos((data && data.gallery && data.gallery.photos) || []);
     if (photos.length === 0) return;
     var photo = photos[Math.floor(Math.random() * photos.length)];
-    scene.appendChild(img("scene__wash", photo.src, "decoration"));
+    scene.appendChild(img("scene__wash", photo.src, "decoration", photo.id));
   }
 
   // Curated sets that hold an organization's logo rather than candid photos
@@ -96,7 +102,7 @@ var VhfScenes = (function () {
   function appendPartnerLogo(scene, data, programId) {
     var photos = usablePhotos(curatedSet(data, programId));
     if (photos.length === 0) return false;
-    scene.appendChild(img("scene__partner-logo", photos[0].src, "decoration"));
+    scene.appendChild(img("scene__partner-logo", photos[0].src, "decoration", photos[0].id));
     return true;
   }
 
@@ -115,7 +121,7 @@ var VhfScenes = (function () {
     if (photos.length === 0) return false;
     var pick = drawPhotos(programId, photos, 1)[0];
     if (!pick) return false;
-    scene.appendChild(img("scene__event-graphic", pick.src, "decoration"));
+    scene.appendChild(img("scene__event-graphic", pick.src, "decoration", pick.id));
     return true;
   }
 
@@ -341,9 +347,9 @@ var VhfScenes = (function () {
     return scene;
   }
 
-  function buildPhotoScene(src, fit, focus, eyebrow) {
+  function buildPhotoScene(src, fit, focus, eyebrow, photoId) {
     var scene = el("div", "scene scene--photo");
-    var photo = img("scene__photo-img", src, "content");
+    var photo = img("scene__photo-img", src, "content", photoId);
     photo.style.objectFit = fit === "contain" ? "contain" : "cover";
     // A generic photo of unknown composition crops slightly better favoring
     // the upper-middle by default (avoids cutting off heads more often than
@@ -365,7 +371,7 @@ var VhfScenes = (function () {
   function renderPhoto(item) {
     var content = item.content || {};
     if (!content.src) throw new Error("photo scene missing content.src");
-    return buildPhotoScene(content.src, content.fit, content.focus);
+    return buildPhotoScene(content.src, content.fit, content.focus, null, item.id);
   }
 
   function renderPhotoPool(item, data) {
@@ -386,14 +392,14 @@ var VhfScenes = (function () {
 
     var photo = drawPhotos(poolKey, photos, 1)[0];
     if (!photo) throw new Error("photo pool has no usable photos left");
-    return buildPhotoScene(photo.src, "cover", null, content.eyebrow);
+    return buildPhotoScene(photo.src, "cover", null, content.eyebrow, photo.id);
   }
 
   function renderCustom(item) {
     var content = item.content || {};
     if (!content.src) throw new Error("custom scene missing content.src");
     var scene = el("div", "scene scene--custom");
-    scene.appendChild(img("scene__photo-img", content.src, "content"));
+    scene.appendChild(img("scene__photo-img", content.src, "content", item.id));
     return scene;
   }
 
