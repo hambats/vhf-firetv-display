@@ -44,10 +44,26 @@ async function main() {
       .filter((f) => IMAGE_EXTS.has(path.extname(f).toLowerCase()))
       .sort();
     if (files.length === 0) continue;
-    sets[entry.name] = files.map((f) => ({
-      id: `${entry.name}/${f}`,
-      src: `content/artwork/curated/${entry.name}/${encodeURIComponent(f)}`
-    }));
+
+    // Optional per-photo caption text — a hand-maintained captions.json
+    // sitting next to the images in the same folder, e.g. military-art's
+    // Iwo Jima photo getting its own line of history instead of sharing
+    // the pool's generic eyebrow. Absent by default; never required.
+    let captions = {};
+    try {
+      captions = JSON.parse(await fs.readFile(path.join(dir, "captions.json"), "utf8"));
+    } catch (err) {
+      if (err.code !== "ENOENT") throw err;
+    }
+
+    sets[entry.name] = files.map((f) => {
+      const photo = {
+        id: `${entry.name}/${f}`,
+        src: `content/artwork/curated/${entry.name}/${encodeURIComponent(f)}`
+      };
+      if (captions[f]) photo.caption = captions[f];
+      return photo;
+    });
   }
 
   const output = {

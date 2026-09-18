@@ -39,7 +39,7 @@
       "type": "photo-pool",
       "duration": 10,
       "enabled": true,
-      "content": { "source": "in-uniform", "eyebrow": "Our Members, In Uniform" }
+      "content": { "source": "in-uniform", "eyebrow": "Our Members, In Uniform", "showEvery": 3 }
     },
     {
       "id": "photo-pool-2",
@@ -266,6 +266,17 @@
       "duration": 12,
       "enabled": true,
       "content": {}
+    },
+    {
+      "id": "volunteer-groups",
+      "type": "information",
+      "duration": 8,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Many Hands, One Farm",
+        "title": "Volunteer Groups Welcome",
+        "body": "Local businesses, churches, and community groups regularly bring volunteer days to the farm — every visit helps a Veteran heal."
+      }
     },
     {
       "id": "get-involved",

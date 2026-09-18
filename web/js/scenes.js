@@ -372,7 +372,7 @@ var VhfScenes = (function () {
     return scene;
   }
 
-  function buildPhotoScene(src, fit, focus, eyebrow, photoId) {
+  function buildPhotoScene(src, fit, focus, eyebrow, photoId, caption) {
     var scene = el("div", "scene scene--photo");
     var photo = img("scene__photo-img", src, "content", photoId);
     photo.style.objectFit = fit === "contain" ? "contain" : "cover";
@@ -383,10 +383,15 @@ var VhfScenes = (function () {
     scene.appendChild(photo);
     scene.appendChild(el("div", "scene__fade scene__fade--subtle"));
     // A standalone curated category (In Uniform, Military Art) names itself
-    // so it doesn't just look like an unlabeled random photo.
-    if (eyebrow) {
+    // so it doesn't just look like an unlabeled random photo. A photo with
+    // its own hand-written caption (curated-photos.json's optional
+    // per-photo `caption`, from a captions.json next to the images) adds a
+    // second, smaller line under the eyebrow for that photo's own story —
+    // e.g. Iwo Jima's history — rather than replacing the category label.
+    if (eyebrow || caption) {
       var label = el("div", "scene__content scene__content--photo-label");
-      label.appendChild(el("p", "scene__eyebrow", eyebrow));
+      if (eyebrow) label.appendChild(el("p", "scene__eyebrow", eyebrow));
+      if (caption) label.appendChild(el("p", "scene__caption", caption));
       scene.appendChild(label);
     }
     brand(scene);
@@ -399,8 +404,26 @@ var VhfScenes = (function () {
     return buildPhotoScene(content.src, content.fit, content.focus, null, item.id);
   }
 
+  // Every playlist item comes up exactly once per loop — there's no
+  // per-item weighting. A thin/low-variety pool (2 photos) can still feel
+  // over-shown at that same cadence as everything else, so content.showEvery
+  // throttles it: skip this slot on all but 1 of every N passes. A skipped
+  // pass throws, which the engine already treats as "move on immediately,"
+  // (verified by tests/engine.test.mjs) so this reads as the item simply not
+  // being in rotation that time, not as a stall or an error.
+  var passCounters = {};
+
+  function throttled(itemId, showEvery) {
+    if (!showEvery || showEvery <= 1) return false;
+    passCounters[itemId] = (passCounters[itemId] || 0) + 1;
+    return passCounters[itemId] % showEvery !== 0;
+  }
+
   function renderPhotoPool(item, data) {
     var content = item.content || {};
+    if (throttled(item.id, content.showEvery)) {
+      throw new Error("throttled: showing 1 in " + content.showEvery + " passes");
+    }
     // content.source names a hand-curated set (content/artwork/curated/<id>/)
     // instead of the general recency-weighted gallery pool — used for
     // standalone categories like "in-uniform" and "military-art" that aren't
@@ -417,7 +440,7 @@ var VhfScenes = (function () {
 
     var photo = drawPhotos(poolKey, photos, 1)[0];
     if (!photo) throw new Error("photo pool has no usable photos left");
-    return buildPhotoScene(photo.src, "cover", null, content.eyebrow, photo.id);
+    return buildPhotoScene(photo.src, "cover", null, content.eyebrow, photo.id, photo.caption);
   }
 
   function renderCustom(item) {

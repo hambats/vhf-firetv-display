@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-18T23:48:12.956Z",
+  "generatedAt": "2026-09-18T23:57:19.164Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -84,11 +84,13 @@
       },
       {
         "id": "military-art/US_Navy_060215-N-9500T-045_The_Los_Angeles-class_fast_attack_submarine_USS_Asheville_(SSN_758),_gets_underway_in_preparation_of_conducting_high-speed_surface_drills_off_the_coast_of_Southern_California.jpg",
-        "src": "content/artwork/curated/military-art/US_Navy_060215-N-9500T-045_The_Los_Angeles-class_fast_attack_submarine_USS_Asheville_(SSN_758)%2C_gets_underway_in_preparation_of_conducting_high-speed_surface_drills_off_the_coast_of_Southern_California.jpg"
+        "src": "content/artwork/curated/military-art/US_Navy_060215-N-9500T-045_The_Los_Angeles-class_fast_attack_submarine_USS_Asheville_(SSN_758)%2C_gets_underway_in_preparation_of_conducting_high-speed_surface_drills_off_the_coast_of_Southern_California.jpg",
+        "caption": "USS Asheville (SSN-758) — today's Asheville, a Los Angeles-class fast attack submarine commissioned in 1991. Now homeported in Guam with the U.S. Pacific Fleet, she's the third Navy vessel to carry the city's name."
       },
       {
         "id": "military-art/thumb-1920-374856.jpg",
-        "src": "content/artwork/curated/military-art/thumb-1920-374856.jpg"
+        "src": "content/artwork/curated/military-art/thumb-1920-374856.jpg",
+        "caption": "Raising the Flag on Iwo Jima — Joe Rosenthal, Feb. 23, 1945. Six Marines raise the second, larger flag atop Mount Suribachi during the battle for Iwo Jima; one of the most reproduced photographs in history."
       }
     ],
     "our-history": [
@@ -101,10 +103,6 @@
       {
         "id": "program-5k-fundraiser/VD-Medal-Reveal-980x1030.jpg",
         "src": "content/artwork/curated/program-5k-fundraiser/VD-Medal-Reveal-980x1030.jpg"
-      },
-      {
-        "id": "program-5k-fundraiser/VD5k_MilitaryGreen_Mock-Up-238x300.jpg",
-        "src": "content/artwork/curated/program-5k-fundraiser/VD5k_MilitaryGreen_Mock-Up-238x300.jpg"
       },
       {
         "id": "program-5k-fundraiser/VDF_5k_2026Logo_-598x1030.png",
@@ -333,6 +331,12 @@
       {
         "id": "program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg",
         "src": "content/artwork/curated/program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg"
+      }
+    ],
+    "volunteer-groups": [
+      {
+        "id": "volunteer-groups/kids-boardwalk-trail.jpg",
+        "src": "content/artwork/curated/volunteer-groups/kids-boardwalk-trail.jpg"
       }
     ]
   }
