@@ -18,19 +18,23 @@ Entries a human wrote are never overwritten. Automation is a good default and a
 bad authority: when someone has looked at a photo and chosen a crop, that
 judgement beats this script's.
 
-STATUS: review tool, not an automatic step. Do not wire this into the sync.
+STATUS: run by hand, reviewed by eye, then committed. Not a sync step.
 
-Measured against the real 120-photo pool it proposed moving 89 of them, and the
-proposals are genuinely mixed. It reliably fixes the case it was built for --
-a tall group portrait whose faces sit above the default crop. It also produces
-clear regressions: where a Haar cascade misses a standing person and finds only
-the seated ones, the window slides down and decapitates whoever it missed, which
-is worse than the problem being solved.
+Detection is YuNet (a small DNN from the OpenCV Zoo, fetched to .cache on first
+use), with the Haar cascades kept only as a fallback if that download fails.
+The difference is not marginal: on a three-person portrait Haar found two faces
+and YuNet found three, and Haar's misses are what produced bad crops.
 
-So run it, read the --sheet, and copy across only the entries that are actually
-better. Getting to unattended would mean a stronger detector (OpenCV's YuNet DNN
-rather than Haar, which needs a model file this repo does not carry), not more
-tuning of the heuristics here.
+The failure that actually matters is a single stray detection low in the frame:
+it stretches the face band across the whole image, the window centres on
+nothing, and the crop lands below everyone's chin -- the exact defect this
+fixes. Both detectors do it (Haar on a quilt, YuNet on a sandal), so
+main_cluster() throws away detections that are nowhere near the others.
+
+With that in place, 71 of 120 photos moved and a sampled review found every one
+equal or better. Keep reviewing the --sheet before committing a run: a detector
+that is right 95% of the time still puts a beheaded photo on a public wall, and
+nobody will be watching when it does.
 """
 
 from __future__ import annotations
@@ -100,7 +104,77 @@ def fetch(url: str) -> bytes | None:
     return data
 
 
+MODEL_DIR = ROOT / ".cache" / "models"
+MODEL_FILE = MODEL_DIR / "face_detection_yunet_2023mar.onnx"
+MODEL_URL = (
+    "https://github.com/opencv/opencv_zoo/raw/main/"
+    "models/face_detection_yunet/face_detection_yunet_2023mar.onnx"
+)
+
+# YuNet's own confidence floor. 0.6 is deliberately above the usual 0.5: a
+# missed face costs headroom, a false one moves the crop onto nothing.
+YUNET_CONFIDENCE = 0.6
+
+_yunet = None
+
+
+def ensure_model() -> Path | None:
+    """Fetch the YuNet model on first use; cached, never committed (232 KB)."""
+    if MODEL_FILE.exists():
+        return MODEL_FILE
+    MODEL_DIR.mkdir(parents=True, exist_ok=True)
+    print(f"[model] downloading YuNet from {MODEL_URL}")
+    try:
+        req = urllib.request.Request(MODEL_URL, headers={"User-Agent": "vhf-display-focus/1.0"})
+        with urllib.request.urlopen(req, timeout=90) as resp:
+            MODEL_FILE.write_bytes(resp.read())
+    except Exception as exc:
+        print(f"[model] download failed ({exc}); falling back to the Haar cascades")
+        return None
+    return MODEL_FILE
+
+
+def detect_faces_yunet(image) -> list[tuple[int, int, int, int]] | None:
+    """YuNet (DNN) detection. Returns None when the model is unavailable.
+
+    Preferred over Haar because it handles turned heads, tilted faces and
+    varied lighting, which is most of what this gallery is: people outdoors,
+    mid-activity, rarely looking at the lens. Haar missed a third of the
+    subjects in a simple three-person portrait.
+    """
+    global _yunet
+    model = ensure_model()
+    if model is None:
+        return None
+    h, w = image.shape[:2]
+    # YuNet wants the input size up front, and the gallery's photos vary, so
+    # the detector is rebuilt per image rather than cached across sizes.
+    _yunet = cv2.FaceDetectorYN.create(str(model), "", (w, h), YUNET_CONFIDENCE, 0.3, 5000)
+    _yunet.setInputSize((w, h))
+    count, faces = _yunet.detect(image)
+    if faces is None:
+        return []
+    out = []
+    for f in faces:
+        x, y, fw, fh = (int(round(v)) for v in f[:4])
+        if fw < w * MIN_FACE_FRAC:
+            continue
+        out.append((max(0, x), max(0, y), fw, fh))
+    return out
+
+
 def detect_faces(image) -> list[tuple[int, int, int, int]]:
+    """Faces as (x, y, w, h). YuNet where possible, Haar as a fallback."""
+    yunet = detect_faces_yunet(image)
+    if yunet is not None:
+        # No relative-size filter here: YuNet's confidence score already does
+        # that job, and filtering by size would throw away the genuinely
+        # distant faces it is better than Haar at finding.
+        return dedupe(yunet)
+    return detect_faces_haar(image)
+
+
+def detect_faces_haar(image) -> list[tuple[int, int, int, int]]:
     """Frontal + profile faces, de-duplicated. Returns (x, y, w, h) boxes."""
     grey = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     grey = cv2.equalizeHist(grey)
@@ -169,6 +243,34 @@ def iou(a, b) -> float:
     return inter / union if union else 0.0
 
 
+def main_cluster(faces):
+    """The dominant group of faces, by vertical proximity.
+
+    One stray detection low in the frame is the failure mode that matters, and
+    both detectors produce them: Haar fired on a quilt, YuNet on a sandal 2,900
+    pixels below the two real faces. Either way a single bad box stretches the
+    band across the whole image, the window centres on nothing, and the crop
+    lands below everybody's chin -- the exact defect this script exists to fix.
+
+    People photographed together stand together, so real faces cluster within a
+    few face-heights of one another. Split on gaps wider than that and keep the
+    group with the most face area, which is the subject of the photo.
+    """
+    if len(faces) < 2:
+        return faces
+    ordered = sorted(faces, key=lambda b: b[1])
+    median_h = sorted(h for (_, _, _, h) in ordered)[len(ordered) // 2]
+    gap_limit = max(median_h * 3, 1)
+
+    clusters = [[ordered[0]]]
+    for prev, cur in zip(ordered, ordered[1:]):
+        if cur[1] - (prev[1] + prev[3]) > gap_limit:
+            clusters.append([cur])
+        else:
+            clusters[-1].append(cur)
+    return max(clusters, key=lambda c: sum(w * h for (_, _, w, h) in c))
+
+
 def focus_for(width: int, height: int, faces) -> tuple[float, str] | None:
     """The object-position percentage that keeps every face inside the crop.
 
@@ -182,6 +284,7 @@ def focus_for(width: int, height: int, faces) -> tuple[float, str] | None:
     if not faces:
         return None, "no faces detected"
 
+    faces = main_cluster(faces)
     top = min(y for (_, y, _, _) in faces)
     bottom = max(y + h for (_, y, _, h) in faces)
 

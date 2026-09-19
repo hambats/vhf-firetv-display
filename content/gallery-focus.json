@@ -17,6 +17,361 @@
     "photo-jun-24-2026-2c-11-05-31-am": {
       "focus": "center 55%",
       "reason": "Recovered after a sync overwrote it in generated/gallery.json. Lower subject, so the crop moves down rather than up."
+    },
+    "20260514-123854": {
+      "focus": "center 10%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 259-852 of 3333px."
+    },
+    "20260514-122235": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 968-1192 of 1875px."
+    },
+    "20260514-120710": {
+      "focus": "center 14%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 134-311 of 1875px."
+    },
+    "20260506-110205": {
+      "focus": "center 40%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 260-765 of 1875px."
+    },
+    "20260404-110738": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 600-1111 of 1875px."
+    },
+    "20260403-103914": {
+      "focus": "center 62%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 1106-1202 of 3000px."
+    },
+    "20260403-094421-280-29": {
+      "focus": "center 85%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 894-1095 of 2377px."
+    },
+    "20260329-144625": {
+      "focus": "center 29%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 638-1204 of 3333px."
+    },
+    "20260329-142439": {
+      "focus": "center 63%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 366-599 of 1875px."
+    },
+    "20260320-171313": {
+      "focus": "center 23%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 178-580 of 1875px."
+    },
+    "20260320-153904-280-29": {
+      "focus": "center 67%",
+      "source": "auto",
+      "reason": "Face detection: 6 face(s), band 1360-1812 of 3333px."
+    },
+    "20260304-135302": {
+      "focus": "center 18%",
+      "source": "auto",
+      "reason": "Face detection: 4 face(s), band 157-514 of 1875px."
+    },
+    "20260228-123631": {
+      "focus": "center 78%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 438-680 of 1875px."
+    },
+    "20260228-122524": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 4 face(s), band 867-1210 of 1875px."
+    },
+    "20260228-122514": {
+      "focus": "center 94%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 513-701 of 1875px."
+    },
+    "20260228-121622": {
+      "focus": "center 0%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 39-753 of 1875px."
+    },
+    "20260228-115156": {
+      "focus": "center 0%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 64-222 of 2114px."
+    },
+    "20260221-131647": {
+      "focus": "center 39%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 817-1103 of 3333px."
+    },
+    "20260210-182245": {
+      "focus": "center 29%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 323-564 of 2278px."
+    },
+    "20260210-181009": {
+      "focus": "center 47%",
+      "source": "auto",
+      "reason": "Face detection: 6 face(s), band 287-464 of 1863px."
+    },
+    "20260210-173921": {
+      "focus": "center 12%",
+      "source": "auto",
+      "reason": "Face detection: 6 face(s), band 128-1314 of 1875px."
+    },
+    "20260210-173837": {
+      "focus": "center 53%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 513-671 of 1562px."
+    },
+    "20260210-173754": {
+      "focus": "center 16%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 272-686 of 2566px."
+    },
+    "20260207-110107": {
+      "focus": "center 16%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 180-758 of 2105px."
+    },
+    "20260207-103425": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 621-1028 of 1875px."
+    },
+    "20260207-102942": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 7 face(s), band 609-1749 of 1875px."
+    },
+    "20260207-102148": {
+      "focus": "center 30%",
+      "source": "auto",
+      "reason": "Face detection: 5 face(s), band 288-1026 of 2127px."
+    },
+    "20260129-183715-280-29": {
+      "focus": "center 8%",
+      "source": "auto",
+      "reason": "Face detection: 6 face(s), band 101-691 of 1786px."
+    },
+    "20260128-110756": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 9 face(s), band 383-717 of 1522px."
+    },
+    "photo-jul-10-2026-2c-12-24-21-pm": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 2025-2719 of 3333px."
+    },
+    "14923": {
+      "focus": "center 39%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 176-1594 of 1875px."
+    },
+    "706780983-18582885499062494-712436914753000047-n": {
+      "focus": "center 39%",
+      "source": "auto",
+      "reason": "Face detection: 6 face(s), band 385-642 of 1560px."
+    },
+    "fb-img-1778620353437": {
+      "focus": "center 91%",
+      "source": "auto",
+      "reason": "Face detection: 7 face(s), band 407-711 of 1536px."
+    },
+    "photo-jul-01-2026-2c-11-21-45-am": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 871-1029 of 1875px."
+    },
+    "682302098e242efce719380e766ae1d7": {
+      "focus": "center 12%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 127-478 of 1444px."
+    },
+    "photo-apr-30-2026-2c-11-59-16-am": {
+      "focus": "center 46%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 961-1117 of 3333px."
+    },
+    "photo-jun-27-2026-2c-10-33-12-am": {
+      "focus": "center 68%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 1375-1581 of 3333px."
+    },
+    "fb-img-1778620390361": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 1636-1737 of 2048px."
+    },
+    "photo-jun-04-2026-2c-10-20-23-am-281-29": {
+      "focus": "center 69%",
+      "source": "auto",
+      "reason": "Face detection: 5 face(s), band 1397-1725 of 3333px."
+    },
+    "photo-jul-01-2026-2c-10-07-08-am": {
+      "focus": "center 42%",
+      "source": "auto",
+      "reason": "Face detection: 8 face(s), band 268-564 of 1875px."
+    },
+    "photo-may-23-2026-2c-3-13-31-pm": {
+      "focus": "center 46%",
+      "source": "auto",
+      "reason": "Face detection: 4 face(s), band 951-1375 of 3333px."
+    },
+    "photo-jul-01-2026-2c-2-02-49-pm": {
+      "focus": "center 52%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 1077-1399 of 3333px."
+    },
+    "photo-jul-01-2026-2c-9-38-09-am": {
+      "focus": "center 52%",
+      "source": "auto",
+      "reason": "Face detection: 4 face(s), band 1075-1446 of 3333px."
+    },
+    "2026-2nd-annual-women-warriors-leadership-luncheon-tickets-on-sale-flyer-final-web": {
+      "focus": "center 39%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 785-1094 of 3235px."
+    },
+    "photo-jun-04-2026-2c-11-32-44-am-281-29": {
+      "focus": "center 70%",
+      "source": "auto",
+      "reason": "Face detection: 5 face(s), band 1410-1781 of 3333px."
+    },
+    "photo-jun-13-2026-2c-2-33-32-pm": {
+      "focus": "center 24%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 541-711 of 3333px."
+    },
+    "photo-jul-10-2026-2c-12-18-45-pm": {
+      "focus": "center 40%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 844-1501 of 3333px."
+    },
+    "photo-apr-30-2026-2c-1-31-32-pm": {
+      "focus": "center 71%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 1435-1704 of 3333px."
+    },
+    "14921": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 2045-2558 of 2772px."
+    },
+    "photo-jun-26-2026-2c-12-45-47-pm": {
+      "focus": "center 62%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 1270-1516 of 3333px."
+    },
+    "photo-jun-11-2026-2c-9-33-34-am": {
+      "focus": "center 45%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 933-1255 of 3333px."
+    },
+    "photo-jun-27-2026-2c-11-50-04-am": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 2123-2274 of 3333px."
+    },
+    "694303530-18578629891062494-9120655707829730797-n": {
+      "focus": "center 72%",
+      "source": "auto",
+      "reason": "Face detection: 10 face(s), band 250-411 of 1152px."
+    },
+    "20251107-160842": {
+      "focus": "center 52%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 1069-1495 of 3333px."
+    },
+    "20251107-153509": {
+      "focus": "center 27%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 594-1173 of 3333px."
+    },
+    "20251107-153457": {
+      "focus": "center 78%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 536-784 of 2000px."
+    },
+    "20251101-141612": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 2501-2943 of 3333px."
+    },
+    "20251101-120644": {
+      "focus": "center 52%",
+      "source": "auto",
+      "reason": "Face detection: 6 face(s), band 333-1010 of 1914px."
+    },
+    "20250918-095610": {
+      "focus": "center 56%",
+      "source": "auto",
+      "reason": "Face detection: 8 face(s), band 334-677 of 1875px."
+    },
+    "20250906-140653": {
+      "focus": "center 18%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 247-573 of 2245px."
+    },
+    "20250906-132128": {
+      "focus": "center 14%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 207-586 of 2046px."
+    },
+    "20250906-131748": {
+      "focus": "center 15%",
+      "source": "auto",
+      "reason": "Face detection: 6 face(s), band 253-1256 of 2527px."
+    },
+    "20250906-123331": {
+      "focus": "center 68%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 391-550 of 1875px."
+    },
+    "20250906-123149": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 3 face(s), band 1074-1441 of 1875px."
+    },
+    "20250906-123031": {
+      "focus": "center 77%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 429-556 of 1875px."
+    },
+    "20250906-113340": {
+      "focus": "center 83%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 460-705 of 1875px."
+    },
+    "20250906-112921": {
+      "focus": "center 18%",
+      "source": "auto",
+      "reason": "Face detection: 8 face(s), band 275-919 of 2424px."
+    },
+    "20250906-111438": {
+      "focus": "center 13%",
+      "source": "auto",
+      "reason": "Face detection: 6 face(s), band 52-1477 of 1875px."
+    },
+    "20250906-103500": {
+      "focus": "center 57%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 336-750 of 1875px."
+    },
+    "20250808-112547-281-29": {
+      "focus": "center 0%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 14-206 of 1213px."
+    },
+    "20250626-181836": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 4 face(s), band 572-1578 of 1875px."
     }
   }
 }
