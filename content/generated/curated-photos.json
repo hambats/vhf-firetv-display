@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-19T01:33:02.430Z",
+  "generatedAt": "2026-09-19T23:39:24.649Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -82,7 +82,7 @@
       {
         "id": "military-art/USS_Asheville_(PG-84)_underway_in_1966.jpg",
         "src": "content/artwork/curated/military-art/USS_Asheville_(PG-84)_underway_in_1966.jpg",
-        "caption": "USS Asheville (PG-84) — an Asheville-class patrol gunboat commissioned in 1966 and deployed to Vietnam's coastal waters under Operation Market Time, intercepting enemy supply traffic; the second Navy ship to carry the city's name."
+        "caption": "USS Asheville (PG-84) — a Ashville-class patrol gunboat commissioned in 1966 and deployed to Vietnam's coastal waters under Operation Market Time, intercepting enemy supply traffic; the second Navy ship to carry the city's name."
       },
       {
         "id": "military-art/USS_Gallup_(PG-85)_operating_in_the_South_China_Sea_in_June_1967.jpg",
@@ -157,12 +157,12 @@
         "src": "content/artwork/curated/program-beekeeping/3941365436047235790_3941363578256282880.jpg"
       },
       {
-        "id": "program-beekeeping/pptx-suiting-up.jpg",
-        "src": "content/artwork/curated/program-beekeeping/pptx-suiting-up.jpg"
-      },
-      {
         "id": "program-beekeeping/pptx-harvesting-frame.png",
         "src": "content/artwork/curated/program-beekeeping/pptx-harvesting-frame.png"
+      },
+      {
+        "id": "program-beekeeping/pptx-suiting-up.jpg",
+        "src": "content/artwork/curated/program-beekeeping/pptx-suiting-up.jpg"
       }
     ],
     "program-chair-massage": [
@@ -201,12 +201,12 @@
     ],
     "program-garden-group": [
       {
-        "id": "program-garden-group/pptx-tarp-planting.jpg",
-        "src": "content/artwork/curated/program-garden-group/pptx-tarp-planting.jpg"
-      },
-      {
         "id": "program-garden-group/pptx-direct-seeding.jpg",
         "src": "content/artwork/curated/program-garden-group/pptx-direct-seeding.jpg"
+      },
+      {
+        "id": "program-garden-group/pptx-tarp-planting.jpg",
+        "src": "content/artwork/curated/program-garden-group/pptx-tarp-planting.jpg"
       }
     ],
     "program-hendersonville-womans-club": [
@@ -233,8 +233,8 @@
         "src": "content/artwork/curated/program-herb-squad/489538612_18492103174062494_369641944237549103_n.jpg"
       },
       {
-        "id": "program-herb-squad/pptx-weeding-flower-bed.jpg",
-        "src": "content/artwork/curated/program-herb-squad/pptx-weeding-flower-bed.jpg"
+        "id": "program-herb-squad/pptx-drying-roselle.jpg",
+        "src": "content/artwork/curated/program-herb-squad/pptx-drying-roselle.jpg"
       },
       {
         "id": "program-herb-squad/pptx-flower-harvest-walk.jpg",
@@ -249,8 +249,8 @@
         "src": "content/artwork/curated/program-herb-squad/pptx-sorting-roselle.jpg"
       },
       {
-        "id": "program-herb-squad/pptx-drying-roselle.jpg",
-        "src": "content/artwork/curated/program-herb-squad/pptx-drying-roselle.jpg"
+        "id": "program-herb-squad/pptx-weeding-flower-bed.jpg",
+        "src": "content/artwork/curated/program-herb-squad/pptx-weeding-flower-bed.jpg"
       }
     ],
     "program-kitchen-medicine": [
@@ -361,6 +361,12 @@
       {
         "id": "program-soap-making/freestocks-DlZD4V2j9oM-unsplash.jpg",
         "src": "content/artwork/curated/program-soap-making/freestocks-DlZD4V2j9oM-unsplash.jpg"
+      }
+    ],
+    "program-sourdough": [
+      {
+        "id": "program-sourdough/sourdough-loaf.jpg",
+        "src": "content/artwork/curated/program-sourdough/sourdough-loaf.jpg"
       }
     ],
     "program-woodworking": [

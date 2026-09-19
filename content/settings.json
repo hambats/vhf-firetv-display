@@ -32,6 +32,14 @@
         "note": "Run by an outside race organiser, not through VHF's own registration."
       },
       {
+        "id": "va-donation-day",
+        "titleContains": [
+          "donation day"
+        ],
+        "hide": true,
+        "note": "A drop-off drive, not a class — there is nothing to register for, so a registration code would send people somewhere irrelevant."
+      },
+      {
         "id": "hendersonville-womens-club",
         "titleContains": [
           "hendersonville women"
