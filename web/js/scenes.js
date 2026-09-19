@@ -253,13 +253,33 @@ var VhfScenes = (function () {
     return picked;
   }
 
-  function upcomingEvents(data, limit, offset) {
+  // titleContainsAny: true if evt.title contains any of the given
+  // substrings, case-insensitive. Used both to pull a recurring program's
+  // occurrences into their own consolidated list (content.titleContains on
+  // an "events" scene) and to keep those same occurrences from also
+  // showing individually (content.excludeTitleContains on an "event"/
+  // "event-pool" scene) — one program's events, one slide, not both.
+  function titleContainsAny(title, substrings) {
+    var lower = (title || "").toLowerCase();
+    for (var i = 0; i < substrings.length; i++) {
+      if (lower.indexOf(substrings[i].toLowerCase()) !== -1) return true;
+    }
+    return false;
+  }
+
+  function upcomingEvents(data, limit, offset, opts) {
     var events = (data.events && data.events.events) || [];
     var now = Date.now();
     var upcoming = events.filter(function (e) {
       var end = e.end || e.start;
       return new Date(end).getTime() >= now;
     });
+    if (opts && opts.titleContains) {
+      upcoming = upcoming.filter(function (e) { return titleContainsAny(e.title, opts.titleContains); });
+    }
+    if (opts && opts.excludeTitleContains) {
+      upcoming = upcoming.filter(function (e) { return !titleContainsAny(e.title, opts.excludeTitleContains); });
+    }
     upcoming.sort(function (a, b) {
       return new Date(a.start).getTime() - new Date(b.start).getTime();
     });
@@ -497,7 +517,8 @@ var VhfScenes = (function () {
   var eventPoolShuffled = [];
 
   function renderEventPool(item, data) {
-    var upcoming = upcomingEvents(data, 999, 0);
+    var content = item.content || {};
+    var upcoming = upcomingEvents(data, 999, 0, { excludeTitleContains: content.excludeTitleContains });
     if (upcoming.length === 0) throw new Error("no upcoming events for event pool");
 
     // Drop any stale entries left over from a previous (now-expired) pool
@@ -524,7 +545,7 @@ var VhfScenes = (function () {
 
   function renderEvents(item, data) {
     var content = item.content || {};
-    var upcoming = upcomingEvents(data, content.limit || 8, content.offset || 0);
+    var upcoming = upcomingEvents(data, content.limit || 8, content.offset || 0, { titleContains: content.titleContains });
     if (upcoming.length === 0) throw new Error("no upcoming events to show");
     var scene = el("div", "scene scene--events");
     appendWash(scene, data);

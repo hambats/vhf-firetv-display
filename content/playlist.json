@@ -32,14 +32,23 @@
       "type": "event-pool",
       "duration": 12,
       "enabled": true,
-      "content": {}
+      "content": {
+        "excludeTitleContains": [
+          "open studio pottery",
+          "open pottery studio"
+        ]
+      }
     },
     {
       "id": "in-uniform-pool",
       "type": "photo-pool",
       "duration": 10,
       "enabled": true,
-      "content": { "source": "in-uniform", "eyebrow": "Our Members, In Uniform", "showEvery": 3 }
+      "content": {
+        "source": "in-uniform",
+        "eyebrow": "Our Members, In Uniform",
+        "showEvery": 3
+      }
     },
     {
       "id": "photo-pool-2",
@@ -76,7 +85,23 @@
       "type": "event-pool",
       "duration": 12,
       "enabled": true,
-      "content": {}
+      "content": {
+        "excludeTitleContains": [
+          "open studio pottery",
+          "open pottery studio"
+        ]
+      }
+    },
+    {
+      "id": "open-studio-pottery-dates",
+      "type": "events",
+      "duration": 12,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Open Studio Pottery with Sophia",
+        "limit": 8,
+        "titleContains": ["open studio pottery", "open pottery studio"]
+      }
     },
     {
       "id": "photo-pool-3",
@@ -119,14 +144,22 @@
       "type": "event-pool",
       "duration": 12,
       "enabled": true,
-      "content": {}
+      "content": {
+        "excludeTitleContains": [
+          "open studio pottery",
+          "open pottery studio"
+        ]
+      }
     },
     {
       "id": "military-art-pool",
       "type": "photo-pool",
       "duration": 10,
       "enabled": true,
-      "content": { "source": "military-art", "eyebrow": "Military Heritage" }
+      "content": {
+        "source": "military-art",
+        "eyebrow": "Military Heritage"
+      }
     },
     {
       "id": "photo-pool-4",
@@ -155,7 +188,12 @@
         "eyebrow": "Workshops",
         "title": "Designed to Heal",
         "body": "Equine and art therapy, blacksmithing, herbal medicine, and more — 85 workshops and 795 participants in 2025 alone.",
-        "washSources": ["program-equine-therapy", "program-art-therapy", "program-blacksmithing", "program-herb-squad"]
+        "washSources": [
+          "program-equine-therapy",
+          "program-art-therapy",
+          "program-blacksmithing",
+          "program-herb-squad"
+        ]
       }
     },
     {
@@ -170,7 +208,12 @@
       "type": "event-pool",
       "duration": 12,
       "enabled": true,
-      "content": {}
+      "content": {
+        "excludeTitleContains": [
+          "open studio pottery",
+          "open pottery studio"
+        ]
+      }
     },
     {
       "id": "resource-fair",
@@ -234,7 +277,12 @@
       "type": "event-pool",
       "duration": 12,
       "enabled": true,
-      "content": {}
+      "content": {
+        "excludeTitleContains": [
+          "open studio pottery",
+          "open pottery studio"
+        ]
+      }
     },
     {
       "id": "free-programs",
@@ -266,7 +314,12 @@
       "type": "event-pool",
       "duration": 12,
       "enabled": true,
-      "content": {}
+      "content": {
+        "excludeTitleContains": [
+          "open studio pottery",
+          "open pottery studio"
+        ]
+      }
     },
     {
       "id": "volunteer-groups",
