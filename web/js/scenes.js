@@ -308,6 +308,12 @@ var VhfScenes = (function () {
 
   function renderInformation(item, data) {
     var content = item.content || {};
+    // Same 1-in-N throttle renderPhotoPool uses (content.showEvery) — an
+    // information slide can be over-shown relative to its content just as
+    // easily as a thin photo pool can.
+    if (throttled(item.id, content.showEvery)) {
+      throw new Error("throttled: showing 1 in " + content.showEvery + " passes");
+    }
     var className = "scene scene--information";
     // content.family lets a small subset of "information" slides (impact
     // numbers, the crisis-line slide) opt into a different ground/anchor

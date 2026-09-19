@@ -67,7 +67,8 @@
       "content": {
         "eyebrow": "Our History",
         "title": "Founded in 2013",
-        "body": "John and Nicole Mahshie founded Veterans Healing Farm with a vision to end the Veteran suicide crisis through nature, connection, and purpose."
+        "body": "John and Nicole Mahshie founded Veterans Healing Farm with a vision to end the Veteran suicide crisis through nature, connection, and purpose.",
+        "showEvery": 2
       }
     },
     {

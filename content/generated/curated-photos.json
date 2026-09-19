@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-18T23:57:19.164Z",
+  "generatedAt": "2026-09-19T00:02:41.833Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -100,10 +100,6 @@
       }
     ],
     "program-5k-fundraiser": [
-      {
-        "id": "program-5k-fundraiser/VD-Medal-Reveal-980x1030.jpg",
-        "src": "content/artwork/curated/program-5k-fundraiser/VD-Medal-Reveal-980x1030.jpg"
-      },
       {
         "id": "program-5k-fundraiser/VDF_5k_2026Logo_-598x1030.png",
         "src": "content/artwork/curated/program-5k-fundraiser/VDF_5k_2026Logo_-598x1030.png"
