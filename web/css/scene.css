@@ -549,6 +549,25 @@ html, body {
   color: var(--vhf-text-on-terracotta);
 }
 
+/* An announcement with its program's graphic card (top-right, see
+   .scene__event-graphic) can't use the default centered-across-full-width
+   layout above — the card sits in the same space centered text runs
+   through. Left-anchored and narrower instead, matching the card's own
+   left edge (right: 100px, width: 380px -> clear from ~1440px on). */
+.scene--announcement--graphic .scene__content {
+  left: 120px;
+  right: auto;
+  max-width: 1240px;
+  text-align: left;
+  padding: 0;
+}
+
+.scene--announcement--graphic .scene__title {
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+}
+
 /* ---- Custom artwork scene ---- */
 
 .scene--custom .scene__photo-img {

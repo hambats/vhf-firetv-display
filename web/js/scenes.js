@@ -386,9 +386,15 @@ var VhfScenes = (function () {
     // designed graphic (the same badge/medal/shirt card the event scene
     // uses) rather than the plain solid-color ground every other
     // announcement gets — reuses appendEventGraphic since the treatment
-    // (contained card, portrait print asset) is identical.
+    // (contained card, portrait print asset) is identical. The default
+    // announcement layout centers text across the full width, which runs
+    // straight under the card's fixed top-right position — the
+    // "--graphic" modifier switches to a left-anchored, narrower layout
+    // that actually leaves the card's column clear.
     var graphicSource = ANNOUNCEMENT_GRAPHIC_SOURCES[announcement.id];
-    if (graphicSource) appendEventGraphic(scene, data, graphicSource);
+    if (graphicSource && appendEventGraphic(scene, data, graphicSource)) {
+      scene.className += " scene--announcement--graphic";
+    }
     scene.appendChild(el("div", "scene__fade"));
     lockup(scene);
     var body = el("div", "scene__content");

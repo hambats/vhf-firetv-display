@@ -21,6 +21,10 @@
     {
       "id": "photo-jul-10-2026-2c-2-13-16-pm",
       "reason": "Same burst as photo-jul-10-2026-2c-2-13-19-pm (3 seconds apart) — also shows the farm's WiFi password legible in the background. Security concern, flagged 2026-09-18."
+    },
+    {
+      "id": "20260221-123622",
+      "reason": "Classroom photo (Feb 21) — same whiteboard-WiFi-password pattern as the two Jul 10 exclusions above, different date/session. Security concern, flagged 2026-09-18. This is the third occurrence of the same pattern (staff writing the WiFi password on the classroom whiteboard where it gets photographed) — worth a heads-up to whoever runs workshops there, since more instances likely exist in the untracked ~270 candidate photos the 120-photo sample doesn't cover."
     }
   ]
 }
