@@ -606,7 +606,11 @@ Costs the shell adds, so nobody rediscovers them:
 
 4. **Installing it needs ADB once.** The no-PC alternative is the Downloader app from the Fire TV
    appstore, with the APK published alongside the content — worth doing if the television
-   is ever reinstalled by someone without a laptop.
+   is ever reinstalled by someone without a laptop. *Update (Sept 19): ADB is no longer farm-only.
+   The television runs Tailscale with always-on VPN, so installs and diagnostics work from
+   anywhere — see [REMOTE_ACCESS.md](REMOTE_ACCESS.md). The same test confirmed `BootReceiver`
+   recovering the display after a power cut, twice; the "no guarantee" above stands as a caveat,
+   not as an expectation of failure.*
 5. **The APK is signed with the local debug key.** Deliberate: one sideloaded television, no store,
    and a release-key ceremony would only add a secret to guard. The consequence is that a rebuild
    from a different machine's debug keystore will not install over this one without an uninstall.
