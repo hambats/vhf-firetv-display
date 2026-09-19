@@ -39,6 +39,42 @@ test("the registration URL is https and absolute", async () => {
   assert.equal(url.protocol, "https:", "a public display must not advertise a plain-http link");
 });
 
+/*
+ * Overrides are the easy thing to get wrong: adding one to settings.json without
+ * re-running the generator leaves the scene pointing at an SVG that does not
+ * exist, and a missing image on a television is a silent blank corner.
+ */
+test("every registration override has a matching, current QR file", async () => {
+  const reg = await readRegistration();
+  for (const o of reg.overrides || []) {
+    assert.ok(o.id, "an override is missing its id");
+    assert.match(o.id, /^[a-z0-9][a-z0-9-]*$/, `override id "${o.id}" is not filename-safe`);
+    assert.ok(o.titleContains && o.titleContains.length, `override "${o.id}" matches nothing`);
+
+    // A `hide` override suppresses the code instead of redirecting it, so it
+    // carries no URL and needs no generated file.
+    if (o.hide) {
+      assert.ok(!o.url, `override "${o.id}" cannot both hide the code and supply a url`);
+      continue;
+    }
+    assert.equal(new URL(o.url).protocol, "https:", `override "${o.id}" must be https`);
+
+    const file = path.join(ROOT, "web", "img", `register-qr-${o.id}.svg`);
+    const svg = await fs.readFile(file, "utf8").catch(() => null);
+    assert.ok(svg, `missing web/img/register-qr-${o.id}.svg — run: node scripts/generate-qr.mjs`);
+    assert.ok(
+      svg.includes(`<!-- encodes: ${o.url} -->`),
+      `web/img/register-qr-${o.id}.svg is stale — run: node scripts/generate-qr.mjs`
+    );
+  }
+});
+
+test("override ids are unique", async () => {
+  const reg = await readRegistration();
+  const ids = (reg.overrides || []).map((o) => o.id);
+  assert.equal(new Set(ids).size, ids.length, "two overrides share an id, so one QR file overwrites the other");
+});
+
 test("the QR keeps the error correction its centre logo depends on", async () => {
   const svg = await readSvg();
   // The seal covers part of the code; only level H has the headroom to survive

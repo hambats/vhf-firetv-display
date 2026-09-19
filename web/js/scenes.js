@@ -504,16 +504,43 @@ var VhfScenes = (function () {
    * just clutter. Driven entirely by settings.json: no registration.url, no
    * code, no layout change.
    *
-   * One registration page covers every program (you pick the event after
-   * signing in), so this is one static code rather than one per event —
-   * which is also why it can be generated at build time and cached offline.
+   * One registration page covers most programs (you pick the event after
+   * signing in), so the default is a single static code rather than one per
+   * event — which is also why it can be generated at build time and cached
+   * offline.
+   *
+   * `registration.overrides` handles the events that register somewhere else:
+   * the Veterans Day 5K is run by an outside race organiser, and sending
+   * runners to the workshop signup would be worse than showing no code at all.
+   * Matching is on a title substring, the same shape as the playlist's own
+   * titleContains, so a recurring series matches every occurrence.
    */
-  function appendRegistration(container, data) {
+  function matchRegistration(reg, title) {
+    var overrides = reg.overrides || [];
+    var hay = String(title || "").toLowerCase();
+    for (var i = 0; i < overrides.length; i++) {
+      var o = overrides[i] || {};
+      var needles = o.titleContains || [];
+      for (var j = 0; j < needles.length; j++) {
+        if (hay.indexOf(String(needles[j]).toLowerCase()) !== -1) {
+          if (o.hide) return null;
+          return { asset: "img/register-qr-" + o.id + ".svg", label: o.label || reg.label };
+        }
+      }
+    }
+    return { asset: "img/register-qr.svg", label: reg.label };
+  }
+
+  function appendRegistration(container, data, title) {
     var reg = (data && data.settings && data.settings.registration) || null;
     if (!reg || !reg.url) return;
+    // null means a `hide` override matched: an event nobody can register for
+    // is better with no code than with one that leads somewhere irrelevant.
+    var pick = matchRegistration(reg, title);
+    if (!pick) return;
     var block = el("div", "scene__qr");
-    block.appendChild(img("scene__qr-code", "img/register-qr.svg", "decoration"));
-    if (reg.label) block.appendChild(el("p", "scene__qr-label", reg.label));
+    block.appendChild(img("scene__qr-code", pick.asset, "decoration"));
+    if (pick.label) block.appendChild(el("p", "scene__qr-label", pick.label));
     container.appendChild(block);
   }
 
@@ -541,7 +568,7 @@ var VhfScenes = (function () {
     scene.appendChild(body);
     // On the scene, not inside .scene__content: the code is positioned against
     // the right edge, opposite the text column, rather than flowing under it.
-    appendRegistration(scene, data);
+    appendRegistration(scene, data, evt.title);
     brand(scene);
     return scene;
   }
@@ -622,7 +649,7 @@ var VhfScenes = (function () {
     // A dates list is as registerable as a single event — more so, since it is
     // the recurring programs (Open Studio, the ornament workshop) people most
     // often want to sign up for. Same one registration page either way.
-    appendRegistration(scene, data);
+    appendRegistration(scene, data, content.title || (upcoming[0] && upcoming[0].title));
     brand(scene);
     return scene;
   }

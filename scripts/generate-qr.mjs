@@ -1,21 +1,28 @@
 #!/usr/bin/env node
 /*
- * Generate the registration QR code shown on event scenes.
+ * Generate the registration QR codes shown on event and dates-list scenes.
  *
  *   node scripts/generate-qr.mjs
  *
- * Reads `registration.url` from content/settings.json and writes
- * web/img/register-qr.svg, with the VHF seal composited into the centre.
+ * Reads `registration` from content/settings.json and writes one SVG per
+ * distinct registration URL, each with the VHF seal composited into the centre:
+ * the default becomes web/img/register-qr.svg, and every entry in
+ * `registration.overrides` becomes web/img/register-qr-<id>.svg.
+ *
+ * Overrides exist because not every VHF event registers through the same
+ * system. The Veterans Day 5K is run by an outside race organiser and has its
+ * own page; pointing that slide at the workshop registration would send
+ * runners somewhere useless.
  *
  * Why generate rather than hand off an image file: the payload is then correct
  * by construction. A QR code is unreadable to a human, so a wrong or stale one
- * looks exactly like a right one until a veteran scans it and lands nowhere.
- * tests/qr.test.mjs fails if this file and settings.json ever disagree.
+ * looks exactly like a right one until someone scans it and lands nowhere.
+ * tests/qr.test.mjs fails if these files and settings.json ever disagree.
  *
  * The output is committed rather than built on the fly, the same as the app
  * icons: the display must work offline and CLAUDE.md caps it at two hosts, so
  * nothing here may reach for a QR service or a runtime library. Re-run this
- * after changing the URL.
+ * after changing any registration URL.
  */
 import { promises as fs } from "node:fs";
 import path from "node:path";
@@ -28,7 +35,8 @@ const SETTINGS = path.join(ROOT, "content", "settings.json");
 // 57 device pixels inside the code, and embedding the full-size logo made the
 // SVG 78 KB of base64 for no visible gain.
 const LOGO = path.join(ROOT, "content", "artwork", "brand", "vhf-logo-128.png");
-const OUT = path.join(ROOT, "web", "img", "register-qr.svg");
+const OUT_DIR = path.join(ROOT, "web", "img");
+const DEFAULT_OUT = path.join(OUT_DIR, "register-qr.svg");
 
 /*
  * Level H tolerates ~30% of the code being obscured, which is what buys room
@@ -37,22 +45,18 @@ const OUT = path.join(ROOT, "web", "img", "register-qr.svg");
 const ERROR_CORRECTION = "H";
 
 /* Fraction of the code's width covered by the logo plate. 0.22 stays well
- * inside what level H can reconstruct; pushing past ~0.3 starts costing scans. */
+ * inside what level H can reconstruct; past ~0.3 it starts costing scans. */
 const LOGO_FRACTION = 0.22;
 
-async function main() {
-  const settings = JSON.parse(await fs.readFile(SETTINGS, "utf8"));
-  const url = settings.registration && settings.registration.url;
-  if (!url) throw new Error('content/settings.json: "registration.url" is missing');
-
+async function buildOne(url, outPath, logo) {
   const svg = await QRCode.toString(url, {
     type: "svg",
     errorCorrectionLevel: ERROR_CORRECTION,
     margin: 2,
     // The light field is transparent here and supplied by the scene instead
-    // (.scene__qr in web/css/scene.css), so the code sits on a designed cream
-    // card rather than a hard white square. It is still a light field -- a QR
-    // over the event scene's dark fade would not scan at all.
+    // (.scene__qr-code in web/css/scene.css), so the code sits on a designed
+    // cream card rather than a hard white square. It is still a light field --
+    // a QR over the event scene's dark fade would not scan at all.
     color: { dark: "#12210f", light: "#0000" }
   });
 
@@ -61,18 +65,18 @@ async function main() {
   if (!viewBox) throw new Error("could not read the viewBox from the generated SVG");
   const size = Number(viewBox[1]);
 
-  const logo = await fs.readFile(LOGO);
   const plate = size * LOGO_FRACTION;
-  const mark = plate * 0.84; // a little white breathing room inside the plate
+  const mark = plate * 0.84; // a little breathing room inside the plate
   const plateXY = (size - plate) / 2;
   const markXY = (size - mark) / 2;
 
   // The plate behind the seal stays opaque: it is what the error correction is
-  // "spending" its 30% headroom on, and a translucent one would let the photo
+  // spending its 30% headroom on, and a translucent one would let the photo
   // through and break the contrast the decoder needs.
   const overlay =
     `<rect x="${plateXY.toFixed(3)}" y="${plateXY.toFixed(3)}" ` +
-    `width="${plate.toFixed(3)}" height="${plate.toFixed(3)}" rx="${(plate * 0.16).toFixed(3)}" fill="#f6f3ea"/>` +
+    `width="${plate.toFixed(3)}" height="${plate.toFixed(3)}" ` +
+    `rx="${(plate * 0.16).toFixed(3)}" fill="#f6f3ea"/>` +
     `<image x="${markXY.toFixed(3)}" y="${markXY.toFixed(3)}" ` +
     `width="${mark.toFixed(3)}" height="${mark.toFixed(3)}" ` +
     `preserveAspectRatio="xMidYMid meet" ` +
@@ -86,11 +90,40 @@ async function main() {
     .replace("<svg ", `<!-- generated by scripts/generate-qr.mjs -->\n<!-- encodes: ${url} -->\n<svg `)
     .replace("</svg>", `${overlay}</svg>`);
 
-  await fs.mkdir(path.dirname(OUT), { recursive: true });
-  await fs.writeFile(OUT, annotated.trimEnd() + "\n", "utf8");
+  await fs.mkdir(path.dirname(outPath), { recursive: true });
+  await fs.writeFile(outPath, annotated.trimEnd() + "\n", "utf8");
+  console.log(`[qr] ${path.relative(ROOT, outPath)}  (level ${ERROR_CORRECTION}, ${size}x${size})`);
+  console.log(`[qr]   -> ${url}`);
+}
 
-  console.log(`[qr] ${url}`);
-  console.log(`[qr] level ${ERROR_CORRECTION}, ${size}x${size} units -> ${path.relative(ROOT, OUT)}`);
+/* An override's id is also its filename, so keep it to something safe. */
+function assertSafeId(id) {
+  if (!/^[a-z0-9][a-z0-9-]*$/.test(id)) {
+    throw new Error(`registration override id "${id}" must be lowercase letters, digits and hyphens`);
+  }
+}
+
+async function main() {
+  const settings = JSON.parse(await fs.readFile(SETTINGS, "utf8"));
+  const reg = settings.registration || {};
+  if (!reg.url) throw new Error('content/settings.json: "registration.url" is missing');
+
+  const logo = await fs.readFile(LOGO);
+  await buildOne(reg.url, DEFAULT_OUT, logo);
+
+  const seen = new Set();
+  for (const o of reg.overrides || []) {
+    if (!o.id) throw new Error("each registration override needs an id");
+    // A `hide` override suppresses the code rather than redirecting it -- an
+    // external group booking the room has nothing for a viewer to register
+    // for -- so there is no URL and nothing to generate.
+    if (o.hide) continue;
+    if (!o.url) throw new Error(`registration override "${o.id}" needs a url (or "hide": true)`);
+    assertSafeId(o.id);
+    if (seen.has(o.id)) throw new Error(`duplicate registration override id: ${o.id}`);
+    seen.add(o.id);
+    await buildOne(o.url, path.join(OUT_DIR, `register-qr-${o.id}.svg`), logo);
+  }
 }
 
 main().catch((err) => {

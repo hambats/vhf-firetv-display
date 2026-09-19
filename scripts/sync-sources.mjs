@@ -7,7 +7,7 @@
  * Currently: gallery and calendar. Instagram is still not started; add it
  * here once its adapter lands.
  */
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import path from "node:path";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -15,7 +15,11 @@ const ROOT = path.resolve(__dirname, "..");
 
 async function run(label, modulePath) {
   console.log(`\n=== ${label} ===`);
-  await import(modulePath);
+  // pathToFileURL, not the bare path: ESM import() accepts only file:, data:
+  // and node: URLs, and a Windows absolute path parses as scheme "d:". On
+  // POSIX a bare path happens to work, which is why this ran fine everywhere
+  // except the machine the display is actually published from.
+  await import(pathToFileURL(modulePath).href);
 }
 
 async function main() {

@@ -20,6 +20,25 @@
   },
   "registration": {
     "url": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
-    "label": "Scan to register"
+    "label": "Scan to register",
+    "overrides": [
+      {
+        "id": "veterans-day-5k",
+        "titleContains": [
+          "veterans day 5k"
+        ],
+        "url": "https://kickitevents.com/veteransday5k/",
+        "label": "Scan to register",
+        "note": "Run by an outside race organiser, not through VHF's own registration."
+      },
+      {
+        "id": "hendersonville-womens-club",
+        "titleContains": [
+          "hendersonville women"
+        ],
+        "hide": true,
+        "note": "An external group that books the space; there is nothing for a viewer to register for."
+      }
+    ]
   }
 }

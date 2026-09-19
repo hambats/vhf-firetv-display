@@ -7,7 +7,8 @@
  * deployed.
  *
  * Only what the viewer actually fetches is published — see PUBLISHED_CONTENT.
- * The curation files (gallery-exclude.json, events-exclude.json) are
+ * The curation files (gallery-exclude.json, gallery-focus.json,
+ * events-exclude.json) are
  * PC-side-only working notes: the display reads neither, and their free-text
  * `reason` fields record why each photo was pulled from rotation. They have no
  * business on a public URL.

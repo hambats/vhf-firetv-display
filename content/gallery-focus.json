@@ -1,0 +1,22 @@
+{
+  "note": "Per-photo crop focus for the scraped gallery pool. content/generated/gallery.json is regenerated from scratch on every sync, so a `focus` value hand-edited there is silently destroyed on the next run -- this file is where it has to live instead. sources/gallery/index.mjs applies it at generation time.",
+  "howItWorks": "The value is a CSS object-position. The display crops each photo to 16:9, and the percentage says which part of the photo's height survives: 0% keeps the top, 100% keeps the bottom, and the default is 'center 35%'. A tall group portrait usually needs a LOWER number, because faces are near the top and 35% starts the crop below them.",
+  "focus": {
+    "a6d929e4f68006b2d1feb20db6b3c919": {
+      "focus": "center 15%",
+      "reason": "Three people holding a quilt, 1080x1204. At the default 35% the crop begins below their chins and shows torsos only; 15% keeps all three faces with clean headroom."
+    },
+    "20260228-114204": {
+      "focus": "center 12%",
+      "reason": "Recovered after a sync overwrote it in generated/gallery.json."
+    },
+    "photo-may-22-2026-2c-2-28-22-pm": {
+      "focus": "center 22%",
+      "reason": "Recovered after a sync overwrote it in generated/gallery.json."
+    },
+    "photo-jun-24-2026-2c-11-05-31-am": {
+      "focus": "center 55%",
+      "reason": "Recovered after a sync overwrote it in generated/gallery.json. Lower subject, so the crop moves down rather than up."
+    }
+  }
+}

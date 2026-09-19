@@ -37,6 +37,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
 const OUTPUT_PATH = path.join(ROOT, "content", "generated", "gallery.json");
 const EXCLUDE_PATH = path.join(ROOT, "content", "gallery-exclude.json");
+const FOCUS_PATH = path.join(ROOT, "content", "gallery-focus.json");
 const SETTINGS_PATH = path.join(ROOT, "content", "settings.json");
 
 const GALLERY_PAGES = [
@@ -149,6 +150,34 @@ function idFromUrl(url) {
     .toLowerCase();
 }
 
+/*
+ * Per-photo crop focus, hand-maintained in content/gallery-focus.json.
+ *
+ * This file exists because gallery.json is regenerated from scratch on every
+ * run: a `focus` typed directly into the generated file survives exactly until
+ * the next sync, and then vanishes with no error. Three of them were lost that
+ * way before this was added.
+ *
+ * An unmatched id is not an error — the pool is re-sampled every run, so a
+ * photo that is tuned today may not be in the pool tomorrow and may well come
+ * back later. Keeping the entry is the point.
+ */
+async function loadFocusById() {
+  try {
+    const raw = await fs.readFile(FOCUS_PATH, "utf8");
+    const doc = JSON.parse(raw);
+    const out = new Map();
+    for (const [id, entry] of Object.entries(doc.focus || {})) {
+      const value = typeof entry === "string" ? entry : entry && entry.focus;
+      if (value) out.set(id, value);
+    }
+    return out;
+  } catch (err) {
+    if (err.code === "ENOENT") return new Map();
+    throw err;
+  }
+}
+
 async function loadExcludedIds() {
   try {
     const raw = await fs.readFile(EXCLUDE_PATH, "utf8");
@@ -163,6 +192,11 @@ async function loadExcludedIds() {
 async function main() {
   const settings = await loadGallerySettings();
   console.log(`[gallery] settings: minDimension=${settings.minDimension} maxPhotos=${settings.maxPhotos} recencyDecay=${settings.recencyDecay}`);
+
+  const focusById = await loadFocusById();
+  if (focusById.size > 0) {
+    console.log(`[gallery] ${focusById.size} crop-focus override(s) from content/gallery-focus.json`);
+  }
 
   const excludedIds = await loadExcludedIds();
   if (excludedIds.size > 0) {
@@ -213,7 +247,7 @@ async function main() {
       if (dims.width / dims.height < 0.7) continue;
       const filenameDate = parseDateFromFilename(url);
       const takenAt = filenameDate ? filenameDate.toISOString() : GALLERY_YEAR_FALLBACK[sourcePage] || null;
-      photos.push({
+      const photo = {
         id: id,
         src: url + "?format=2500w",
         width: dims.width,
@@ -221,7 +255,11 @@ async function main() {
         sourcePage,
         takenAt,
         dateSource: filenameDate ? "filename" : "gallery-page-fallback"
-      });
+      };
+      // Only set when overridden, so the renderer's own default stays the
+      // single source of truth for every untuned photo.
+      if (focusById.has(id)) photo.focus = focusById.get(id);
+      photos.push(photo);
     }
   }
 
