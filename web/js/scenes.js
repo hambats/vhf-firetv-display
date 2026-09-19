@@ -414,6 +414,38 @@ var VhfScenes = (function () {
     return scene;
   }
 
+  /*
+   * A portrait photo on a 16:9 panel is a choice between two bad options: crop
+   * it and lose a third of the frame (the reason 35 tall photos are filtered
+   * out of the pool entirely), or letterbox it against black pillars.
+   *
+   * The third option is to fill the pillars with a blurred, dimmed copy of the
+   * photo itself. The frame stays whole, the panel stays filled, and the fill
+   * reads as depth rather than as a mistake.
+   *
+   * Decided from the loaded image rather than from JSON so it applies to every
+   * source — the scraped gallery, curated artwork, a hand-placed photo scene —
+   * without any of them having to declare dimensions.
+   */
+  var PORTRAIT_FILL_MAX_ASPECT = 1.05;
+
+  /* The fill is blurred past recognition, so fetch a small derivative instead
+     of asking a TV SoC to blur a 2500px image every twelve seconds. */
+  function lowResVariant(src) {
+    return /format=\d+w/.test(src) ? src.replace(/format=\d+w/, "format=750w") : src;
+  }
+
+  function applyPortraitFill(scene, photo, src) {
+    if (!photo.naturalWidth || !photo.naturalHeight) return;
+    if (photo.naturalWidth / photo.naturalHeight > PORTRAIT_FILL_MAX_ASPECT) return;
+    if (scene.querySelector(".scene__photo-fill")) return;
+    var fill = img("scene__photo-fill", lowResVariant(src), "decoration");
+    scene.insertBefore(fill, scene.firstChild);
+    // contain, so the whole frame survives; the fill covers what it leaves.
+    photo.style.objectFit = "contain";
+    scene.className += " scene--photo-filled";
+  }
+
   function buildPhotoScene(src, fit, focus, eyebrow, photoId, caption, zoom, pan) {
     var scene = el("div", "scene scene--photo");
     var photo = img("scene__photo-img", src, "content", photoId);
@@ -434,6 +466,15 @@ var VhfScenes = (function () {
     if (pan) {
       if (pan.x) photo.style.setProperty("--vhf-pan-x", pan.x);
       if (pan.y) photo.style.setProperty("--vhf-pan-y", pan.y);
+    }
+    // A cached image can already be complete before the listener attaches, in
+    // which case no load event is ever coming.
+    if (photo.complete) {
+      applyPortraitFill(scene, photo, src);
+    } else {
+      photo.addEventListener("load", function () {
+        applyPortraitFill(scene, photo, src);
+      });
     }
     scene.appendChild(photo);
     scene.appendChild(el("div", "scene__fade scene__fade--subtle"));

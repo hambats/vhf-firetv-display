@@ -225,6 +225,10 @@ async function main() {
   const photos = [];
   let nextIndex = 0;
   let checked = 0;
+  // Why a candidate did not make it. Worth counting rather than inferring: the
+  // gap between "images on the page" and "photos on the wall" is large, and
+  // without this the only way to explain it is to read the code.
+  const rejected = { unreadable: 0, tooSmall: 0, excluded: 0, screenshot: 0, tooTall: 0 };
 
   async function worker() {
     while (nextIndex < entries.length) {
@@ -238,13 +242,14 @@ async function main() {
       }
       checked++;
       if (checked % 50 === 0) console.log(`[gallery]   checked ${checked}/${entries.length}`);
-      if (!dims || Math.max(dims.width, dims.height) < settings.minDimension) continue;
+      if (!dims) { rejected.unreadable++; continue; }
+      if (Math.max(dims.width, dims.height) < settings.minDimension) { rejected.tooSmall++; continue; }
       const id = idFromUrl(url);
-      if (excludedIds.has(id)) continue;
-      if (/screenshot/i.test(id)) continue;
+      if (excludedIds.has(id)) { rejected.excluded++; continue; }
+      if (/screenshot/i.test(id)) { rejected.screenshot++; continue; }
       // A meaningfully-taller-than-4:5 frame (e.g. a phone screenshot) reads
       // wrong in a 16:9 photo grid designed around landscape/portrait photos.
-      if (dims.width / dims.height < 0.7) continue;
+      if (dims.width / dims.height < 0.7) { rejected.tooTall++; continue; }
       const filenameDate = parseDateFromFilename(url);
       const takenAt = filenameDate ? filenameDate.toISOString() : GALLERY_YEAR_FALLBACK[sourcePage] || null;
       const photo = {
@@ -264,6 +269,16 @@ async function main() {
   }
 
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+
+  const dropped = Object.values(rejected).reduce((a, b) => a + b, 0);
+  console.log(
+    `[gallery] ${entries.length} candidates -> ${photos.length} usable (${dropped} dropped: ` +
+      `${rejected.tooSmall} under ${settings.minDimension}px, ` +
+      `${rejected.tooTall} too tall for a 16:9 crop, ` +
+      `${rejected.screenshot} screenshot(s), ` +
+      `${rejected.excluded} hand-excluded, ` +
+      `${rejected.unreadable} size unreadable)`
+  );
 
   // Most recent first (missing dates sort last), then weighted-sample the
   // pool so recent photos dominate without making it 100% deterministic.

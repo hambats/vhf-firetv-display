@@ -694,3 +694,49 @@ html, body {
   text-align: left;
   max-width: 9ch;
 }
+
+/* ---------------------------------------------------------------------------
+   Portrait fill
+
+   A tall photo on a 16:9 panel loses a third of itself to a cover crop, or
+   sits between black pillars. Instead, a blurred and dimmed copy of the same
+   photo fills the pillars: the frame stays whole and the panel stays filled.
+
+   scale(1.18) hides the soft edge a large blur leaves around the element's
+   own border, which would otherwise show as a pale halo against the scene
+   background. brightness keeps the fill clearly subordinate to the photo.
+   --------------------------------------------------------------------------- */
+.scene__photo-fill {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: blur(42px) saturate(1.15) brightness(0.5);
+  transform: scale(1.18);
+  z-index: 0;
+}
+.scene--photo-filled .scene__photo-img {
+  z-index: 1;
+  background-color: transparent;
+}
+
+/* The Ken Burns zoom scales .scene__photo-img past the viewport, which is what
+   gives a cover-cropped photo its drift. On a contained portrait that same
+   scale eats ~12% of the frame by the end of the dwell -- re-cropping the
+   photo the fill exists to keep whole. So the subject holds still and the
+   blurred fill drifts instead: the scene still breathes, and nothing is lost. */
+.scene--photo-filled .scene__photo-img {
+  animation: none;
+  transform: none;
+}
+@keyframes vhf-fill-drift {
+  from { transform: scale(1.18) translate(0, 0); }
+  to { transform: scale(1.26) translate(-1.2%, -0.8%); }
+}
+.scene--photo-filled .scene__photo-fill {
+  animation: vhf-fill-drift linear both;
+  animation-duration: var(--vhf-scene-duration, 12s);
+  transform-origin: center;
+}
