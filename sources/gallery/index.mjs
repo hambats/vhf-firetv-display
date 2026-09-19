@@ -250,6 +250,22 @@ async function main() {
   // without this the only way to explain it is to read the code.
   const rejected = { unreadable: 0, tooSmall: 0, excluded: 0, screenshot: 0, tooTall: 0 };
   const tallAspects = [];
+  /*
+   * Every candidate that did not make it, with its URL. Counting them answers
+   * "how many", which is never the question anyone actually has -- the useful
+   * question is "which ones, and was that right?", and a hand-exclusion in
+   * particular is a judgement someone may want to revisit against the actual
+   * photo. Written only when --report is passed, because it is a working note
+   * and has no business on a public URL.
+   */
+  const dropList = [];
+  const reportPath = (() => {
+    const i = process.argv.indexOf("--report");
+    return i !== -1 && process.argv[i + 1] ? process.argv[i + 1] : null;
+  })();
+  const note = (reason, url, dims) => {
+    if (reportPath) dropList.push({ reason, id: idFromUrl(url), url, ...(dims || {}) });
+  };
 
   async function worker() {
     while (nextIndex < entries.length) {
@@ -263,14 +279,17 @@ async function main() {
       }
       checked++;
       if (checked % 50 === 0) console.log(`[gallery]   checked ${checked}/${entries.length}`);
-      if (!dims) { rejected.unreadable++; continue; }
-      if (Math.max(dims.width, dims.height) < settings.minDimension) { rejected.tooSmall++; continue; }
+      if (!dims) { rejected.unreadable++; note("unreadable", url); continue; }
+      if (Math.max(dims.width, dims.height) < settings.minDimension) {
+        rejected.tooSmall++; note("tooSmall", url, dims); continue;
+      }
       const id = idFromUrl(url);
-      if (excludedIds.has(id)) { rejected.excluded++; continue; }
-      if (/screenshot/i.test(id)) { rejected.screenshot++; continue; }
+      if (excludedIds.has(id)) { rejected.excluded++; note("handExcluded", url, dims); continue; }
+      if (/screenshot/i.test(id)) { rejected.screenshot++; note("screenshot", url, dims); continue; }
       if (dims.width / dims.height < MIN_ASPECT) {
         rejected.tooTall++;
         tallAspects.push(+(dims.width / dims.height).toFixed(3));
+        note("tooTall", url, dims);
         continue;
       }
       const filenameDate = parseDateFromFilename(url);
@@ -296,6 +315,17 @@ async function main() {
   if (tallAspects.length) {
     console.log(`[gallery] aspect of the too-tall: ${tallAspects.sort((a, b) => a - b).join(", ")}`);
   }
+  if (reportPath) {
+    const byReason = {};
+    for (const d of dropList) (byReason[d.reason] ||= []).push(d);
+    await fs.writeFile(
+      reportPath,
+      JSON.stringify({ generatedAt: new Date().toISOString(), counts: rejected, dropped: byReason }, null, 2),
+      "utf8"
+    );
+    console.log(`[gallery] wrote a dropped-candidate report -> ${reportPath}`);
+  }
+
   const dropped = Object.values(rejected).reduce((a, b) => a + b, 0);
   console.log(
     `[gallery] ${entries.length} candidates -> ${photos.length} usable (${dropped} dropped: ` +
