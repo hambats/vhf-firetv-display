@@ -404,7 +404,7 @@ var VhfScenes = (function () {
     return scene;
   }
 
-  function buildPhotoScene(src, fit, focus, eyebrow, photoId, caption) {
+  function buildPhotoScene(src, fit, focus, eyebrow, photoId, caption, zoom) {
     var scene = el("div", "scene scene--photo");
     var photo = img("scene__photo-img", src, "content", photoId);
     photo.style.objectFit = fit === "contain" ? "contain" : "cover";
@@ -412,6 +412,11 @@ var VhfScenes = (function () {
     // the upper-middle by default (avoids cutting off heads more often than
     // it cuts off feet/ground) than a dead-center crop would.
     photo.style.objectPosition = focus || "center 35%";
+    // Per-photo override for a cover crop that's too tight (e.g. a portrait
+    // shot cropped nearly to a close-up on a landscape screen) — scales the
+    // Ken Burns baseline down instead of switching to `contain`, which would
+    // letterbox the photo for its whole dwell instead of just easing the crop.
+    if (zoom) photo.style.setProperty("--vhf-zoom", zoom);
     scene.appendChild(photo);
     scene.appendChild(el("div", "scene__fade scene__fade--subtle"));
     // A standalone curated category (In Uniform, Military Art) names itself
@@ -433,7 +438,7 @@ var VhfScenes = (function () {
   function renderPhoto(item) {
     var content = item.content || {};
     if (!content.src) throw new Error("photo scene missing content.src");
-    return buildPhotoScene(content.src, content.fit, content.focus, null, item.id);
+    return buildPhotoScene(content.src, content.fit, content.focus, null, item.id, null, content.zoom);
   }
 
   // Every playlist item comes up exactly once per loop — there's no
@@ -472,7 +477,7 @@ var VhfScenes = (function () {
 
     var photo = drawPhotos(poolKey, photos, 1)[0];
     if (!photo) throw new Error("photo pool has no usable photos left");
-    return buildPhotoScene(photo.src, "cover", null, content.eyebrow, photo.id, photo.caption);
+    return buildPhotoScene(photo.src, "cover", photo.focus || null, content.eyebrow, photo.id, photo.caption, photo.zoom);
   }
 
   function renderCustom(item) {

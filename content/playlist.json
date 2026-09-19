@@ -124,6 +124,17 @@
       }
     },
     {
+      "id": "vhf-why",
+      "type": "information",
+      "duration": 10,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Why We Do This",
+        "title": "It's Not About the Cabbage",
+        "body": "VHF is a place where hands find purpose in the earth, where stories are shared without judgment, and where the quiet strength of community helps heal wounds both seen and unseen."
+      }
+    },
+    {
       "id": "photo-pool-10",
       "type": "photo-pool",
       "duration": 12,
@@ -139,6 +150,17 @@
         "eyebrow": "Medicinal Herb Squad",
         "title": "Healing from the Ground Up",
         "body": "Over 70 healing plant species grown on-site, crafted into teas, tinctures, salves, and balms — a plant-based approach to sleep, anxiety, and inflammation."
+      }
+    },
+    {
+      "id": "program-garden-group",
+      "type": "information",
+      "duration": 8,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Garden Group",
+        "title": "Hands in the Earth",
+        "body": "Rain or shine, our Garden Group plants, tends, and harvests every row on the farm — the produce behind every free box we give back to the community."
       }
     },
     {
@@ -331,7 +353,19 @@
       "content": {
         "eyebrow": "Many Hands, One Farm",
         "title": "Volunteer Groups Welcome",
-        "body": "Local businesses, churches, and community groups regularly bring volunteer days to the farm — every visit helps a Veteran heal."
+        "body": "42 businesses, churches, and community groups brought volunteer days to the farm in 2025 — every visit helps a Veteran heal."
+      }
+    },
+    {
+      "id": "volunteer-sign-in",
+      "type": "information",
+      "duration": 8,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Before You Head Out",
+        "title": "Please Sign In",
+        "body": "Every volunteer hour counts toward our impact — sign in and log your hours at the farm house before you start.",
+        "washSources": "volunteer-groups"
       }
     },
     {

@@ -118,7 +118,8 @@
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-10-13T14:00:00.000Z",
       "end": "2026-10-13T16:00:00.000Z",
-      "programId": "program-hendersonville-womans-club"
+      "programId": "program-hendersonville-womans-club",
+      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service."
     },
     {
       "id": "woodworking-workshop-with-chris-from-forest-project-woodwork-2026-10-14",
@@ -263,7 +264,8 @@
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-11-10T15:00:00.000Z",
       "end": "2026-11-10T17:00:00.000Z",
-      "programId": "program-hendersonville-womans-club"
+      "programId": "program-hendersonville-womans-club",
+      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service."
     },
     {
       "id": "pottery-create-your-ornaments-2-part-series-with-sophia-2026-11-11",
@@ -310,7 +312,8 @@
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-12-08T15:00:00.000Z",
       "end": "2026-12-08T17:00:00.000Z",
-      "programId": "program-hendersonville-womans-club"
+      "programId": "program-hendersonville-womans-club",
+      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service."
     }
   ]
 }

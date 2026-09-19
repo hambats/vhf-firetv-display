@@ -364,15 +364,6 @@
       "dateSource": "filename"
     },
     {
-      "id": "20260207-111449",
-      "src": "https://images.squarespace-cdn.com/content/v1/6477470669facb6ffbb41557/6751e9cf-4374-4b18-8891-3d572393db8c/20260207_111449.jpg?format=2500w",
-      "width": 1104,
-      "height": 1410,
-      "sourcePage": "https://www.veteranshealingfarm.org/gallery-2026",
-      "takenAt": "2026-02-07T11:14:49.000Z",
-      "dateSource": "filename"
-    },
-    {
       "id": "20260207-110107",
       "src": "https://images.squarespace-cdn.com/content/v1/6477470669facb6ffbb41557/f022eea4-9faa-4905-9f8d-72eeeab8f070/20260207_110107.jpg?format=2500w",
       "width": 2500,
@@ -503,6 +494,7 @@
       "src": "https://images.squarespace-cdn.com/content/v1/6477470669facb6ffbb41557/b913303e-ff12-4fb0-b082-6ad30e459d4f/Photo+May+22+2026%2C+2+28+22+PM.jpg?format=2500w",
       "width": 2500,
       "height": 3333,
+      "focus": "center 22%",
       "sourcePage": "https://www.veteranshealingfarm.org/gallery-2026",
       "takenAt": "2026-01-01T00:00:00Z",
       "dateSource": "gallery-page-fallback"
@@ -845,6 +837,7 @@
       "src": "https://images.squarespace-cdn.com/content/v1/6477470669facb6ffbb41557/155407f5-ae26-4320-b32c-e53c0abd7364/Photo+May+28+2026%2C+7+49+46+PM.jpg?format=2500w",
       "width": 2500,
       "height": 3333,
+      "zoom": 0.9,
       "sourcePage": "https://www.veteranshealingfarm.org/gallery-2026",
       "takenAt": "2026-01-01T00:00:00Z",
       "dateSource": "gallery-page-fallback"

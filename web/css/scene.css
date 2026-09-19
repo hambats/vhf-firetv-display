@@ -90,13 +90,13 @@ html, body {
    the hardware constraints this must respect on the Fire OS 7 WebView. */
 
 @keyframes vhf-ken-burns-in {
-  from { transform: scale(1) translate(0, 0); }
-  to { transform: scale(1.12) translate(-2.5%, -1.8%); }
+  from { transform: scale(var(--vhf-zoom, 1)) translate(0, 0); }
+  to { transform: scale(calc(var(--vhf-zoom, 1) * 1.12)) translate(-2.5%, -1.8%); }
 }
 
 @keyframes vhf-ken-burns-out {
-  from { transform: scale(1.12) translate(2.5%, 1.8%); }
-  to { transform: scale(1) translate(0, 0); }
+  from { transform: scale(calc(var(--vhf-zoom, 1) * 1.12)) translate(2.5%, 1.8%); }
+  to { transform: scale(var(--vhf-zoom, 1)) translate(0, 0); }
 }
 
 .scene__photo-img {

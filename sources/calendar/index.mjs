@@ -68,6 +68,15 @@ const PROGRAM_KEYWORDS = [
   { programId: "program-blacksmithing", patterns: ["blacksmith"] }
 ];
 
+// A recurring partner-org meeting's calendar description is usually just
+// registration boilerplate (or blank) — not worth a screen on its own. This
+// overrides the scraped description with the org's own tagline/blurb so it
+// rides along on the event card every time that program's meeting comes up,
+// rather than needing a standalone info slide in playlist.json per partner.
+const PROGRAM_DESCRIPTION_OVERRIDES = {
+  "program-hendersonville-womans-club": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service."
+};
+
 function matchProgramId(title) {
   const lower = (title || "").toLowerCase();
   for (const { programId, patterns } of PROGRAM_KEYWORDS) {
@@ -423,6 +432,10 @@ async function main() {
       if (description && description.toLowerCase().startsWith(String(title).toLowerCase())) {
         description = description.slice(title.length).replace(/^[\s.:—-]+/, "").trim() || undefined;
       }
+      const programId = matchProgramId(title);
+      if (PROGRAM_DESCRIPTION_OVERRIDES[programId]) {
+        description = PROGRAM_DESCRIPTION_OVERRIDES[programId];
+      }
       events.push(applyTimeOverride({
         id,
         title: cleanText(title, 120),
@@ -430,7 +443,7 @@ async function main() {
         end: occ.end ? occ.end.toISOString() : undefined,
         location: cleanLocation(occ.source.location),
         description,
-        programId: matchProgramId(title)
+        programId
       }, timeOverrides));
     }
   }
