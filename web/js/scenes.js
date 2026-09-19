@@ -404,7 +404,7 @@ var VhfScenes = (function () {
     return scene;
   }
 
-  function buildPhotoScene(src, fit, focus, eyebrow, photoId, caption, zoom) {
+  function buildPhotoScene(src, fit, focus, eyebrow, photoId, caption, zoom, pan) {
     var scene = el("div", "scene scene--photo");
     var photo = img("scene__photo-img", src, "content", photoId);
     photo.style.objectFit = fit === "contain" ? "contain" : "cover";
@@ -417,6 +417,14 @@ var VhfScenes = (function () {
     // Ken Burns baseline down instead of switching to `contain`, which would
     // letterbox the photo for its whole dwell instead of just easing the crop.
     if (zoom) photo.style.setProperty("--vhf-zoom", zoom);
+    // Per-photo override for the Ken Burns drift direction — the default
+    // (up and slightly left) drifts away from the subject on a photo whose
+    // subject sits low or to one side in frame; { x, y } are CSS translate
+    // values for the animation's end state (e.g. { y: "1.8%" } drifts down).
+    if (pan) {
+      if (pan.x) photo.style.setProperty("--vhf-pan-x", pan.x);
+      if (pan.y) photo.style.setProperty("--vhf-pan-y", pan.y);
+    }
     scene.appendChild(photo);
     scene.appendChild(el("div", "scene__fade scene__fade--subtle"));
     // A standalone curated category (In Uniform, Military Art) names itself
@@ -438,7 +446,7 @@ var VhfScenes = (function () {
   function renderPhoto(item) {
     var content = item.content || {};
     if (!content.src) throw new Error("photo scene missing content.src");
-    return buildPhotoScene(content.src, content.fit, content.focus, null, item.id, null, content.zoom);
+    return buildPhotoScene(content.src, content.fit, content.focus, null, item.id, null, content.zoom, content.pan);
   }
 
   // Every playlist item comes up exactly once per loop — there's no
@@ -477,7 +485,7 @@ var VhfScenes = (function () {
 
     var photo = drawPhotos(poolKey, photos, 1)[0];
     if (!photo) throw new Error("photo pool has no usable photos left");
-    return buildPhotoScene(photo.src, "cover", photo.focus || null, content.eyebrow, photo.id, photo.caption, photo.zoom);
+    return buildPhotoScene(photo.src, "cover", photo.focus || null, content.eyebrow, photo.id, photo.caption, photo.zoom, photo.pan);
   }
 
   function renderCustom(item) {

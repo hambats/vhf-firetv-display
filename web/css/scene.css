@@ -91,11 +91,11 @@ html, body {
 
 @keyframes vhf-ken-burns-in {
   from { transform: scale(var(--vhf-zoom, 1)) translate(0, 0); }
-  to { transform: scale(calc(var(--vhf-zoom, 1) * 1.12)) translate(-2.5%, -1.8%); }
+  to { transform: scale(calc(var(--vhf-zoom, 1) * 1.12)) translate(var(--vhf-pan-x, -2.5%), var(--vhf-pan-y, -1.8%)); }
 }
 
 @keyframes vhf-ken-burns-out {
-  from { transform: scale(calc(var(--vhf-zoom, 1) * 1.12)) translate(2.5%, 1.8%); }
+  from { transform: scale(calc(var(--vhf-zoom, 1) * 1.12)) translate(calc(var(--vhf-pan-x, -2.5%) * -1), calc(var(--vhf-pan-y, -1.8%) * -1)); }
   to { transform: scale(var(--vhf-zoom, 1)) translate(0, 0); }
 }
 

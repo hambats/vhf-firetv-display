@@ -819,6 +819,8 @@
       "src": "https://images.squarespace-cdn.com/content/v1/6477470669facb6ffbb41557/d0d5f213-c7b9-402b-90b1-708bb329d639/Photo+Jun+24+2026%2C+11+05+31+AM.jpg?format=2500w",
       "width": 2500,
       "height": 3333,
+      "focus": "center 55%",
+      "pan": { "x": "0%", "y": "2.5%" },
       "sourcePage": "https://www.veteranshealingfarm.org/gallery-2026",
       "takenAt": "2026-01-01T00:00:00Z",
       "dateSource": "gallery-page-fallback"

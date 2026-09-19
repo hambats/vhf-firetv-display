@@ -33,7 +33,7 @@ this project already use.
 | `information`    | `title`                        | `eyebrow`, `body` optional |
 | `announcement`   | `announcementId` OR `title`    | looked up from `content/announcements/announcements.json` by id, or inline |
 | `photo`          | `src`                          | `fit` (`cover`\|`contain`, default `cover`), `focus` (CSS `object-position`, default `center 35%`) |
-| `photo-pool`     | —                               | picks a random photo from `content/generated/gallery.json` (or a curated set, via `content.source`) each time it comes up in rotation; a photo entry there may carry its own `focus` (object-position override) or `zoom` (<1 eases a too-tight cover crop, e.g. `0.9`) |
+| `photo-pool`     | —                               | picks a random photo from `content/generated/gallery.json` (or a curated set, via `content.source`) each time it comes up in rotation; a photo entry there may carry its own `focus` (object-position override), `zoom` (<1 eases a too-tight cover crop, e.g. `0.9`), or `pan` (`{ x, y }` CSS translate override for the Ken Burns drift direction — default drifts up-left; positive `y` drifts down, e.g. `{ y: "2.5%" }`, toward a subject sitting low in frame) |
 | `custom`         | `src`                          | full 16:9 artwork, no overlay |
 | `event`          | `eventId` OR `title`+`start`   | looked up from `content/generated/events.json` by id, or inline |
 | `event-pool`     | —                               | picks one upcoming event (full detail, same layout as `event`) each time it comes up in rotation, cycling through all of them before repeating — put a few of these in the playlist instead of one big list so each event gets its own screen |
