@@ -554,16 +554,24 @@ var VhfScenes = (function () {
     var upcoming = upcomingEvents(data, content.limit || 8, content.offset || 0, { titleContains: content.titleContains });
     if (upcoming.length === 0) throw new Error("no upcoming events to show");
     var scene = el("div", "scene scene--events");
-    appendWash(scene, data);
+    // content.title marks this as a single-series list (every occurrence
+    // shares one name, e.g. "Open Studio Pottery with Sophia") rather than a
+    // mixed "Upcoming at the Farm" list: one big heading up top instead of
+    // repeating the identical title on every row, and each row shrinks to
+    // just its date/time. content.washSource points the background at that
+    // series' own curated photos instead of the generic gallery pool.
+    if (content.title) scene.className += " scene--events--series";
+    appendWash(scene, data, content.washSource);
     scene.appendChild(el("div", "scene__fade"));
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", content.eyebrow || "Upcoming at the Farm"));
-    var list = el("div", "events-list");
+    if (content.title) body.appendChild(el("h1", "scene__title", content.title));
+    var list = el("div", "events-list" + (content.title ? " events-list--compact" : ""));
     upcoming.forEach(function (evt) {
       var row = el("div", "events-list__item");
       row.appendChild(el("div", "events-list__date", formatEventDate(evt.start).toUpperCase()));
       var main = el("div", "events-list__main");
-      main.appendChild(el("div", "events-list__title", evt.title));
+      if (!content.title) main.appendChild(el("div", "events-list__title", evt.title));
       var metaBits = [];
       var timeRange = formatEventTimeRange(evt.start, evt.end);
       if (timeRange) metaBits.push(timeRange);

@@ -98,7 +98,9 @@
       "duration": 12,
       "enabled": true,
       "content": {
-        "eyebrow": "Open Studio Pottery with Sophia",
+        "eyebrow": "With Resident Potter Sophia",
+        "title": "Open Studio Pottery",
+        "washSource": "program-pottery",
         "limit": 8,
         "titleContains": ["open studio pottery", "open pottery studio"]
       }

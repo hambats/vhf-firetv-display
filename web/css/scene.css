@@ -514,6 +514,34 @@ html, body {
   color: var(--vhf-text-caption);
 }
 
+/* A single-series list (content.title set — see renderEvents): one big
+   heading already names the series, so every row is just its own date and
+   time, smaller and tighter than the mixed-list default above. */
+.events-list--compact {
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.events-list--compact .events-list__item {
+  gap: 20px;
+}
+
+.events-list--compact .events-list__date {
+  font-size: var(--vhf-size-caption);
+  min-width: 150px;
+}
+
+.events-list--compact .events-list__meta {
+  font-size: var(--vhf-size-caption);
+  opacity: 0.85;
+}
+
+/* ---- Single-series events scene (see renderEvents / scene--events--series) ---- */
+
+.scene--events--series .scene__title {
+  margin-bottom: 4px;
+}
+
 /* ---- Announcement scene ---- */
 
 .scene--announcement {
