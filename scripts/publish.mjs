@@ -67,11 +67,23 @@ function parseArgs(argv) {
   return opts;
 }
 
+/*
+ * `shell: true` hands the argv back to cmd.exe, which re-parses it and splits any
+ * argument containing a space. That turned every commit message into a list of
+ * pathspecs -- `git commit -m Publish: update content/playlist.json` failed with
+ * "pathspec 'update' did not match any file(s)". The shell is only needed at all
+ * because npm is a .cmd shim on Windows, so the args have to be quoted back up.
+ */
+function quoteForCmd(arg) {
+  return /[\s"^&|<>()]/.test(arg) ? `"${String(arg).replace(/"/g, '\\"')}"` : arg;
+}
+
 function run(command, args, { capture = false } = {}) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
+    const useShell = process.platform === "win32";
+    const child = spawn(command, useShell ? args.map(quoteForCmd) : args, {
       cwd: ROOT,
-      shell: process.platform === "win32",
+      shell: useShell,
       stdio: capture ? ["ignore", "pipe", "pipe"] : "inherit"
     });
     let out = "";

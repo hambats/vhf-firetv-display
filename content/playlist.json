@@ -2,6 +2,18 @@
   "version": 1,
   "playlist": [
     {
+      "id": "remote-push-demo",
+      "type": "information",
+      "duration": 20,
+      "enabled": true,
+      "content": {
+        "lockup": true,
+        "eyebrow": "Remote publish test",
+        "title": "SUCCESS!",
+        "body": "This slide was pushed from off the television, with nobody touching it."
+      }
+    },
+    {
       "id": "welcome-information",
       "type": "information",
       "duration": 10,
@@ -102,7 +114,10 @@
         "title": "Open Studio Pottery",
         "washSource": "program-pottery",
         "limit": 8,
-        "titleContains": ["open studio pottery", "open pottery studio"]
+        "titleContains": [
+          "open studio pottery",
+          "open pottery studio"
+        ]
       }
     },
     {
