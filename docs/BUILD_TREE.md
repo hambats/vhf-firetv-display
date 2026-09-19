@@ -12,6 +12,70 @@ the source of truth; the display is a runtime that must keep working with the PC
 > §0 explains why. §6 carries forward everything the old tree recorded about what's already
 > built — those decisions and curation workflows are still current.
 
+---
+
+## State of play — Sept 19, 2026
+
+Read this first. It is the handover point for whoever picks the project up next.
+
+**The display is live, unattended, and recovers on its own.** v1.1.0 of the `app/` shell is on the
+television (Toshiba AFTTI43, Fire OS 7.7.1.6). It relaunches after a power cut, keeps the screen
+awake, and serves cached content when the network drops. Content publishes with `npm run publish`.
+
+**The television is now reachable off-site** — Tailscale, always-on VPN, verified from another
+network with a direct peer-to-peer tunnel. `docs/REMOTE_ACCESS.md` has the addresses and the two
+settings that make it survive reboots.
+
+### Open threads, most valuable first
+
+1. **Outbound heartbeat — not built, and the biggest remaining gap.** `web/js/diagnostics.js`
+   already records uptime, error count and last error; nothing sends them anywhere. Remote access
+   made *fixing* cheap but did nothing for *noticing* — a display that dies on a Friday is still
+   dark until someone walks past. Needs a write endpoint that is not Netlify (see below);
+   Cloudflare Workers' free tier fits.
+
+2. **Publish-loop verification — investigated, blocked, bigger than it looks.** `publish.mjs` ends
+   by confirming GitHub Pages serves the new version, then says the television "picks this up on
+   its next content poll" — which it never checks. The obvious fix was to have the page log its
+   version and read it back over ADB. **That does not work:** Amazon's WebView does not forward
+   page console output to logcat without a `WebChromeClient` override in `DisplayActivity`. So this
+   is an APK change, not a `web/`-only change. Verified empirically on the device, not assumed.
+
+3. **Netlify retirement — prepared, undeployable.** `netlify-retired/` holds a redirect to GitHub
+   Pages plus a self-unregistering `sw.js` (the old origin registered a Service Worker that would
+   otherwise serve its cached shell forever). It cannot ship: the Netlify account is over its
+   credit limit and returns 403 on any deploy. The old URL still serves a stale copy. Deleting the
+   site instead would free the `vhf-firetv-display.netlify.app` name for anyone to claim, and the
+   v1.0.0 APK has that URL compiled in — so deletion is not obviously the safe option.
+
+4. **M3 proof still unrun.** Nothing has been observed for a week on the real television. Remote
+   screenshots make this much cheaper to do than it was.
+
+### Loose ends in the repo itself
+
+- **An orphaned worktree with unmerged work.** `.claude/worktrees/build-tree-76ded0` is a live git
+  worktree on branch `claude/build-tree-76ded0`, holding one commit that is **not in `main`**:
+  `7847052 Localise the photo pool and drop two dead event fields`. Its working tree is clean.
+  Decide whether to merge or drop it — it is easy to miss and easy to clobber.
+- **That worktree also carries a stale `CLAUDE.md`** naming Netlify as the publish transport, and
+  stale skill files that still say to run `netlify deploy`. It is git-excluded so it will never be
+  committed, but a repo-wide grep reads it and will hand back the wrong answer. Trust `/CLAUDE.md`
+  at the repo root, not the copy under `.claude/worktrees/`.
+
+### Two traps that cost time today
+
+- **`settings put secure`, never `global`,** for `always_on_vpn_app`. The `global` write is
+  accepted, reads back correctly, and does nothing. Cost a reboot to find.
+- **Only a real reboot tests boot-path work.** Starting Tailscale by hand produced a perfectly
+  healthy tunnel while the boot path was still broken.
+
+### Also fixed today
+
+`scripts/publish.mjs` spawned with `shell: true` on Windows, so cmd re-parsed the argv and split
+any argument containing a space — every publish from Windows failed, including with the default
+commit message. Arguments are now quoted. If publishing has ever seemed to work from Windows
+before this, it went out by some other route.
+
 ## 0. What changed
 
 Two things, and the second one is the bigger deal.

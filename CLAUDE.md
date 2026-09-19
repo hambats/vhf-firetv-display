@@ -38,8 +38,8 @@ it independently. The television must NOT depend on the developer's PC remaining
 - **Device:** Fire TV Edition television — a TV with Fire TV built in (Fire OS 7, Android 9 /
   API 28-based).
 - **Runtime:** the display is a **web page** — HTML/CSS/JS in `web/`, published as a static site
-  and shown on the television through a browser or off-the-shelf app chosen on the device.
-  The page itself owns caching, content refresh, and crash recovery.
+  and shown on the television by the `app/` shell (below). The page itself owns caching, content
+  refresh, and crash recovery; the shell owns only what a page cannot do for itself.
 - **Publish transport:** a GitHub Pages static site (`hambats.github.io/vhf-firetv-display`) is
   the PC → television publish endpoint. A push to the repo's `main` branch triggers a GitHub
   Actions workflow ([.github/workflows/deploy-pages.yml](.github/workflows/deploy-pages.yml)) that
@@ -55,6 +55,10 @@ it independently. The television must NOT depend on the developer's PC remaining
   the scene engine, caching and content refresh stay in `web/`. Content changes never require a
   rebuild — only a change of publish endpoint does. Install steps:
   [docs/DISPLAY_SETUP.md](docs/DISPLAY_SETUP.md).
+- **The television is reachable from anywhere (Sept 19).** It runs Tailscale with always-on VPN, so
+  `adb connect 100.69.183.1:5555` works off-site — installs, screenshots, logcat. This is *access,
+  not awareness*: nothing yet notices a dead display. See
+  [docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md).
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full rationale.
 
@@ -78,9 +82,9 @@ See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full rationale.
 Ordered by risk — what keeps an unattended page alive — not by feature layer. Full detail,
 including ship gates, in [docs/BUILD_TREE.md](docs/BUILD_TREE.md).
 
-0. **On the screen** — *done.* The `app/` WebView shell is the answer: fullscreen, no chrome,
-   screen never sleeps, points at Netlify. `docs/DISPLAY_SETUP.md` covers sideloading and the
-   television's own sleep/screensaver settings.
+0. **On the screen** — *done (Sept 18–19).* The `app/` WebView shell is the answer: fullscreen,
+   no chrome, screen never sleeps, points at GitHub Pages. v1.1.0 is installed on the television.
+   `docs/DISPLAY_SETUP.md` covers sideloading and the television's own sleep/screensaver settings.
 1. **Survives being left alone** — Service Worker (app shell + JSON + photos), self-hosted fonts,
    version polling so content actually refreshes, error/stall watchdog, diagnostics overlay,
    browser compatibility check. *This is the heart of the plan; two real gaps live here.*
@@ -98,8 +102,10 @@ with the milestones above and shares almost no files. **D0 is live on the public
 ship regardless of what else is happening.**
 
 Already built and current: the scene engine and all scene types, the content schema and its
-validator, JSON cache fallback, the gallery and calendar adapters, the local admin editor, and the
-live Netlify site. See [docs/BUILD_TREE.md](docs/BUILD_TREE.md) §6.
+validator, JSON cache fallback, the gallery and calendar adapters, the local admin editor, the live
+GitHub Pages site, the `app/` shell installed on the television, and off-site access to that
+television ([docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md)). See
+[docs/BUILD_TREE.md](docs/BUILD_TREE.md) §6.
 
 ## Guiding principle
 
