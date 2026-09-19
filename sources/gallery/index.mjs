@@ -38,6 +38,26 @@ const ROOT = path.resolve(__dirname, "..", "..");
 const OUTPUT_PATH = path.join(ROOT, "content", "generated", "gallery.json");
 const EXCLUDE_PATH = path.join(ROOT, "content", "gallery-exclude.json");
 const FOCUS_PATH = path.join(ROOT, "content", "gallery-focus.json");
+
+/*
+ * How tall a photo may be and still be worth showing.
+ *
+ * This was 0.7, on the reasoning that a taller frame "reads wrong" in a 16:9
+ * layout -- true when the only options were cropping a third of it away or
+ * pillarboxing it against black. The display now fills the pillars with a
+ * blurred copy of the photo itself (.scene__photo-fill), so a tall photo keeps
+ * its whole frame and the panel stays filled.
+ *
+ * 0.7 was also excluding the wrong thing. Of the 35 photos it dropped, 33 sat
+ * between 0.545 and 0.70 -- ordinary phone portraits, 0.5625 being exactly the
+ * 9:16 a phone shoots. Those are not malformed images, they are most of how
+ * the farm photographs itself.
+ *
+ * 0.45 keeps a floor, because the fill stops helping eventually: at 0.45 the
+ * photo is about a quarter of the panel's width and the rest is blur. Nothing
+ * in the gallery is near that today (the two tallest are 0.462 and 0.49).
+ */
+const MIN_ASPECT = 0.45;
 const SETTINGS_PATH = path.join(ROOT, "content", "settings.json");
 
 const GALLERY_PAGES = [
@@ -229,6 +249,7 @@ async function main() {
   // gap between "images on the page" and "photos on the wall" is large, and
   // without this the only way to explain it is to read the code.
   const rejected = { unreadable: 0, tooSmall: 0, excluded: 0, screenshot: 0, tooTall: 0 };
+  const tallAspects = [];
 
   async function worker() {
     while (nextIndex < entries.length) {
@@ -247,9 +268,11 @@ async function main() {
       const id = idFromUrl(url);
       if (excludedIds.has(id)) { rejected.excluded++; continue; }
       if (/screenshot/i.test(id)) { rejected.screenshot++; continue; }
-      // A meaningfully-taller-than-4:5 frame (e.g. a phone screenshot) reads
-      // wrong in a 16:9 photo grid designed around landscape/portrait photos.
-      if (dims.width / dims.height < 0.7) { rejected.tooTall++; continue; }
+      if (dims.width / dims.height < MIN_ASPECT) {
+        rejected.tooTall++;
+        tallAspects.push(+(dims.width / dims.height).toFixed(3));
+        continue;
+      }
       const filenameDate = parseDateFromFilename(url);
       const takenAt = filenameDate ? filenameDate.toISOString() : GALLERY_YEAR_FALLBACK[sourcePage] || null;
       const photo = {
@@ -270,6 +293,9 @@ async function main() {
 
   await Promise.all(Array.from({ length: CONCURRENCY }, worker));
 
+  if (tallAspects.length) {
+    console.log(`[gallery] aspect of the too-tall: ${tallAspects.sort((a, b) => a - b).join(", ")}`);
+  }
   const dropped = Object.values(rejected).reduce((a, b) => a + b, 0);
   console.log(
     `[gallery] ${entries.length} candidates -> ${photos.length} usable (${dropped} dropped: ` +
