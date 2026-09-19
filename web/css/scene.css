@@ -172,20 +172,26 @@ html, body {
 /* A partner/organization logo (e.g. an outside group's meeting on the
    calendar) reads as a shape, not a scene composition — cropping it full-
    bleed like .scene__wash turns a circular badge into an unrecognizable
-   sliver. Shown small and plain instead, same corner as .scene__brand would
-   sit but opposite it, on its own light card so a logo drawn for a white
-   background stays legible against the event scene's dark fade. */
+   sliver. Shown plain instead, on its own light card so a logo drawn for a
+   white background stays legible against the event scene's dark fade.
+
+   Sits on the right, vertically centred: .scene--event anchors
+   .scene__content top-left and moves .scene__brand to the bottom-right, so
+   the middle of the right half is the one large empty region on the scene —
+   which is also what lets the mark be big enough to actually read as the
+   organization's badge rather than a decoration. */
 .scene__partner-logo {
   position: absolute;
-  top: 48px;
-  left: 64px;
-  width: 96px;
-  height: 96px;
+  top: 50%;
+  right: 120px;
+  transform: translateY(-50%);
+  width: 320px;
+  height: 320px;
   object-fit: contain;
   background: #fff;
   border-radius: 50%;
-  padding: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  padding: 24px;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
   z-index: 1;
 }
 
