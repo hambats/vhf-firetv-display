@@ -400,6 +400,16 @@ var VhfScenes = (function () {
     var body = el("div", "scene__content");
     body.appendChild(el("h1", "scene__title", announcement.title));
     if (announcement.body) body.appendChild(el("p", "scene__body", announcement.body));
+    /*
+     * Opt-in per announcement, not automatic: this family also carries
+     * closures and thank-yous, which have nothing to register for. Inline
+     * rather than against the right edge, because an announcement with a
+     * designed graphic puts that card in the right column — the same space
+     * the event scenes leave empty.
+     */
+    if (announcement.showRegistration) {
+      appendRegistration(body, data, announcement.title, { inline: true });
+    }
     scene.appendChild(body);
     return scene;
   }
@@ -531,14 +541,14 @@ var VhfScenes = (function () {
     return { asset: "img/register-qr.svg", label: reg.label };
   }
 
-  function appendRegistration(container, data, title) {
+  function appendRegistration(container, data, title, opts) {
     var reg = (data && data.settings && data.settings.registration) || null;
     if (!reg || !reg.url) return;
     // null means a `hide` override matched: an event nobody can register for
     // is better with no code than with one that leads somewhere irrelevant.
     var pick = matchRegistration(reg, title);
     if (!pick) return;
-    var block = el("div", "scene__qr");
+    var block = el("div", "scene__qr" + (opts && opts.inline ? " scene__qr--inline" : ""));
     block.appendChild(img("scene__qr-code", pick.asset, "decoration"));
     if (pick.label) block.appendChild(el("p", "scene__qr-label", pick.label));
     container.appendChild(block);

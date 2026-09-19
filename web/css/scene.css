@@ -678,3 +678,19 @@ html, body {
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
   margin: 0;
 }
+
+/* Announcement slides put their designed graphic in the right column, where
+   the event scenes leave space — so the code sits inline under the copy
+   instead, with the label beside it rather than beneath. */
+.scene__qr--inline {
+  position: static;
+  transform: none;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+.scene__qr--inline .scene__qr-label {
+  text-align: left;
+  max-width: 9ch;
+}

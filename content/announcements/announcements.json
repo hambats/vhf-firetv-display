@@ -6,7 +6,9 @@
       "title": "Now Registering: Veterans Day 5K",
       "body": "The First Annual Veterans Healing Farm 5K & Kids Fun Run is open for registration — November 8, 2026.",
       "activation": "2026-09-01T00:00:00-04:00",
-      "expiration": "2026-11-08T23:59:59-05:00"
+      "expiration": "2026-11-08T23:59:59-05:00",
+      "showRegistration": true,
+      "registrationNote": "Opt-in: this slide exists to drive signups, so it carries the race QR. Most announcements (a closure, a thank-you) have nothing to register for and must not."
     }
   ]
 }
