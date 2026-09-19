@@ -496,6 +496,27 @@ var VhfScenes = (function () {
     return scene;
   }
 
+  /*
+   * The registration code, shown only on event scenes.
+   *
+   * It is the answer to "how do I get into this workshop", so it belongs
+   * beside a workshop and nowhere else — on a photo or a mission slide it is
+   * just clutter. Driven entirely by settings.json: no registration.url, no
+   * code, no layout change.
+   *
+   * One registration page covers every program (you pick the event after
+   * signing in), so this is one static code rather than one per event —
+   * which is also why it can be generated at build time and cached offline.
+   */
+  function appendRegistration(container, data) {
+    var reg = (data && data.settings && data.settings.registration) || null;
+    if (!reg || !reg.url) return;
+    var block = el("div", "scene__qr");
+    block.appendChild(img("scene__qr-code", "img/register-qr.svg", "decoration"));
+    if (reg.label) block.appendChild(el("p", "scene__qr-label", reg.label));
+    container.appendChild(block);
+  }
+
   function buildEventScene(evt, data) {
     var scene = el("div", "scene scene--event");
     // evt.programId is set PC-side (sources/calendar/index.mjs) by matching
@@ -518,6 +539,9 @@ var VhfScenes = (function () {
     if (evt.description) body.appendChild(el("p", "scene__body", evt.description));
     if (evt.location) body.appendChild(el("p", "scene__caption", evt.location));
     scene.appendChild(body);
+    // On the scene, not inside .scene__content: the code is positioned against
+    // the right edge, opposite the text column, rather than flowing under it.
+    appendRegistration(scene, data);
     brand(scene);
     return scene;
   }
@@ -595,6 +619,10 @@ var VhfScenes = (function () {
     });
     body.appendChild(list);
     scene.appendChild(body);
+    // A dates list is as registerable as a single event — more so, since it is
+    // the recurring programs (Open Studio, the ornament workshop) people most
+    // often want to sign up for. Same one registration page either way.
+    appendRegistration(scene, data);
     brand(scene);
     return scene;
   }

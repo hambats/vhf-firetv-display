@@ -4,8 +4,13 @@
     {
       "name": "vhf-preview",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["--yes", "serve", "dist", "-l", "8080"],
-      "port": 8080
+      "runtimeArgs": [
+        "--yes",
+        "serve",
+        "dist"
+      ],
+      "port": 8080,
+      "autoPort": true
     }
   ]
 }

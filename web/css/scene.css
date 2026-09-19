@@ -623,3 +623,58 @@ html, body {
 .scene--blank {
   background-color: #000;
 }
+
+/* ---------------------------------------------------------------------------
+   Registration code (event scenes)
+
+   Sits against the right edge, opposite the text column, in the space the
+   photo occupies but the copy never does.
+
+   The cream card is a scanning requirement, not styling: .scene--event lays a
+   dark fade over the photo, and dark QR modules on a dark background do not
+   decode at all. The card supplies the light field, and its padding doubles as
+   the quiet zone the spec requires around the code.
+
+   Sized for someone who has walked up to the display. A QR needs roughly ten
+   times its own width in scanning distance, so ~190px on a 1080p panel reads
+   from about three feet — honest for a person reading the slide, rather than
+   pretending to be scannable from across the room.
+
+   Vertically centred, which keeps it clear of .scene--event .scene__brand in
+   the bottom-right corner (bottom: 48px, 112px wide) without either element
+   needing to know the other's size.
+   --------------------------------------------------------------------------- */
+.scene__qr {
+  position: absolute;
+  right: 64px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+}
+.scene__qr-code {
+  width: 190px;
+  height: 190px;
+  padding: 14px;
+  border-radius: 14px;
+  background: #f6f3ea;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.32);
+  /* Burn-in mitigation (M4), same rationale as .scene__brand: a small, very
+     high-contrast block in a fixed position on every event scene is exactly
+     the pattern that burns in. Transform-only, so it never triggers layout. */
+  animation: vhf-pixel-shift 240s ease-in-out infinite;
+}
+.scene__qr-label {
+  font-family: var(--vhf-font-ui);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #f4f1ea;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.55);
+  margin: 0;
+}

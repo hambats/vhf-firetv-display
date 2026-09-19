@@ -13,6 +13,13 @@
     "windowDays": 120
   },
   "hours": {
-    "closedWeekdays": [0, 1]
+    "closedWeekdays": [
+      0,
+      1
+    ]
+  },
+  "registration": {
+    "url": "https://www.regpack.com/reg/templates/build/?url_vars=31d340228db9000d806432d944c96f60",
+    "label": "Scan to register"
   }
 }
