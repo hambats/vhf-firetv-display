@@ -2,7 +2,7 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-09-19T01:05:51.923Z",
+  "generatedAt": "2026-09-19T18:35:53.415Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
     {
@@ -10,7 +10,7 @@
       "title": "Chair Massage with Lisa - 10a-3p",
       "start": "2026-09-23T14:00:00.000Z",
       "end": "2026-09-23T19:00:00.000Z",
-      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands.",
+      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands. Sessions can be 15 or 30 minutes, it uses a specialized ergonomic chair to provide targeted acupressure and Swedish massage techniques.",
       "programId": "program-chair-massage"
     },
     {
@@ -40,7 +40,7 @@
       "title": "Half Day Trout Fishing with Southern Appalachian Anglers",
       "start": "2026-10-03T11:00:00.000Z",
       "end": "2026-10-03T15:00:00.000Z",
-      "description": "Half Day Trout Wade: 5 anglers at Southern Appalachian Anglers LLC - Asheville Fly Fishing Guide Service, no previous experience necessary. Location and more information will be available closer to the date.",
+      "description": "Half Day Trout Wade: 5 anglers at Southern Appalachian Anglers LLC - Asheville Fly Fishing Guide Service, no previous experience necessary. Location and more information will be available closer to the date. A meetup location and time will be given via email.",
       "programId": "program-fishing"
     },
     {
@@ -98,14 +98,6 @@
       "programId": "program-dog-training"
     },
     {
-      "id": "sourdough-101-with-patrina-2026-10-10",
-      "title": "Sourdough 101 with Patrina",
-      "start": "2026-10-10T14:00:00.000Z",
-      "end": "2026-10-10T17:00:00.000Z",
-      "description": "Sourdough Baking class Come learn the easiest sourdough bread baking ever! You will learn about the care and feeding of a sourdough starter, how to make a wonderful loaf of bread from start to finish and take home dough to bake at home!",
-      "programId": "program-kitchen-medicine"
-    },
-    {
       "id": "pottery-with-resident-potter-sophia-2026-10-10",
       "title": "Pottery with resident potter Sophia",
       "start": "2026-10-10T14:00:00.000Z",
@@ -114,12 +106,20 @@
       "programId": "program-pottery"
     },
     {
+      "id": "sourdough-101-with-patrina-2026-10-10",
+      "title": "Sourdough 101 with Patrina",
+      "start": "2026-10-10T14:00:00.000Z",
+      "end": "2026-10-10T17:00:00.000Z",
+      "description": "Sourdough Baking class Come learn the easiest sourdough bread baking ever! You will learn about the care and feeding of a sourdough starter, how to make a wonderful loaf of bread from start to finish and take home dough to bake at home!",
+      "programId": "program-kitchen-medicine"
+    },
+    {
       "id": "hendersonville-women-s-club-meeting-2026-10-13",
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-10-13T14:00:00.000Z",
       "end": "2026-10-13T16:00:00.000Z",
-      "programId": "program-hendersonville-womans-club",
-      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service."
+      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service.",
+      "programId": "program-hendersonville-womans-club"
     },
     {
       "id": "woodworking-workshop-with-chris-from-forest-project-woodwork-2026-10-14",
@@ -131,20 +131,20 @@
       "programId": "program-woodworking"
     },
     {
-      "id": "chair-massage-with-lisa-2026-10-14",
-      "title": "Chair Massage with Lisa",
-      "start": "2026-10-14T14:00:00.000Z",
-      "end": "2026-10-14T19:00:00.000Z",
-      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands.",
-      "programId": "program-chair-massage"
-    },
-    {
       "id": "meal-prep-workshop-with-sam-2026-10-14",
       "title": "Meal Prep Workshop with Sam",
       "start": "2026-10-14T14:00:00.000Z",
       "end": "2026-10-14T16:00:00.000Z",
-      "description": "Simple & Nourishing Meal Prep: prioritizing your health through affordable, seasonal, and local ingredients.Learn simple and cost-effective meal preparation to nourish your body, and support your local community—all while saving time in…",
+      "description": "Simple & Nourishing Meal Prep: prioritizing your health through affordable, seasonal, and local ingredients. Learn simple and cost-effective meal preparation to nourish your body, and support your local community—all while saving time in the kitchen and reducing food waste!",
       "programId": "program-kitchen-medicine"
+    },
+    {
+      "id": "chair-massage-with-lisa-2026-10-14",
+      "title": "Chair Massage with Lisa",
+      "start": "2026-10-14T14:00:00.000Z",
+      "end": "2026-10-14T19:00:00.000Z",
+      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands. Sessions can be 15 or 30 minutes, it uses a specialized ergonomic chair to provide targeted acupressure and Swedish massage techniques.",
+      "programId": "program-chair-massage"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-14",
@@ -159,7 +159,7 @@
       "title": "Acupuncture with Doaist Clinic",
       "start": "2026-10-16T13:00:00.000Z",
       "end": "2026-10-16T17:00:00.000Z",
-      "description": "The Daoist Traditions Acupuncture Clinic is located in Asheville NC. Their clinical interns are in the final phase of a rigorous four-year academic program and treat patients under the direct supervision of clinical faculty who are NC…",
+      "description": "The Daoist Traditions Acupuncture Clinic is located in Asheville NC. Their clinical interns are in the final phase of a rigorous four-year academic program and treat patients under the direct supervision of clinical faculty who are NC licensed acupuncturists.",
       "programId": "program-acupuncture"
     },
     {
@@ -191,7 +191,7 @@
       "title": "Fly Casting Clinic for Beginners",
       "start": "2026-10-23T14:00:00.000Z",
       "end": "2026-10-23T18:00:00.000Z",
-      "description": "Fishing with a fly rod is a special experience that allows the angler to cast a nearly weightless lure that resembles the various insects trout love to eat.",
+      "description": "Fishing with a fly rod is a special experience that allows the angler to cast a nearly weightless lure that resembles the various insects trout love to eat. To cast a fly, you must learn how to cast the line itself.",
       "programId": "program-fishing"
     },
     {
@@ -207,7 +207,7 @@
       "title": "Vet for Vets with Canine Companions",
       "start": "2026-10-24T13:00:00.000Z",
       "end": "2026-10-24T16:00:00.000Z",
-      "description": "The staff of Pinnacle Animal Hospital will be here toprovide brief health exams, heartworm tests, as well asvaccines appropriate to your pet(s).",
+      "description": "The staff of Pinnacle Animal Hospital will be here toprovide brief health exams, heartworm tests, as well asvaccines appropriate to your pet(s). Flea, tick, andheartworm prevention will also be provided.",
       "programId": "program-dog-training"
     },
     {
@@ -256,7 +256,7 @@
       "start": "2026-11-08T13:00:00.000Z",
       "end": "2026-11-08T17:00:00.000Z",
       "location": "Mills River Park, 124 Town Center Dr, Mills River, NC 28759, USA",
-      "description": "The 5k starts at 10AM and the Fun Run Loop starts at 9:45AM. The 5K course follows the family-friendly greenway at Mills River Park, that welcomes runners and walkers of all ages and abilities.",
+      "description": "The 5k starts at 10AM and the Fun Run Loop starts at 9:45AM. The 5K course follows the family-friendly greenway at Mills River Park, that welcomes runners and walkers of all ages and abilities. This is a flat course with surrounding mountain views.",
       "programId": "program-5k-fundraiser"
     },
     {
@@ -264,8 +264,8 @@
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-11-10T15:00:00.000Z",
       "end": "2026-11-10T17:00:00.000Z",
-      "programId": "program-hendersonville-womans-club",
-      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service."
+      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service.",
+      "programId": "program-hendersonville-womans-club"
     },
     {
       "id": "pottery-create-your-ornaments-2-part-series-with-sophia-2026-11-11",
@@ -312,8 +312,8 @@
       "title": "Hendersonville Women's Club Meeting",
       "start": "2026-12-08T15:00:00.000Z",
       "end": "2026-12-08T17:00:00.000Z",
-      "programId": "program-hendersonville-womans-club",
-      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service."
+      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service.",
+      "programId": "program-hendersonville-womans-club"
     }
   ]
 }

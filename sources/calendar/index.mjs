@@ -27,6 +27,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ical from "node-ical";
+import { normalizeSentenceSpacing, truncateText } from "./text.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
@@ -235,22 +236,16 @@ function stripAdminBoilerplate(text) {
   return ADMIN_PHRASE_PATTERNS.reduce((acc, re) => acc.replace(re, " "), String(text));
 }
 
-// Prefers cutting at a sentence boundary so the fragment reads as a complete
-// thought; falls back to a word boundary so we never cut mid-word.
-function truncateText(text, maxLen) {
-  if (text.length <= maxLen) return text;
-  const slice = text.slice(0, maxLen - 1);
-  const sentenceBreak = Math.max(slice.lastIndexOf(". "), slice.lastIndexOf("! "), slice.lastIndexOf("? "));
-  if (sentenceBreak > maxLen * 0.4) return slice.slice(0, sentenceBreak + 1).trimEnd();
-  const wordBreak = slice.lastIndexOf(" ");
-  return (wordBreak > 0 ? slice.slice(0, wordBreak) : slice).trimEnd() + "…";
-}
-
 function cleanText(text, maxLen) {
   if (!text) return undefined;
   // Admin boilerplate runs first, while "**cancellations...**" still has its
   // asterisks to match on — stripHtml() below removes any that survive.
-  const collapsed = stripUrls(stripMarkdown(stripHtml(stripAdminBoilerplate(text))))
+  // normalizeSentenceSpacing runs before the collapse so a missing space after a
+  // full stop is repaired for the reader *and* left visible to truncateText,
+  // which needs it to find the sentence boundary.
+  const collapsed = normalizeSentenceSpacing(
+    stripUrls(stripMarkdown(stripHtml(stripAdminBoilerplate(text))))
+  )
     .replace(/\s+/g, " ")
     .trim();
   if (collapsed.length === 0) return undefined;
@@ -428,7 +423,12 @@ async function main() {
       }
       seenIds.add(id);
 
-      let description = cleanText(occ.source.description, 240);
+      // 280, not 240: a typical VHF description runs to ~250 characters, and at 240
+      // the truncator was discarding a whole second sentence to save a handful of
+      // characters (the Meal Prep workshop lost 140 of its 250). The scene has the
+      // vertical room — verified on the panel — so the limit only needs to stop a
+      // genuinely long description, not trim an ordinary one.
+      let description = cleanText(occ.source.description, 280);
       if (description && description.toLowerCase().startsWith(String(title).toLowerCase())) {
         description = description.slice(title.length).replace(/^[\s.:—-]+/, "").trim() || undefined;
       }
