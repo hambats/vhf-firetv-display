@@ -26,6 +26,50 @@ awake, and serves cached content when the network drops. Content publishes with 
 network with a direct peer-to-peer tunnel. `docs/REMOTE_ACCESS.md` has the addresses and the two
 settings that make it survive reboots.
 
+### Shipped later on Sept 19 (all live and verified on the panel)
+
+**Registration QR codes.** The display could describe a workshop and give nobody a way to act on
+it — `stripUrls()` discards registration links, correctly, since a URL is useless on a screen no
+one can click. Event scenes, dates-list scenes and (opt-in per item) announcements now carry a
+code. `registration` in `content/settings.json` holds the default URL plus `overrides` matched on
+a title substring: a `url` redirects (the Veterans Day 5K is run by an outside race organiser) and
+`"hide": true` suppresses it (the Hendersonville Women's Club books the room and has nothing to
+register for). `scripts/generate-qr.mjs` builds one SVG per URL; `tests/qr.test.mjs` fails the
+build if a committed code and `settings.json` ever drift, because a stale QR looks exactly like a
+correct one until someone scans it.
+
+**`content/gallery-focus.json`.** `generated/gallery.json` is rebuilt from scratch every sync, so
+a `focus` typed into it survives until the next run and then vanishes silently — three tuned crops
+were destroyed that way before this existed. Overrides now live in a hand-maintained file the
+adapter applies at generation time. Hand-written entries always beat the generated ones.
+
+**Face-aware cropping.** `scripts/detect-photo-focus.py` finds faces locally (YuNet DNN, model
+fetched to `.cache`, Haar only as fallback) and proposes the crop that keeps them in frame; 57 of
+the current pool carry one. **It is run by hand and reviewed with `--sheet`, deliberately not
+wired into the sync.** The failure that matters is one stray detection low in the frame dragging
+the crop past everybody — `main_cluster()` handles the cases seen so far, but a detector that is
+right 95% of the time still puts a beheaded photo on a public wall unsupervised.
+
+**Portrait fill.** Over half the pool is portrait. Rather than crop a third away or pillarbox
+against black, the photo is contained and a blurred copy of itself fills the sides. Ken Burns had
+to move to the fill layer: scaling a *contained* photo re-crops the frame the fill exists to keep
+whole.
+
+**The aspect floor dropped from 0.7 to 0.45**, so the qualifying pool went 389 → 424. The old
+value was rejecting ordinary phone portraits — 33 of the 35 it dropped sat between 0.545 and 0.70,
+and 0.5625 is exactly the 9:16 a phone shoots.
+
+**Two Windows-only breakages fixed.** `publish.mjs` spawned with `shell: true`, so cmd re-parsed
+the argv and split any argument with a space — every publish from Windows failed, including with
+its own default commit message. `sync-sources.mjs` passed a bare absolute path to a dynamic
+`import()`, which only accepts file:/data:/node: URLs, so `D:` parsed as a scheme. Both worked on
+POSIX, which is why they survived on the one machine that cannot publish.
+
+**`node sources/gallery/index.mjs --report <path>`** now names every dropped candidate rather than
+counting it. Of 628 candidates: 195 under the 1200px floor (mostly Squarespace's own small
+derivatives of photos already in the pool, *not* 195 distinct photographs), 7 hand-excluded, 2
+screenshots, 0 unreadable.
+
 ### Open threads, most valuable first
 
 1. **Outbound heartbeat — not built, and the biggest remaining gap.** `web/js/diagnostics.js`

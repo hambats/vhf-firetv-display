@@ -103,9 +103,13 @@ ship regardless of what else is happening.**
 
 Already built and current: the scene engine and all scene types, the content schema and its
 validator, JSON cache fallback, the gallery and calendar adapters, the local admin editor, the live
-GitHub Pages site, the `app/` shell installed on the television, and off-site access to that
-television ([docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md)). See
-[docs/BUILD_TREE.md](docs/BUILD_TREE.md) §6.
+GitHub Pages site, the `app/` shell installed on the television, off-site access to that television
+([docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md)), registration QR codes with per-event overrides,
+face-aware photo cropping, and the portrait fill treatment.
+
+**Start at the "State of play" section at the top of [docs/BUILD_TREE.md](docs/BUILD_TREE.md)** —
+it carries what was tried, what is blocked and why, which is the part that saves time. §6 lists
+what exists.
 
 ## Guiding principle
 
