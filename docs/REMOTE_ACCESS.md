@@ -18,7 +18,7 @@ remains the higher-value piece of work for an unattended display.
 
 | Device | Tailnet address | Node name |
 |---|---|---|
-| The television (Toshiba AFTTI43) | `100.69.183.1` | `nicoles-tv` |
+| The television (Toshiba AFTTI43) | `100.69.183.1` | `vhf-display` |
 | Development PC | `100.84.23.92` | `desktop-m8kebh3` |
 
 Tailnet: `taild0c74d.ts.net`, account `rwlauterbach@`.
@@ -71,14 +71,23 @@ rather than falling back to its normal connection. With lockdown off, a broken V
 access and nothing else. The cost of this choice is that a VPN failure is silent — accepted,
 because the display staying up matters more.
 
-## Maintenance: disable key expiry
+## Key expiry: disabled (Sept 19, 2026)
 
-**Tailscale nodes expire by default, typically every 180 days.** When the key for `nicoles-tv`
-expires, the television drops off the tailnet with no warning, and the only way to bring it
-back is to be physically at the farm — which defeats the entire point.
+Tailscale nodes expire by default — this one was set to `2027-03-18`. An expired key drops the
+television off the tailnet with no warning, and the only way back is to be physically at the
+farm, which defeats the entire point. **Expiry is now disabled**, confirmed against
+`tailscale status --json` rather than the console's confirmation message.
 
-Disable key expiry for that node in the Tailscale admin console. This is the single piece of
-maintenance that matters, and it is one click.
+Nothing further is needed. If it ever reappears, it is in the admin console under the machine's
+`⋯` menu → *Disable key expiry*.
+
+The node was also renamed from `nicoles-tv` to `vhf-display`. Doing that required first turning
+off **"Auto-generate from OS hostname"** in the rename dialog — left on, the name reverts to the
+device's own hostname, which this television reports as `localhost`. A rename without that step
+appears to succeed and then quietly undoes itself.
+
+Renaming retires `nicoles-tv.taild0c74d.ts.net`. Nothing depends on it; everything here uses the
+address.
 
 ## Verifying it actually works
 
@@ -92,7 +101,7 @@ adb -s 100.69.183.1:5555 reboot
 
 Then, from the PC, without touching the television:
 
-- `tailscale status` shows `nicoles-tv` without `offline` (took about 10 seconds)
+- `tailscale status` shows `vhf-display` without `offline` (took about 10 seconds)
 - `adb connect 100.69.183.1:5555` succeeds — drop any LAN connection first, or you will
   test the wrong path
 - `adb shell ip -f inet addr show` shows `inet 100.` on `tun0`
