@@ -35,7 +35,8 @@
       "content": {
         "excludeTitleContains": [
           "open studio pottery",
-          "open pottery studio"
+          "open pottery studio",
+          "create your ornaments"
         ]
       }
     },
@@ -88,7 +89,8 @@
       "content": {
         "excludeTitleContains": [
           "open studio pottery",
-          "open pottery studio"
+          "open pottery studio",
+          "create your ornaments"
         ]
       }
     },
@@ -103,6 +105,19 @@
         "washSource": "program-pottery",
         "limit": 8,
         "titleContains": ["open studio pottery", "open pottery studio"]
+      }
+    },
+    {
+      "id": "ornaments-workshop-dates",
+      "type": "events",
+      "duration": 12,
+      "enabled": true,
+      "content": {
+        "eyebrow": "With Resident Potter Sophia",
+        "title": "Create Your Ornaments",
+        "washSource": "program-pottery",
+        "limit": 8,
+        "titleContains": ["create your ornaments"]
       }
     },
     {
@@ -171,7 +186,8 @@
       "content": {
         "excludeTitleContains": [
           "open studio pottery",
-          "open pottery studio"
+          "open pottery studio",
+          "create your ornaments"
         ]
       }
     },
@@ -235,7 +251,8 @@
       "content": {
         "excludeTitleContains": [
           "open studio pottery",
-          "open pottery studio"
+          "open pottery studio",
+          "create your ornaments"
         ]
       }
     },
@@ -304,7 +321,8 @@
       "content": {
         "excludeTitleContains": [
           "open studio pottery",
-          "open pottery studio"
+          "open pottery studio",
+          "create your ornaments"
         ]
       }
     },
@@ -341,7 +359,8 @@
       "content": {
         "excludeTitleContains": [
           "open studio pottery",
-          "open pottery studio"
+          "open pottery studio",
+          "create your ornaments"
         ]
       }
     },
