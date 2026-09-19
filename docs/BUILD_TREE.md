@@ -51,16 +51,36 @@ settings that make it survive reboots.
 4. **M3 proof still unrun.** Nothing has been observed for a week on the real television. Remote
    screenshots make this much cheaper to do than it was.
 
-### Loose ends in the repo itself
+### The photo-mirror branch — resolved, not merged (Sept 19)
 
-- **An orphaned worktree with unmerged work.** `.claude/worktrees/build-tree-76ded0` is a live git
-  worktree on branch `claude/build-tree-76ded0`, holding one commit that is **not in `main`**:
-  `7847052 Localise the photo pool and drop two dead event fields`. Its working tree is clean.
-  Decide whether to merge or drop it — it is easy to miss and easy to clobber.
-- **That worktree also carries a stale `CLAUDE.md`** naming Netlify as the publish transport, and
-  stale skill files that still say to run `netlify deploy`. It is git-excluded so it will never be
-  committed, but a repo-wide grep reads it and will hand back the wrong answer. Trust `/CLAUDE.md`
-  at the repo root, not the copy under `.claude/worktrees/`.
+`claude/build-tree-76ded0` held one commit that was never in `main`:
+`7847052 Localise the photo pool and drop two dead event fields`. It was examined for merging and
+**deliberately not merged.** A trial merge produced eight conflicting files; more importantly,
+almost nothing in it was still worth having:
+
+| Part of the commit | Verdict |
+|---|---|
+| Calendar venue/location handling | **Superseded.** `main`'s `cleanLocation` is strictly better — it only strips the address when `FARM_SIGNATURE` matches, so an off-site venue keeps the full address a viewer needs, and it also handles unpunctuated and all-lowercase location strings. Merging would have been a regression. |
+| `content/generated/*.json` | Generated artifacts. Regenerate with the sync; never reconcile line by line. |
+| `docs/BUILD_TREE.md`, `docs/CONTENT_SCHEMA.md` | Conflict with newer versions of the same docs. |
+| `scripts/fetch-photos.mjs` | The only unique artifact — and it *implements* open decision §1a.1. |
+
+So merging it would have silently decided a question this document explicitly parks. The commit is
+preserved as the tag **`archive/photo-mirror-experiment`**, pushed to the remote, so it survives
+the branch and the worktree:
+
+```bash
+git checkout -b photo-mirror archive/photo-mirror-experiment
+```
+
+Treat it as the reference implementation for §1a.1, not as work awaiting a merge. Nothing is lost
+by leaving it unmerged; the decision is what is outstanding.
+
+The stale worktree it lived in has been removed, along with the stale `CLAUDE.md` and skill files
+inside it that still named Netlify as the publish transport. An empty
+`.claude/worktrees/build-tree-76ded0/` directory may linger until the process holding it exits;
+it is harmless. The local branch `claude/build-tree-76ded0` still exists and can be deleted once
+the tag is trusted.
 
 ### Two traps that cost time today
 
@@ -455,6 +475,12 @@ buys four things it does not:
 It also collapses the "display talks to exactly two hosts" invariant in §3 down to one. Cost is
 roughly 40 lines in the build, plus disk. **Decision needed: keep it dropped, or reinstate it as
 an M2 item.**
+
+> *Sept 19:* a working implementation of this already exists — `scripts/fetch-photos.mjs`, 207
+> lines, on the tag `archive/photo-mirror-experiment`. It was written on a branch that also
+> carried calendar work since superseded by `main`, so the branch was **not merged**; see the
+> state-of-play section at the top. The existence of the implementation does not decide the
+> question — read it as evidence of cost, not as a vote.
 
 **2. "A real heartbeat would need a server that isn't static — probably not worth it."**
 *Reasoning revised Sept 18, after the host move.* This was re-opened on the grounds that Netlify
