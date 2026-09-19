@@ -281,11 +281,31 @@ function normalizeSegment(segment) {
 // to walk to. So drop the farm's own address and keep only a sub-location
 // ("Greenhouse", "Pavilion"); when nothing meaningful is left, return
 // undefined so the scene omits the line entirely.
+// A calendar author sometimes types a location as one flat lowercase run
+// ("forest project woodworking 141 holland rd pisgah forest nc 28768")
+// instead of a normally-capitalized address — same source, same program,
+// inconsistent with its own other occurrences. Title-cases it only when the
+// whole string has no uppercase letters at all, so an already-fine location
+// ("141 Holland Rd, Pisgah Forest, NC 28768, USA") is never touched.
+const LOWERCASE_CONNECTORS = new Set(["and", "at", "in", "of", "on", "the", "to", "with"]);
+const UPPERCASE_WORDS = new Set(["nc", "usa"]);
+
+function titleCaseIfFlat(text) {
+  if (!text || /[A-Z]/.test(text)) return text;
+  return text.replace(/[a-z0-9']+/gi, (word, offset) => {
+    var lower = word.toLowerCase();
+    if (UPPERCASE_WORDS.has(lower)) return lower.toUpperCase();
+    if (offset > 0 && LOWERCASE_CONNECTORS.has(lower)) return lower;
+    if (/^\d+$/.test(word)) return word;
+    return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+  });
+}
+
 function cleanLocation(loc) {
   if (!loc || loc === "undefined") return undefined;
   const cleaned = cleanText(loc, 120);
   if (!cleaned) return undefined;
-  if (!FARM_SIGNATURE.test(cleaned)) return cleaned;
+  if (!FARM_SIGNATURE.test(cleaned)) return titleCaseIfFlat(cleaned);
 
   // Comma-separated form: keep the segments that aren't part of the address.
   let remainder = cleaned
@@ -317,7 +337,7 @@ function cleanLocation(loc) {
 
   // A bare house number or a one-character scrap is noise, not a sub-location.
   if (remainder.length < 2 || /^\d+$/.test(remainder)) return undefined;
-  return remainder;
+  return titleCaseIfFlat(remainder);
 }
 
 // Expands a single VEVENT (master or non-recurring) into concrete

@@ -2,7 +2,7 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-09-18T22:25:04.509Z",
+  "generatedAt": "2026-09-19T01:05:51.923Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
     {
@@ -71,7 +71,7 @@
       "title": "Woodworking Workshop with Chris from Forest Project Woodworking",
       "start": "2026-10-07T13:30:00.000Z",
       "end": "2026-10-07T16:30:00.000Z",
-      "location": "forest project woodworking 141 holland rd pisgah forest nc 28768",
+      "location": "Forest Project Woodworking 141 Holland Rd Pisgah Forest NC 28768",
       "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing.",
       "programId": "program-woodworking"
     },
@@ -162,20 +162,20 @@
       "programId": "program-acupuncture"
     },
     {
-      "id": "pasta-making-101-with-helene-2026-10-17",
-      "title": "Pasta Making 101 with Helene",
-      "start": "2026-10-17T14:00:00.000Z",
-      "end": "2026-10-17T18:00:00.000Z",
-      "description": "Pasta is the world’s ultimate comfort food! Please join us for a fun, hands-on class to learn how easy and satisfying it is to make pasta from scratch without the use of fancy equipment.",
-      "programId": "program-kitchen-medicine"
-    },
-    {
       "id": "pottery-with-resident-potter-sophia-2026-10-17",
       "title": "Pottery with resident potter Sophia",
       "start": "2026-10-17T14:00:00.000Z",
       "end": "2026-10-17T15:00:00.000Z",
       "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
       "programId": "program-pottery"
+    },
+    {
+      "id": "pasta-making-101-with-helene-2026-10-17",
+      "title": "Pasta Making 101 with Helene",
+      "start": "2026-10-17T14:00:00.000Z",
+      "end": "2026-10-17T18:00:00.000Z",
+      "description": "Pasta is the world’s ultimate comfort food! Please join us for a fun, hands-on class to learn how easy and satisfying it is to make pasta from scratch without the use of fancy equipment.",
+      "programId": "program-kitchen-medicine"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-21",
