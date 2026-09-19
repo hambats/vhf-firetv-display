@@ -55,3 +55,27 @@ export function truncateText(text, maxLen) {
   const wordBreak = slice.lastIndexOf(" ");
   return (wordBreak > 0 ? slice.slice(0, wordBreak) : slice).trimEnd() + "…";
 }
+
+/*
+ * VHF house style: no em dashes on the display, and a plain hyphen for a
+ * range rather than an en dash. Calendar authors use both freely, so this
+ * normalizes what the feed hands us instead of leaving the display to show
+ * whatever punctuation a given event description happened to be typed with.
+ *
+ * An em dash between words becomes a full stop when what follows can stand
+ * as its own sentence, and a comma otherwise — but telling those apart needs
+ * a parser, so the simple, predictable rule is a full stop when the dash is
+ * surrounded by spaces (an aside) and a comma when it is tight against the
+ * words either side ("community—all while saving time"), which is nearly
+ * always a continuation.
+ *
+ * An en dash keeps its meaning as a range and only changes shape: " - "
+ * when spaced, "-" when tight ("8:30 AM-3:30 PM").
+ */
+export function normalizeDashes(text) {
+  return String(text)
+    .replace(/\s+—\s+/g, ". ")
+    .replace(/—/g, ", ")
+    .replace(/\s+–\s+/g, " - ")
+    .replace(/–/g, "-");
+}

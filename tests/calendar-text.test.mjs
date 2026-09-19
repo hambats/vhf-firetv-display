@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { normalizeSentenceSpacing, truncateText } from "../sources/calendar/text.mjs";
+import { normalizeDashes, normalizeSentenceSpacing, truncateText } from "../sources/calendar/text.mjs";
 
 /*
  * The string that caused this: the Meal Prep Workshop description, as Google
@@ -67,4 +67,28 @@ test("a very early full stop does not gut the text", () => {
   const text = "Note. " + "detail ".repeat(60).trim();
   const out = truncateText(text, 240);
   assert.ok(out.length > 100, `lost almost everything: ${JSON.stringify(out)}`);
+});
+
+/*
+ * Both strings below are real: the Meal Prep and Quail Hunt descriptions as
+ * the calendar feed actually delivered them on 2026-09-19.
+ */
+test("a spaced em dash becomes a full stop", () => {
+  const out = normalizeDashes("Veterans Quail Hunt — November 14!");
+  assert.equal(out, "Veterans Quail Hunt. November 14!");
+});
+
+test("a tight em dash becomes a comma, not a sentence break", () => {
+  const out = normalizeDashes("support your local community—all while saving time");
+  assert.equal(out, "support your local community, all while saving time");
+});
+
+test("an en dash range keeps its meaning and loses its shape", () => {
+  assert.equal(normalizeDashes("from 8:30 AM–3:30 PM"), "from 8:30 AM-3:30 PM");
+  assert.equal(normalizeDashes("Oct 3 – Oct 24"), "Oct 3 - Oct 24");
+});
+
+test("text with no dashes is returned untouched", () => {
+  const text = "Come learn the easiest sourdough bread baking ever!";
+  assert.equal(normalizeDashes(text), text);
 });

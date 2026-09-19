@@ -164,7 +164,7 @@
       "content": {
         "eyebrow": "Medicinal Herb Squad",
         "title": "Healing from the Ground Up",
-        "body": "Over 70 healing plant species grown on-site, crafted into teas, tinctures, salves, and balms — a plant-based approach to sleep, anxiety, and inflammation."
+        "body": "Over 70 healing plant species grown on-site, crafted into teas, tinctures, salves, and balms: a plant-based approach to sleep, anxiety, and inflammation."
       }
     },
     {
@@ -175,7 +175,7 @@
       "content": {
         "eyebrow": "Garden Group",
         "title": "Hands in the Earth",
-        "body": "Rain or shine, our Garden Group plants, tends, and harvests every row on the farm — the produce behind every free box we give back to the community."
+        "body": "Rain or shine, our Garden Group plants, tends, and harvests every row on the farm, growing the produce behind every free box we give back to the community."
       }
     },
     {
@@ -216,7 +216,7 @@
       "content": {
         "eyebrow": "Beekeeping Squad",
         "title": "Patience, Focus, Calm",
-        "body": "Veterans build hives and tend colonies together — a quiet practice that builds patience and calm while giving back to the land."
+        "body": "Veterans build hives and tend colonies together: a quiet practice that builds patience and calm while giving back to the land."
       }
     },
     {
@@ -294,7 +294,7 @@
       "enabled": true,
       "content": {
         "family": "impact",
-        "eyebrow": "Our Impact — 2025",
+        "eyebrow": "Our Impact - 2025",
         "title": "13 Years of Healing",
         "body": "4,474 volunteer hours. 3,500 lbs of produce donated. 450 bouquets shared. 10 gallons of honey harvested. All given back to Veterans and their families."
       }
@@ -334,7 +334,7 @@
       "content": {
         "eyebrow": "No Cost to Veterans",
         "title": "Every Program, Free",
-        "body": "Every program, workshop, and event is offered completely free — Veterans Healing Farm is a registered 501(c)(3) nonprofit, sustained entirely by volunteers, sponsors, and donors across Western North Carolina."
+        "body": "Every program, workshop, and event is offered completely free. Veterans Healing Farm is a registered 501(c)(3) nonprofit, sustained entirely by volunteers, sponsors, and donors across Western North Carolina."
       }
     },
     {
@@ -372,7 +372,7 @@
       "content": {
         "eyebrow": "Many Hands, One Farm",
         "title": "Volunteer Groups Welcome",
-        "body": "42 businesses, churches, and community groups brought volunteer days to the farm in 2025 — every visit helps a Veteran heal."
+        "body": "42 businesses, churches, and community groups brought volunteer days to the farm in 2025. Every visit helps a Veteran heal."
       }
     },
     {
@@ -383,7 +383,7 @@
       "content": {
         "eyebrow": "Before You Head Out",
         "title": "Please Sign In",
-        "body": "Every volunteer hour counts toward our impact — sign in and log your hours at the farm house before you start.",
+        "body": "Every volunteer hour counts toward our impact. Sign in and log your hours at the farm house before you start.",
         "washSources": "volunteer-groups"
       }
     },
@@ -395,7 +395,7 @@
       "content": {
         "eyebrow": "Get Involved",
         "title": "Help a Veteran Heal",
-        "body": "Volunteer, sponsor a program, make a donation, or check our Amazon Wish List — every bit of support makes a difference."
+        "body": "Volunteer, sponsor a program, make a donation, or check our Amazon Wish List. Every bit of support makes a difference."
       }
     },
     {

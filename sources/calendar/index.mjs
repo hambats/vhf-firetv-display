@@ -27,7 +27,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ical from "node-ical";
-import { normalizeSentenceSpacing, truncateText } from "./text.mjs";
+import { normalizeDashes, normalizeSentenceSpacing, truncateText } from "./text.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
@@ -247,8 +247,10 @@ function cleanText(text, maxLen) {
   // normalizeSentenceSpacing runs before the collapse so a missing space after a
   // full stop is repaired for the reader *and* left visible to truncateText,
   // which needs it to find the sentence boundary.
-  const collapsed = normalizeSentenceSpacing(
-    stripUrls(stripMarkdown(stripHtml(stripAdminBoilerplate(text))))
+  const collapsed = normalizeDashes(
+    normalizeSentenceSpacing(
+      stripUrls(stripMarkdown(stripHtml(stripAdminBoilerplate(text))))
+    )
   )
     .replace(/\s+/g, " ")
     .trim();

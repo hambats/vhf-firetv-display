@@ -211,7 +211,8 @@ var VhfScenes = (function () {
     }
     var start = fmt(startIso);
     var end = endIso ? fmt(endIso) : "";
-    return end ? start + " – " + end : start;
+    // Plain hyphen, not an en dash: VHF's house style for a time range.
+    return end ? start + " - " + end : start;
   }
 
   function findEvent(data, eventId) {
