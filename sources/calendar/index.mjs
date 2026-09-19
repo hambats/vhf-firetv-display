@@ -52,7 +52,11 @@ const PROGRAM_KEYWORDS = [
   { programId: "program-soap-making", patterns: ["soap making", "soap pour"] },
   { programId: "program-chair-massage", patterns: ["chair massage"] },
   { programId: "program-acupuncture", patterns: ["acupuncture"] },
-  { programId: "program-kitchen-medicine", patterns: ["kitchen medicine", "sourdough", "pasta making", "meal prep", "canning"] },
+  // Sourdough sits ahead of kitchen-medicine deliberately: first pattern to
+  // hit wins, and a loaf of bread is specific enough to deserve its own
+  // photo rather than the general kitchen set's pasta and canning shots.
+  { programId: "program-sourdough", patterns: ["sourdough"] },
+  { programId: "program-kitchen-medicine", patterns: ["kitchen medicine", "pasta making", "meal prep", "canning"] },
   { programId: "program-fishing", patterns: ["trout", "fly casting", "fly tying", "fishing"] },
   { programId: "program-dog-training", patterns: ["dog training", "canine companions"] },
   { programId: "program-wellness-retreat", patterns: ["wellness retreat"] },
