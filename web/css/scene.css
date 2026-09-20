@@ -605,11 +605,24 @@ html, body {
 .scene--announcement--graphic .scene__content {
   left: 120px;
   right: auto;
-  top: 26%;
+  top: 21%;
   transform: none;
   max-width: 900px;
   text-align: left;
   padding: 0;
+}
+
+/* The copy and the code form one stack on the left; this centres the card
+   against it rather than hanging it from the top, and matches the right
+   gutter to the copy's 120px left one. Without this the three elements sit
+   at three different heights with a dead band along the bottom — most
+   visible since the standing lockup was dropped from this slide. Scoped to
+   the announcement: the event scene's own card is positioned against a
+   different layout. */
+.scene--announcement--graphic .scene__event-graphic {
+  top: 233px;
+  bottom: 233px;
+  right: 120px;
 }
 
 .scene--announcement--graphic .scene__title {
@@ -713,7 +726,7 @@ html, body {
 .scene__qr--center {
   left: 50%;
   right: auto;
-  top: 71%;
+  top: 66%;
   transform: translate(-50%, -50%);
 }
 /* An event scene carrying its program's graphic card (.scene__event-graphic,
