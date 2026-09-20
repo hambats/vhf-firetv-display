@@ -429,11 +429,17 @@ var VhfScenes = (function () {
     // "--graphic" modifier switches to a left-anchored, narrower layout
     // that actually leaves the card's column clear.
     var graphicSource = ANNOUNCEMENT_GRAPHIC_SOURCES[announcement.id];
+    var hasGraphic = false;
     if (graphicSource && appendEventGraphic(scene, data, graphicSource)) {
+      hasGraphic = true;
       scene.className += " scene--announcement--graphic";
     }
     scene.appendChild(el("div", "scene__fade"));
-    lockup(scene);
+    // The standing lockup is the only VHF mark on a plain announcement, but a
+    // designed graphic carries the seal inside the artwork already — showing
+    // both puts two copies of the same mark on one slide, next to a QR code.
+    // The card is the better of the two, so the loose coin goes.
+    if (!hasGraphic) lockup(scene);
     var body = el("div", "scene__content");
     body.appendChild(el("h1", "scene__title", announcement.title));
     if (announcement.body) body.appendChild(el("p", "scene__body", announcement.body));
