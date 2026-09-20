@@ -4,7 +4,7 @@
     {
       "id": "welcome-information",
       "type": "information",
-      "duration": 10,
+      "duration": 13,
       "enabled": true,
       "content": {
         "lockup": true,
@@ -16,21 +16,21 @@
     {
       "id": "photo-pool-1",
       "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
     },
     {
       "id": "announcements",
       "type": "announcement",
-      "duration": 10,
+      "duration": 13,
       "enabled": true,
       "content": {}
     },
     {
       "id": "event-pool-1",
       "type": "event-pool",
-      "duration": 12,
+      "duration": 14,
       "enabled": true,
       "content": {
         "excludeTitleContains": [
@@ -43,7 +43,7 @@
     {
       "id": "in-uniform-pool",
       "type": "photo-pool",
-      "duration": 10,
+      "duration": 9,
       "enabled": true,
       "content": {
         "source": "in-uniform",
@@ -54,14 +54,14 @@
     {
       "id": "photo-pool-2",
       "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
     },
     {
       "id": "our-mission",
       "type": "information",
-      "duration": 10,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "Our Mission",
@@ -70,21 +70,9 @@
       }
     },
     {
-      "id": "our-history",
-      "type": "information",
-      "duration": 10,
-      "enabled": true,
-      "content": {
-        "eyebrow": "Our History",
-        "title": "Founded in 2013",
-        "body": "John and Nicole Mahshie founded Veterans Healing Farm with a vision to end the Veteran suicide crisis through nature, connection, and purpose.",
-        "showEvery": 2
-      }
-    },
-    {
       "id": "event-pool-2",
       "type": "event-pool",
-      "duration": 12,
+      "duration": 14,
       "enabled": true,
       "content": {
         "excludeTitleContains": [
@@ -95,9 +83,21 @@
       }
     },
     {
+      "id": "our-history",
+      "type": "information",
+      "duration": 13,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Our History",
+        "title": "Founded in 2013",
+        "body": "John and Nicole Mahshie founded Veterans Healing Farm with a vision to end the Veteran suicide crisis through nature, connection, and purpose.",
+        "showEvery": 2
+      }
+    },
+    {
       "id": "open-studio-pottery-dates",
       "type": "events",
-      "duration": 12,
+      "duration": 16,
       "enabled": true,
       "content": {
         "eyebrow": "With Resident Potter Sophia",
@@ -110,7 +110,7 @@
     {
       "id": "ornaments-workshop-dates",
       "type": "events",
-      "duration": 12,
+      "duration": 16,
       "enabled": true,
       "content": {
         "eyebrow": "With Resident Potter Sophia",
@@ -123,14 +123,14 @@
     {
       "id": "photo-pool-3",
       "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
     },
     {
       "id": "program-agritherapy",
       "type": "information",
-      "duration": 8,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "Agritherapy",
@@ -139,9 +139,16 @@
       }
     },
     {
+      "id": "photo-pool-10",
+      "type": "photo-pool",
+      "duration": 9,
+      "enabled": true,
+      "content": {}
+    },
+    {
       "id": "vhf-why",
       "type": "information",
-      "duration": 10,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "Why We Do This",
@@ -150,16 +157,16 @@
       }
     },
     {
-      "id": "photo-pool-10",
+      "id": "photo-pool-4",
       "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
     },
     {
       "id": "program-herb-squad",
       "type": "information",
-      "duration": 8,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "Medicinal Herb Squad",
@@ -168,20 +175,9 @@
       }
     },
     {
-      "id": "program-garden-group",
-      "type": "information",
-      "duration": 8,
-      "enabled": true,
-      "content": {
-        "eyebrow": "Garden Group",
-        "title": "Hands in the Earth",
-        "body": "Rain or shine, our Garden Group plants, tends, and harvests every row on the farm, growing the produce behind every free box we give back to the community."
-      }
-    },
-    {
       "id": "event-pool-3",
       "type": "event-pool",
-      "duration": 12,
+      "duration": 14,
       "enabled": true,
       "content": {
         "excludeTitleContains": [
@@ -192,9 +188,20 @@
       }
     },
     {
+      "id": "program-garden-group",
+      "type": "information",
+      "duration": 13,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Garden Group",
+        "title": "Hands in the Earth",
+        "body": "Rain or shine, our Garden Group plants, tends, and harvests every row on the farm, growing the produce behind every free box we give back to the community."
+      }
+    },
+    {
       "id": "military-art-pool",
       "type": "photo-pool",
-      "duration": 10,
+      "duration": 9,
       "enabled": true,
       "content": {
         "source": "military-art",
@@ -202,16 +209,16 @@
       }
     },
     {
-      "id": "photo-pool-4",
+      "id": "photo-pool-5",
       "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
     },
     {
       "id": "program-beekeeping",
       "type": "information",
-      "duration": 8,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "Beekeeping Squad",
@@ -220,9 +227,22 @@
       }
     },
     {
+      "id": "event-pool-4",
+      "type": "event-pool",
+      "duration": 14,
+      "enabled": true,
+      "content": {
+        "excludeTitleContains": [
+          "open studio pottery",
+          "open pottery studio",
+          "create your ornaments"
+        ]
+      }
+    },
+    {
       "id": "program-workshops",
       "type": "information",
-      "duration": 8,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "Workshops",
@@ -237,29 +257,16 @@
       }
     },
     {
-      "id": "photo-pool-5",
+      "id": "photo-pool-6",
       "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
     },
     {
-      "id": "event-pool-4",
-      "type": "event-pool",
-      "duration": 12,
-      "enabled": true,
-      "content": {
-        "excludeTitleContains": [
-          "open studio pottery",
-          "open pottery studio",
-          "create your ornaments"
-        ]
-      }
-    },
-    {
       "id": "resource-fair",
       "type": "information",
-      "duration": 8,
+      "duration": 13,
       "enabled": true,
       "content": {
         "family": "impact",
@@ -269,9 +276,16 @@
       }
     },
     {
+      "id": "photo-pool-11",
+      "type": "photo-pool",
+      "duration": 9,
+      "enabled": true,
+      "content": {}
+    },
+    {
       "id": "memorial-wall",
       "type": "information",
-      "duration": 8,
+      "duration": 13,
       "enabled": true,
       "content": {
         "family": "impact",
@@ -281,16 +295,22 @@
       }
     },
     {
-      "id": "photo-pool-6",
-      "type": "photo-pool",
-      "duration": 12,
+      "id": "event-pool-5",
+      "type": "event-pool",
+      "duration": 14,
       "enabled": true,
-      "content": {}
+      "content": {
+        "excludeTitleContains": [
+          "open studio pottery",
+          "open pottery studio",
+          "create your ornaments"
+        ]
+      }
     },
     {
       "id": "our-impact-2025",
       "type": "information",
-      "duration": 8,
+      "duration": 13,
       "enabled": true,
       "content": {
         "family": "impact",
@@ -300,36 +320,16 @@
       }
     },
     {
-      "id": "photo-pool-11",
-      "type": "photo-pool",
-      "duration": 12,
-      "enabled": true,
-      "content": {}
-    },
-    {
       "id": "photo-pool-7",
       "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
-    },
-    {
-      "id": "event-pool-5",
-      "type": "event-pool",
-      "duration": 12,
-      "enabled": true,
-      "content": {
-        "excludeTitleContains": [
-          "open studio pottery",
-          "open pottery studio",
-          "create your ornaments"
-        ]
-      }
     },
     {
       "id": "free-programs",
       "type": "information",
-      "duration": 10,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "No Cost to Veterans",
@@ -338,23 +338,27 @@
       }
     },
     {
-      "id": "photo-pool-8",
+      "id": "photo-pool-12",
       "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
     },
     {
-      "id": "photo-pool-12",
-      "type": "photo-pool",
-      "duration": 12,
+      "id": "volunteer-groups",
+      "type": "information",
+      "duration": 13,
       "enabled": true,
-      "content": {}
+      "content": {
+        "eyebrow": "Many Hands, One Farm",
+        "title": "Volunteer Groups Welcome",
+        "body": "42 businesses, churches, and community groups brought volunteer days to the farm in 2025. Every visit helps a Veteran heal."
+      }
     },
     {
       "id": "event-pool-6",
       "type": "event-pool",
-      "duration": 12,
+      "duration": 14,
       "enabled": true,
       "content": {
         "excludeTitleContains": [
@@ -365,20 +369,9 @@
       }
     },
     {
-      "id": "volunteer-groups",
-      "type": "information",
-      "duration": 8,
-      "enabled": true,
-      "content": {
-        "eyebrow": "Many Hands, One Farm",
-        "title": "Volunteer Groups Welcome",
-        "body": "42 businesses, churches, and community groups brought volunteer days to the farm in 2025. Every visit helps a Veteran heal."
-      }
-    },
-    {
       "id": "volunteer-sign-in",
       "type": "information",
-      "duration": 8,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "Before You Head Out",
@@ -388,9 +381,16 @@
       }
     },
     {
+      "id": "photo-pool-8",
+      "type": "photo-pool",
+      "duration": 9,
+      "enabled": true,
+      "content": {}
+    },
+    {
       "id": "get-involved",
       "type": "information",
-      "duration": 10,
+      "duration": 13,
       "enabled": true,
       "content": {
         "eyebrow": "Get Involved",
@@ -399,9 +399,16 @@
       }
     },
     {
+      "id": "photo-pool-13",
+      "type": "photo-pool",
+      "duration": 9,
+      "enabled": true,
+      "content": {}
+    },
+    {
       "id": "crisis-line",
       "type": "information",
-      "duration": 12,
+      "duration": 14,
       "enabled": true,
       "content": {
         "family": "crisis",
@@ -413,14 +420,7 @@
     {
       "id": "photo-pool-9",
       "type": "photo-pool",
-      "duration": 12,
-      "enabled": true,
-      "content": {}
-    },
-    {
-      "id": "photo-pool-13",
-      "type": "photo-pool",
-      "duration": 12,
+      "duration": 9,
       "enabled": true,
       "content": {}
     }
