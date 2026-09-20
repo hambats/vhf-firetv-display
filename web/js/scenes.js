@@ -106,8 +106,37 @@ var VhfScenes = (function () {
     // part the slide is about. photo.focus comes from a curated set's
     // focus.json or from gallery-focus.json, and is absent for the photos
     // that crop fine on their own.
-    if (photo.focus) wash.style.objectPosition = photo.focus;
+    var focus = pickFocus(photo);
+    if (focus) wash.style.objectPosition = focus;
     scene.appendChild(wash);
+  }
+
+  /*
+   * Where a slide has exactly one photo, a fixed crop means the television
+   * shows the identical frame every time that slide comes around, for months.
+   *
+   * So focus may also be a *list* of crops, cycled one per showing: a tall
+   * photo whose subject is taller than the 16:9 window it has to fit
+   * ("It's Not About the Cabbage" — a cabbage filling a portrait frame) can
+   * never show all of itself in one crop, and showing a different part each
+   * pass beats picking one and living with it. It also keeps a single-photo
+   * slide from being a fixed image on an LCD panel, which is the burn-in
+   * pattern .scene__brand's pixel-shift exists to avoid.
+   *
+   * Cycled rather than random so consecutive showings are always different;
+   * keyed by photo id so two slides sharing a photo keep their own place.
+   */
+  var focusRotation = {};
+
+  function pickFocus(photo) {
+    var focus = photo && photo.focus;
+    if (!focus) return null;
+    if (typeof focus === "string") return focus;
+    if (!focus.length) return null;
+    var key = photo.id || photo.src;
+    var next = (focusRotation[key] || 0) % focus.length;
+    focusRotation[key] = next + 1;
+    return focus[next];
   }
 
   // Curated sets that hold an organization's logo rather than candid photos
