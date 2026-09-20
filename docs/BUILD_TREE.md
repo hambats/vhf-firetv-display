@@ -324,7 +324,7 @@ What has been verified so far, and how, so the gap is honest:
 - The version poll, the fonts, the compat check and the overlay were verified in a live browser.
 - **Nothing has been verified on the Fire TV, and nothing has run for a week.** That is M3.
 
-### M2 — Repeatable publish  *(core landed Sept 18, 2026)*
+### M2 — Repeatable publish  *(done — core landed Sept 18, 2026)*
 
 Hand-running a deploy command was the one step still living in a human's memory — and that memory
 went stale the moment the publish endpoint moved to GitHub Pages, leaving both skills and the admin

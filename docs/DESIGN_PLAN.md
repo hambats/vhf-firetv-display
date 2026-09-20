@@ -224,10 +224,15 @@ plan that cannot be signed off in a desktop browser.
 Content work rather than code; can run in parallel with everything above.
 
 ### D5.1 Photo pool sweep
-- [ ] exclude signage-dominated frames — one grid cell is a cheque presentation dominated by "APLIX
-      INC. QUALITY POLICY" boards, which reads as a corporate office, not a farm
-- [ ] spot-check crops: `object-position: center 35%` is a blunt global rule and slices faces at
-      cell edges in the 2- and 3-up grids; add per-photo focus overrides where it matters
+- [x] exclude signage-dominated frames — `content/gallery-exclude.json` is now actively curated (9
+      entries), including the "APLIX INC. QUALITY POLICY" cheque-presentation frame this bullet
+      called out.
+- [x] spot-check crops: `object-position: center 35%` is still the global default, but per-photo
+      focus overrides now exist — `content/gallery-focus.json` for the scraped pool, and a
+      per-set `focus.json` convention for curated folders (see `sources/curated-photos/index.mjs`
+      and `content/artwork/curated/program-pottery/focus.json`). `appendWash` in
+      `web/js/scenes.js` applies them, and `pickFocus` lets a focus value be a list of crops that
+      cycle per showing.
 - [ ] consider reserving part of the pool for **seasonal spread**. It is currently 98 photos from
       2026 and 22 from 2025, clustered in a few months — recency weighting working as designed, but
       the farm is a seasonal place and the display shows one slice of the year
@@ -249,9 +254,10 @@ same visual weight as "Founded in 2013".
       watchdog work (BUILD_TREE M1), out of scope for this design pass
 
 ### D5.4 Resolve the unused scene types
-`events` (the plural list view) and `custom` (artwork) are implemented and appear nowhere in
-`playlist.json`.
-- [ ] use them — the events-list view would break up the one-event-at-a-time rhythm — or delete them
+- [x] `events` (the plural list view) — adopted. It's now used twice in `playlist.json` (the Open
+      Studio Pottery and ornament-workshop date lists), and it breaks up the one-event-at-a-time
+      rhythm exactly as hoped.
+- [ ] `custom` (artwork) — still unused in `playlist.json`. Use it or delete it.
 
 ---
 

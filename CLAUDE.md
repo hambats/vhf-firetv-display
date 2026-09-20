@@ -167,7 +167,9 @@ including ship gates, in [docs/BUILD_TREE.md](docs/BUILD_TREE.md).
 1. **Survives being left alone** — Service Worker (app shell + JSON + photos), self-hosted fonts,
    version polling so content actually refreshes, error/stall watchdog, diagnostics overlay,
    browser compatibility check. *This is the heart of the plan; two real gaps live here.*
-2. **Repeatable publish** — `scripts/publish.mjs`: validate → build → test → deploy → verify.
+2. **Repeatable publish** — *done (Sept 20).* `scripts/publish.mjs`: validate → build → test →
+   commit → push → verify, ending by polling the live version manifest until it advances, because
+   a push only *starts* a GitHub Pages deploy. Covered by `tests/publish.test.mjs`.
 3. **Proof it lasts** — 72-hour unattended run, then `RUNBOOK.md` and `RELIABILITY.md` written
    from what actually broke.
 4. **Content that maintains itself** — quiet hours, burn-in review, the Instagram decision,
