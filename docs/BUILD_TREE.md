@@ -14,7 +14,7 @@ the source of truth; the display is a runtime that must keep working with the PC
 
 ---
 
-## State of play — Sept 19, 2026
+## State of play — Sept 20, 2026
 
 Read this first. It is the handover point for whoever picks the project up next.
 
@@ -70,6 +70,62 @@ counting it. Of 628 candidates: 195 under the 1200px floor (mostly Squarespace's
 derivatives of photos already in the pool, *not* 195 distinct photographs), 7 hand-excluded, 2
 screenshots, 0 unreadable.
 
+### Shipped Sept 19–20: registration fixes, per-slide curation, and a copy pass
+
+**Two registration-code placement bugs.** The 5K announcement's QR sat squarely on the race badge
+artwork — nobody could scan a code printed over a photograph of a runner's bib. Centring the code
+and letting curated photos set their own crop fixed the immediate overlap, but pulling the standing
+VHF-coin lockup off the same slide (it now defers to the program's own designed graphic, which
+already carries the seal) left the surviving elements at three different heights with a dead band
+along the bottom. Both were the same underlying problem — the layout was never built for a slide
+that could lose an element — and both are now scoped narrowly to
+`.scene--announcement--graphic` so the plain event-scene layout, which never had this problem, is
+untouched.
+
+**A `focus` override that cycles.** `content/gallery-focus.json` (Sept 19) fixed the case of a
+single wrong crop. It could not fix "It's Not About the Cabbage": the source photo is 2500×3333,
+a 16:9 cover crop shows about 42% of its height, and the cabbage occupies roughly 55%, so no single
+crop contains the whole subject. `focus` may now be a list as well as a string, and a slide steps
+through it one crop per showing — keyed by photo id, so two slides sharing a photo keep independent
+positions. Same mechanism also gave the cabbage slide and the sourdough class each their own
+curated photo folder, instead of drawing from the general kitchen or produce pool and showing
+whatever farm photo came up.
+
+**Every em dash the display can show, gone.** Five copy fixes (the 5K announcement, the
+agritherapy slide, the "Designed to Heal" workshops slide, and two others) each replaced a dash
+with a period, comma, or colon — not a global find-and-replace, since each one reads differently
+depending on what follows it. A calendar-side normaliser now catches any em dash arriving through
+synced event text too, so this is not a one-time cleanup that a future sync can quietly undo.
+
+**Calendar corrections that belong in overrides, not in code.** The Oct 3 pottery handbuilding
+session runs 10 AM–12 PM; the public calendar has it as 10–11, corrected through
+`events-time-overrides.json` (the other three sessions in the same four-week series were left
+alone — only Oct 3 was reported wrong). The VA Donation Day announcement dropped its registration
+code: it is a drop-off drive, not a class, so the QR pointed at a Regpack form with nothing on it
+for anyone. Two gallery photos judged unfit for an unattended public display were added to the
+exclude list, and the Biltmore Championship golf photo got a small badge crediting the tournament,
+composited into the image itself since it belongs to that one photo, not to the photo scene type.
+
+**Playlist pacing.** Six places in `playlist.json` ran two information slides back to back — a
+wall of text with no photograph between them — and the loop's own wrap seam (last slide to first)
+had never been checked, so it could stack too. Reordering fixed both. Durations, previously 8, 10,
+or 12 seconds with no rule behind the choice, now follow scene type: photo pools 9s, information
+and announcements 13s, event pools 14s, dates-list scenes 16s (up to eight rows, the densest thing
+on the display). The full loop grew from 7:14 to 8:06 — the point of the change, not a side effect,
+since nothing was getting enough time and a longer loop also means less repetition for anyone
+actually standing in front of the television.
+
+**Housekeeping.** One curated photo's filename was its full 242-character Wikimedia description;
+that pushed the deepest tracked path past Windows' `MAX_PATH` as soon as a `git worktree add` used
+a path even one level deeper than the repo's own, so worktrees — and therefore parallel agents —
+could not be created on Windows at all. Shortened to 64 characters; `captions.json` and the
+generated `curated-photos.json` moved with it, content unchanged. Three stale claims in
+`CLAUDE.md`/`docs/BUILD_TREE.md` were also corrected: the `events` scene type is in active use
+(the Open Studio Pottery and ornament-workshop date lists), only `custom` is still the open
+use-it-or-delete-it question; M2 (`publish.mjs`) was already done, not upcoming; and the
+gallery-exclude/per-photo-focus half of D5.1 is addressed, leaving seasonal spread as the one
+genuinely open item there.
+
 ### Open threads, most valuable first
 
 1. **Outbound heartbeat — not built, and the biggest remaining gap.** `web/js/diagnostics.js`
@@ -93,7 +149,56 @@ screenshots, 0 unreadable.
    v1.0.0 APK has that URL compiled in — so deletion is not obviously the safe option.
 
 4. **M3 proof still unrun.** Nothing has been observed for a week on the real television. Remote
-   screenshots make this much cheaper to do than it was.
+   screenshots make this much cheaper to do than it was. This session's changes were all content
+   and doc edits made on the PC and not yet published, so this thread is unchanged and, if
+   anything, a day further behind.
+
+5. **The events pool has no refresh trigger, and will eventually starve silently.**
+   `sources/calendar/index.mjs` windows the synced calendar to the next `windowDays` (120) at
+   *sync* time; `upcomingEvents()` in `web/js/scenes.js` correctly filters out anything already
+   past at *render* time. Both are right in isolation. But nothing re-runs the sync on its own —
+   `docs/SCHEDULED_CONTENT_UPDATE.md` is written as a ready-to-paste recurring task, and no such
+   task is registered anywhere. So `content/generated/events.json` only gets fresher when someone
+   remembers to run `npm run sync-sources` by hand.
+
+   Measured against the file on disk today (generated 2026-09-20, 39 events). The number that
+   matters is not how many events fall within the next N days, but how many are **still upcoming
+   once N days have passed with no sync** — that is what the render-time filter leaves on screen:
+
+   | If no sync runs for | Events still showing |
+   |---|---|
+   | today | 39 |
+   | 7 days | 36 |
+   | 30 days | 17 |
+   | 60 days | **2** |
+   | 90 days | **0** |
+
+   The last event in the file ends Dec 8, well inside the 120-day window, so the file is
+   calendar-limited today rather than window-limited — it is not starved now. But the decay above
+   is not hypothetical, it is arithmetic: the filter is correct, the events simply run out. That is
+   closer to the failure than it looks: the moment the public calendar goes quiet for longer than a sync
+   cycle, or a sync is simply skipped for a few weeks, the same window mechanism drains this file
+   to zero events with nothing to distinguish that from a healthy sync. When it does hit zero,
+   every event and dates-list scene throws "no upcoming events," the engine skips them exactly as
+   designed, and the display keeps looping — it just quietly becomes a photo-and-facts loop with no
+   error, no log line, and no visible fault. Worth wiring up before it happens rather than after
+   someone notices the calendar looks empty.
+
+6. **A code or style change is slower to reach the panel than the version-poll story suggests.**
+   `startVersionPoll` in `web/js/engine.js` treats its first poll after any page load as a
+   baseline only — `if (known === null) { known = manifest.version; return; }` — so a freshly
+   loaded page never reloads on that first poll even if the live version has already moved on.
+   The next poll, up to `syncIntervalMinutes` (20 minutes, from `content/settings.json`) later, is
+   what actually detects the change and reloads. So a deploy that lands right after a page's own
+   baseline poll can sit undetected for close to 20 minutes before the reload even fires — and the
+   code comment at that reload is explicit that a reload driven by a *content* version bump only
+   guarantees content is current: the Service Worker still serves the old shell from cache while
+   fetching the new build behind it, so a CSS or JS change can need a second reload to actually
+   show. In the worst realistic case — a push lands moments after a poll, and the resulting reload
+   only forces the content fetch, not a fresh shell — a visual change can wait one full
+   `syncIntervalMinutes` cycle for the reload to fire, then as long as the 6-hour `PERIODIC_RELOAD_MS`
+   forced reload for the shell itself to catch up, if nothing else nudges it sooner. Content is
+   fast; appearance is not guaranteed fast.
 
 ### The photo-mirror branch — resolved, not merged (Sept 19)
 
