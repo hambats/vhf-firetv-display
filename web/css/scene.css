@@ -529,12 +529,22 @@ html, body {
 }
 
 .events-list--compact .events-list__item {
-  gap: 20px;
+  gap: 28px;
 }
 
+/* The date has to be a real column, not just text followed by a gap, or every
+   row starts its time wherever that row's own date happened to end — "SAT,
+   NOV 7" and "WED, OCT 28" differ by ~30px, so seven rows gave seven
+   different left edges for the times.
+
+   formatEventDate produces at most "WED, SEPT 28"-shaped text: a 3-letter
+   short weekday, a 3-letter short month and two digits, uppercased at
+   --vhf-size-caption with 0.08em tracking, which measures ~190px. This must
+   stay wider than that; it was 150px, which is narrower than *every* real
+   date, so it never applied at all. */
 .events-list--compact .events-list__date {
   font-size: var(--vhf-size-caption);
-  min-width: 150px;
+  min-width: 205px;
 }
 
 .events-list--compact .events-list__meta {
