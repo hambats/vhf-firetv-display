@@ -3,6 +3,14 @@
   "note": "Hand-maintained. Ids here are dropped from content/generated/gallery.json every time sources/gallery/index.mjs re-runs, even though the adapter re-derives the pool from scratch. Add an id here (and why) after spotting a photo in rotation that needs context an unattended TV can't provide, or that's otherwise not a good fit for the auto-pool.",
   "excluded": [
     {
+      "id": "20260404-110738",
+      "reason": "Tight candid of a child mid-bite across a cluttered table — an unattended public display is the wrong place for a close-up of a minor, and the framing (packaging, cups, a backpack) does not read as a farm scene. Flagged 2026-09-19."
+    },
+    {
+      "id": "20260304-090420",
+      "reason": "Close-up of the NC Governor's Working Group banner filling the whole frame — another organisation's branding rather than a VHF scene, which on a VHF display reads as someone else's logo. Flagged 2026-09-19."
+    },
+    {
       "id": "20260506-110209",
       "reason": "Flag retirement ceremony (burning a worn flag) — correct/respectful practice, but reads as alarming out of context with no caption on an unattended public display."
     },
