@@ -17,7 +17,7 @@ of this is judged by eye and needs a stated bar.
 | Stage | Theme | Blocking? | Rough size |
 |---|---|---|---|
 | **D0** | Blockers live on the public display | **yes — ship now** | hours — **done** |
-| **D1** | Brand and logo | no | half a day — **mostly done, mark-only crop pending** |
+| **D1** | Brand and logo | no | half a day — **mostly done; mark-only variant needs redrawing, see D1.1** |
 | **D2** | Colour system | no | half a day — **done** |
 | **D3** | Layout and typography | no | a day — **mostly done** |
 | **D4** | Motion | no | a day, plus TV verification — **CSS done, unverified on TV** |
@@ -91,14 +91,31 @@ a rake, blueberry sprig and tomato, wordmark around the ring.
 
 - [x] downloaded to `content/artwork/brand/vhf-logo.webp` (the source is itself WebP, 1024×1026) —
       **not** hot-linked, so it survives offline with everything else (BUILD_TREE M1)
-- [ ] produce a simplified **mark-only** variant without the ring text for small sizes — **not
-      done**, needs actual image editing (crop/vectorize) that isn't available in this pass; the
-      corner mark below renders the full logo at 112px instead, which holds up as a shape but the
-      ring wordmark is soft at that size
+- [ ] produce a simplified **mark-only** variant without the ring text for small sizes — **still
+      not done**, and Sept 20 established *why*: this is not a cropping job. **Do not attempt it
+      again with a crop.**
+
+      The wordmark and the fruit occupy the *same* annular band — the blueberry sprig sits at 9
+      o'clock and the tomato at 3 o'clock, the text runs along the top and bottom of that same
+      ring. So any crop that removes the text either clips the fruit or keeps letter fragments.
+      An attempt using an elliptical alpha mask (the shape that best separates the two) did remove
+      the text cleanly, and the result was still unusable: it **severed the ring into four floating
+      arcs**, leaving the badge with no coherent edge, and — worse — **cut the two figures off at
+      mid-calf.** On a mark whose entire subject is two people standing on their land, that is the
+      one crop that cannot be made. Compared side by side at true on-screen size against the
+      current full logo at 112px, the cropped version was clearly worse: the full logo's ring text
+      is soft, but it still reads as a complete circular seal, where the crop read as a damaged
+      sticker.
+
+      What this actually needs is the mark **redrawn** — the ring reconstructed without its text,
+      or the figures and fruit re-composed inside a new circle. That is a designer's job on the
+      source artwork, not something to derive from the 1024×1026 raster. Until then the corner mark
+      renders the full logo at 112px, which holds up as a shape.
 
 ### D1.2 Corner mark
 **Owns:** `web/css/scene.css` `.scene__brand`, `web/js/scenes.js` `brand()`
-- [x] replace the `VHF` text with the logo (full logo at 112px — mark-only crop still pending, see D1.1)
+- [x] replace the `VHF` text with the logo (full logo at 112px — a mark-only variant is still
+      pending and cannot be cropped from this artwork, see D1.1)
 - [x] give it a soft shadow (`drop-shadow`) so it holds against a bright sky on photo scenes
 - [x] its position varies with scene family — see D3.4 (burn-in)
 

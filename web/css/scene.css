@@ -338,7 +338,7 @@ html, body {
 }
 
 /* Corner brand mark (D1.2). The source logo's ring wordmark is illegible
-   below ~280px (see .scene__lockup) — a true mark-only crop without the
+   below ~280px (see .scene__lockup) — a true mark-only variant without the
    ring text is still needed for a fully crisp small mark (tracked as a
    D1 follow-up); until then this renders the full logo at a size chosen to
    stay readable as a shape rather than mush. */
