@@ -706,6 +706,20 @@ html, body {
   top: 71%;
   transform: translate(-50%, -50%);
 }
+/* An event scene carrying its program's graphic card (.scene__event-graphic,
+   right: 100px, width: 380px, reaching down to ~754px) has no room left at
+   the right edge, where .scene__qr sits by default — the code landed on the
+   card and hid the race date. Below the card instead, aligned to its left
+   edge so the pair reads as one column: here is the race, here is how to
+   sign up. Left of .scene__brand's bottom-right corner (from 1745px on),
+   which is why this is not simply centred under the card. */
+.scene__qr--under-graphic {
+  top: auto;
+  bottom: 56px;
+  right: 290px;
+  transform: none;
+}
+
 .scene__qr--center .scene__qr-code {
   width: 260px;
   height: 260px;

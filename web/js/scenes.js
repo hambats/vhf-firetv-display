@@ -601,7 +601,10 @@ var VhfScenes = (function () {
     // is better with no code than with one that leads somewhere irrelevant.
     var pick = matchRegistration(reg, title);
     if (!pick) return;
-    var block = el("div", "scene__qr" + (opts && opts.center ? " scene__qr--center" : ""));
+    var variant = "";
+    if (opts && opts.center) variant = " scene__qr--center";
+    else if (opts && opts.underGraphic) variant = " scene__qr--under-graphic";
+    var block = el("div", "scene__qr" + variant);
     block.appendChild(img("scene__qr-code", pick.asset, "decoration"));
     if (pick.label) block.appendChild(el("p", "scene__qr-label", pick.label));
     container.appendChild(block);
@@ -613,10 +616,15 @@ var VhfScenes = (function () {
     // the event title against a known program's keywords, so a "Pottery
     // with resident potter Sophia" event shows an actual pottery photo
     // instead of a random farm photo.
+    // Tracked because the registration code and the graphic card both want
+    // the right edge: with a card present the code has to go below it rather
+    // than on top of it, which is exactly what it was doing.
+    var hasGraphic = false;
     if (LOGO_PROGRAM_IDS.indexOf(evt.programId) !== -1) {
       if (!appendPartnerLogo(scene, data, evt.programId)) appendWash(scene, data, evt.programId);
     } else if (GRAPHIC_PROGRAM_IDS.indexOf(evt.programId) !== -1) {
-      if (!appendEventGraphic(scene, data, evt.programId)) appendWash(scene, data, evt.programId);
+      hasGraphic = appendEventGraphic(scene, data, evt.programId);
+      if (!hasGraphic) appendWash(scene, data, evt.programId);
     } else {
       appendWash(scene, data, evt.programId);
     }
@@ -631,7 +639,7 @@ var VhfScenes = (function () {
     scene.appendChild(body);
     // On the scene, not inside .scene__content: the code is positioned against
     // the right edge, opposite the text column, rather than flowing under it.
-    appendRegistration(scene, data, evt.title);
+    appendRegistration(scene, data, evt.title, { underGraphic: hasGraphic });
     brand(scene);
     return scene;
   }
