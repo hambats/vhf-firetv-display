@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-20T00:02:31.057Z",
+  "generatedAt": "2026-09-20T00:23:45.722Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -386,6 +386,17 @@
       {
         "id": "program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg",
         "src": "content/artwork/curated/program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg"
+      }
+    ],
+    "vhf-why": [
+      {
+        "id": "vhf-why/cabbage.jpg",
+        "src": "content/artwork/curated/vhf-why/cabbage.jpg",
+        "focus": [
+          "center 18%",
+          "center 55%",
+          "center 92%"
+        ]
       }
     ],
     "volunteer-groups": [
