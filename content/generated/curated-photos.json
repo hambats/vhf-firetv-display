@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-19T23:53:02.981Z",
+  "generatedAt": "2026-09-20T00:02:31.057Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -161,6 +161,10 @@
         "src": "content/artwork/curated/program-beekeeping/3941365436047235790_3941363578256282880.jpg"
       },
       {
+        "id": "program-beekeeping/hives-and-barn.jpg",
+        "src": "content/artwork/curated/program-beekeeping/hives-and-barn.jpg"
+      },
+      {
         "id": "program-beekeeping/pptx-harvesting-frame.png",
         "src": "content/artwork/curated/program-beekeeping/pptx-harvesting-frame.png"
       },
@@ -308,7 +312,8 @@
       },
       {
         "id": "program-pottery/01.jpg",
-        "src": "content/artwork/curated/program-pottery/01.jpg"
+        "src": "content/artwork/curated/program-pottery/01.jpg",
+        "focus": "center 90%"
       },
       {
         "id": "program-pottery/02.jpg",

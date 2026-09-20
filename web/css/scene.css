@@ -588,10 +588,16 @@ html, body {
    layout above — the card sits in the same space centered text runs
    through. Left-anchored and narrower instead, matching the card's own
    left edge (right: 100px, width: 380px -> clear from ~1440px on). */
+/* Anchored near the top rather than vertically centred, so the copy and the
+   centred registration code stack instead of colliding: .scene__qr--center
+   takes the middle of the slide, and centred copy would sit straight on top
+   of it. */
 .scene--announcement--graphic .scene__content {
   left: 120px;
   right: auto;
-  max-width: 1240px;
+  top: 26%;
+  transform: none;
+  max-width: 900px;
   text-align: left;
   padding: 0;
 }
@@ -686,19 +692,25 @@ html, body {
 }
 
 /* Announcement slides put their designed graphic in the right column, where
-   the event scenes leave space — so the code sits inline under the copy
-   instead, with the label beside it rather than beneath. */
-.scene__qr--inline {
-  position: static;
-  transform: none;
-  flex-direction: row;
-  align-items: center;
-  gap: 1.25rem;
-  margin-top: 2rem;
+   the event scenes leave space — so the code takes the middle of the slide
+   instead of an edge. Centred on the scene, below the midline: the copy is
+   vertically centred above it and the graphic card's column (right: 100px,
+   width: 380px -> from ~1440px on) stays clear either way.
+
+   Larger than the edge-anchored code, because this one is the point of the
+   slide rather than a footnote to it — an announcement that exists to drive
+   signups should be scannable from across the room. */
+.scene__qr--center {
+  left: 50%;
+  right: auto;
+  top: 71%;
+  transform: translate(-50%, -50%);
 }
-.scene__qr--inline .scene__qr-label {
-  text-align: left;
-  max-width: 9ch;
+.scene__qr--center .scene__qr-code {
+  width: 260px;
+  height: 260px;
+  padding: 18px;
+  border-radius: 18px;
 }
 
 /* ---------------------------------------------------------------------------

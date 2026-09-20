@@ -56,12 +56,30 @@ async function main() {
       if (err.code !== "ENOENT") throw err;
     }
 
+    /*
+     * Optional per-photo crop focus, same shape as content/gallery-focus.json
+     * does for the scraped pool: a hand-maintained focus.json beside the
+     * images, mapping a filename to an object-position value.
+     *
+     * A cover crop centres on the middle of the frame, which is wrong
+     * whenever the subject is not there — a tall shot of a piece of pottery
+     * held up to the camera centres on the wall behind it. Absent by
+     * default; only the photos that actually crop badly need an entry.
+     */
+    let focus = {};
+    try {
+      focus = JSON.parse(await fs.readFile(path.join(dir, "focus.json"), "utf8"));
+    } catch (err) {
+      if (err.code !== "ENOENT") throw err;
+    }
+
     sets[entry.name] = files.map((f) => {
       const photo = {
         id: `${entry.name}/${f}`,
         src: `content/artwork/curated/${entry.name}/${encodeURIComponent(f)}`
       };
       if (captions[f]) photo.caption = captions[f];
+      if (focus[f]) photo.focus = focus[f];
       return photo;
     });
   }

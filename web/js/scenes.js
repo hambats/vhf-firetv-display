@@ -100,7 +100,14 @@ var VhfScenes = (function () {
     var photos = curated.length > 0 ? curated : usablePhotos((data && data.gallery && data.gallery.photos) || []);
     if (photos.length === 0) return;
     var photo = photos[Math.floor(Math.random() * photos.length)];
-    scene.appendChild(img("scene__wash", photo.src, "decoration", photo.id));
+    var wash = img("scene__wash", photo.src, "decoration", photo.id);
+    // A wash is a cover crop, so a photo whose subject sits low in the frame
+    // (pottery held up to the camera, hives below a barn) loses exactly the
+    // part the slide is about. photo.focus comes from a curated set's
+    // focus.json or from gallery-focus.json, and is absent for the photos
+    // that crop fine on their own.
+    if (photo.focus) wash.style.objectPosition = photo.focus;
+    scene.appendChild(wash);
   }
 
   // Curated sets that hold an organization's logo rather than candid photos
@@ -401,17 +408,21 @@ var VhfScenes = (function () {
     var body = el("div", "scene__content");
     body.appendChild(el("h1", "scene__title", announcement.title));
     if (announcement.body) body.appendChild(el("p", "scene__body", announcement.body));
+    scene.appendChild(body);
     /*
      * Opt-in per announcement, not automatic: this family also carries
-     * closures and thank-yous, which have nothing to register for. Inline
-     * rather than against the right edge, because an announcement with a
-     * designed graphic puts that card in the right column — the same space
-     * the event scenes leave empty.
+     * closures and thank-yous, which have nothing to register for.
+     *
+     * Centred on the scene rather than against the right edge, because an
+     * announcement with a designed graphic puts that card in the right
+     * column — the same space the event scenes leave empty. Appended to the
+     * scene, not to .scene__content, because that element is itself
+     * absolutely positioned: a code centred inside it would centre on the
+     * text column rather than on the slide.
      */
     if (announcement.showRegistration) {
-      appendRegistration(body, data, announcement.title, { inline: true });
+      appendRegistration(scene, data, announcement.title, { center: true });
     }
-    scene.appendChild(body);
     return scene;
   }
 
@@ -590,7 +601,7 @@ var VhfScenes = (function () {
     // is better with no code than with one that leads somewhere irrelevant.
     var pick = matchRegistration(reg, title);
     if (!pick) return;
-    var block = el("div", "scene__qr" + (opts && opts.inline ? " scene__qr--inline" : ""));
+    var block = el("div", "scene__qr" + (opts && opts.center ? " scene__qr--center" : ""));
     block.appendChild(img("scene__qr-code", pick.asset, "decoration"));
     if (pick.label) block.appendChild(el("p", "scene__qr-label", pick.label));
     container.appendChild(block);
