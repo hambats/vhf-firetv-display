@@ -2,7 +2,7 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-09-20T00:05:59.262Z",
+  "generatedAt": "2026-09-20T23:30:48.019Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
     {
@@ -131,20 +131,20 @@
       "programId": "program-woodworking"
     },
     {
-      "id": "meal-prep-workshop-with-sam-2026-10-14",
-      "title": "Meal Prep Workshop with Sam",
-      "start": "2026-10-14T14:00:00.000Z",
-      "end": "2026-10-14T16:00:00.000Z",
-      "description": "Simple & Nourishing Meal Prep: prioritizing your health through affordable, seasonal, and local ingredients. Learn simple and cost-effective meal preparation to nourish your body, and support your local community, all while saving time in the kitchen and reducing food waste!",
-      "programId": "program-kitchen-medicine"
-    },
-    {
       "id": "chair-massage-with-lisa-2026-10-14",
       "title": "Chair Massage with Lisa",
       "start": "2026-10-14T14:00:00.000Z",
       "end": "2026-10-14T19:00:00.000Z",
       "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands. Sessions can be 15 or 30 minutes, it uses a specialized ergonomic chair to provide targeted acupressure and Swedish massage techniques.",
       "programId": "program-chair-massage"
+    },
+    {
+      "id": "meal-prep-workshop-with-sam-2026-10-14",
+      "title": "Meal Prep Workshop with Sam",
+      "start": "2026-10-14T14:00:00.000Z",
+      "end": "2026-10-14T16:00:00.000Z",
+      "description": "Simple & Nourishing Meal Prep: prioritizing your health through affordable, seasonal, and local ingredients. Learn simple and cost-effective meal preparation to nourish your body, and support your local community, all while saving time in the kitchen and reducing food waste!",
+      "programId": "program-kitchen-medicine"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-14",
@@ -163,20 +163,20 @@
       "programId": "program-acupuncture"
     },
     {
-      "id": "pottery-with-resident-potter-sophia-2026-10-17",
-      "title": "Pottery with resident potter Sophia",
-      "start": "2026-10-17T14:00:00.000Z",
-      "end": "2026-10-17T16:00:00.000Z",
-      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
-      "programId": "program-pottery"
-    },
-    {
       "id": "pasta-making-101-with-helene-2026-10-17",
       "title": "Pasta Making 101 with Helene",
       "start": "2026-10-17T14:00:00.000Z",
       "end": "2026-10-17T18:00:00.000Z",
       "description": "Pasta is the world’s ultimate comfort food! Please join us for a fun, hands-on class to learn how easy and satisfying it is to make pasta from scratch without the use of fancy equipment.",
       "programId": "program-kitchen-medicine"
+    },
+    {
+      "id": "pottery-with-resident-potter-sophia-2026-10-17",
+      "title": "Pottery with resident potter Sophia",
+      "start": "2026-10-17T14:00:00.000Z",
+      "end": "2026-10-17T16:00:00.000Z",
+      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
+      "programId": "program-pottery"
     },
     {
       "id": "open-studio-pottery-with-sophia-2026-10-21",

@@ -372,6 +372,61 @@
       "focus": "center 100%",
       "source": "auto",
       "reason": "Face detection: 4 face(s), band 572-1578 of 1875px."
+    },
+    "20250906-132159": {
+      "focus": "center 20%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 412-994 of 2920px."
+    },
+    "20250906-132025": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 1373-1468 of 1875px."
+    },
+    "20250906-123733": {
+      "focus": "center 79%",
+      "source": "auto",
+      "reason": "Face detection: 9 face(s), band 442-746 of 1875px."
+    },
+    "20250906-123055": {
+      "focus": "center 66%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 380-547 of 1875px."
+    },
+    "20250906-120201": {
+      "focus": "center 28%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 193-1631 of 2147px."
+    },
+    "20250906-120127": {
+      "focus": "center 54%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 774-863 of 2265px."
+    },
+    "20250906-120120": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 1212-1375 of 2071px."
+    },
+    "20250906-113514": {
+      "focus": "center 100%",
+      "source": "auto",
+      "reason": "Face detection: 1 face(s), band 1456-1615 of 1875px."
+    },
+    "20250906-112958": {
+      "focus": "center 18%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 174-514 of 1420px."
+    },
+    "20250906-103517": {
+      "focus": "center 17%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 286-590 of 2429px."
+    },
+    "photo-jun-13-2026-2c-2-04-10-pm": {
+      "focus": "center 11%",
+      "source": "auto",
+      "reason": "Face detection: 2 face(s), band 282-742 of 3333px."
     }
   }
 }
