@@ -98,7 +98,21 @@ jobs:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_ID && secrets.TS_OAUTH_SECRET }}
           authkey: ${{ secrets.TS_AUTHKEY || secrets.TS_AUTH_KEY }}
-          tags: tag:ci
+          # No `tags:` on purpose. Advertising tag:ci requires that tag to be
+          # declared in the tailnet policy's tagOwners, and Tailscale refuses
+          # the login outright if it is not -- which presents as a node that
+          # joined fine and simply cannot see anything. `tailscale status` said
+          # "Logged out." while the step itself reported success.
+          #
+          # Omitting it is also strictly more permissive of how the key was
+          # made: a key that already carries tags applies them anyway.
+          #
+          # The cost is scope. An untagged node is an ordinary member device
+          # covered by whatever the tailnet grants members -- here, everything.
+          # To narrow it to adb on the display alone, declare the tag and grant
+          # it explicitly, then put `tags: tag:ci` back:
+          #   "tagOwners": { "tag:ci": ["autogroup:admin"] }
+          #   grants: { "src": ["tag:ci"], "dst": ["100.69.183.1"], "ip": ["5555"] }
           version: latest
 
       # Prove whether the tailnet path exists before blaming the television.
