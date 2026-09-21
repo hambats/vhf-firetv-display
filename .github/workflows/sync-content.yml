@@ -1,0 +1,161 @@
+# Refresh the gallery and calendar, and publish only if anything actually moved.
+#
+# This replaces the scheduled task that ran on the developer's PC. That task
+# failed twice in one day, and both times it failed *quietly*: it wedged on an
+# interactive permission prompt, sat there, and then recorded itself as
+# "succeeded" having published nothing. A scheduler whose success signal cannot
+# be trusted is worse than no scheduler. Actions has no interactive approval to
+# wedge on, fails loudly, and does not need anyone's laptop to be awake.
+#
+# The architecture rule this amends: CLAUDE.md says scraping is "PC-side
+# sync/authoring layer only". The intent of that rule is that *the television*
+# must never scrape -- it must not depend on Squarespace or Google being
+# reachable from the building, and must carry no credentials. CI honours that
+# intent completely. The rule should read "build-side, never device-side".
+#
+# Both sources are public, so nothing here needs a credential to read them.
+
+name: sync content
+
+on:
+  schedule:
+    # Mondays, roughly 09:00 in the farm's own time zone. GitHub cron is UTC and
+    # does not follow US daylight saving, so this drifts an hour in winter. That
+    # is fine for a weekly content sync and not worth a workaround.
+    - cron: "0 13 * * 1"
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Sync and report the diff, but never commit or publish"
+        type: boolean
+        default: false
+
+concurrency:
+  # Two syncs writing content/generated at once is a corrupt commit waiting to
+  # happen. We have already watched a PC-side sync race a publish and have its
+  # output swept into someone else's commit.
+  group: sync-content
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      # A push made with the default GITHUB_TOKEN deliberately does NOT trigger
+      # other workflows, so deploy-pages.yml would never fire and the site would
+      # silently never rebuild -- a sync that looks successful and changes
+      # nothing on the wall. A PAT's pushes do trigger workflows, which also
+      # keeps scripts/publish.mjs authoritative rather than reimplementing its
+      # validate -> build -> test -> push -> verify sequence here.
+      - name: Check the publish credential is present
+        id: creds
+        run: |
+          if [ -z "${{ secrets.PUBLISH_TOKEN }}" ]; then
+            echo "::warning::No PUBLISH_TOKEN configured — set a fine-grained PAT with contents:write. Skipping."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.creds.outputs.ready == 'true'
+        with:
+          token: ${{ secrets.PUBLISH_TOKEN }}
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        if: steps.creds.outputs.ready == 'true'
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+        if: steps.creds.outputs.ready == 'true'
+
+      - name: Re-scrape the gallery and re-fetch the calendar
+        if: steps.creds.outputs.ready == 'true'
+        run: npm run sync-sources
+
+      # The adapters are deterministic (commit f2a9a15): unchanged sources
+      # produce byte-identical output apart from generatedAt. So "did anything
+      # move?" is a real question with a real answer, and a week where nothing
+      # changed costs an empty run rather than a commit full of churn.
+      #
+      # Comparing with generatedAt stripped is what makes this honest -- the
+      # timestamp always differs, and committing on that alone would publish
+      # every single week regardless.
+      - name: Decide whether anything actually changed
+        if: steps.creds.outputs.ready == 'true'
+        id: diff
+        run: |
+          node -e '
+            const cp = require("node:child_process");
+            const files = ["content/generated/gallery.json", "content/generated/events.json"];
+            const strip = (o) => { const c = JSON.parse(JSON.stringify(o)); delete c.generatedAt; return JSON.stringify(c); };
+            let changed = false;
+            const notes = [];
+            for (const f of files) {
+              const before = JSON.parse(cp.execSync("git show HEAD:" + f, { maxBuffer: 1e8 }).toString());
+              const after = JSON.parse(require("node:fs").readFileSync(f, "utf8"));
+              const differs = strip(before) !== strip(after);
+              if (differs) changed = true;
+              const key = f.includes("gallery") ? "photos" : "events";
+              notes.push(`${f.split("/").pop()}: ${differs ? "CHANGED" : "no change"} (${(before[key] || []).length} -> ${(after[key] || []).length})`);
+            }
+            console.log(notes.join("\n"));
+            require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, "changed=" + changed + "\n");
+            require("node:fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, "### Sync\n\n" + notes.map(n => "- " + n).join("\n") + "\n");
+          '
+
+      # Nothing moved: throw away the timestamp-only rewrite so the tree is
+      # clean and no empty commit is made. This is the expected weekly outcome.
+      - name: Discard a timestamp-only rewrite
+        if: steps.creds.outputs.ready == 'true' && steps.diff.outputs.changed != 'true'
+        run: |
+          git checkout -- content/generated/
+          echo "No content change — nothing to publish." >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Publish
+        if: steps.creds.outputs.ready == 'true' && steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          npm run publish -- -m "Sync gallery and calendar
+
+          Scheduled content refresh. Only content/generated changed; the
+          adapters are deterministic, so this run is here because something in
+          the gallery or the calendar actually moved."
+
+      - name: Report a dry run
+        if: steps.creds.outputs.ready == 'true' && steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run == 'true'
+        run: |
+          echo "Dry run — content changed but nothing was committed:" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          git --no-pager diff --stat content/generated/ >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+
+      # The event pool drains on its own: the render-time filter is correct and
+      # the events simply run out. Measured 2026-09-20, 39 events then, 17 after
+      # thirty days with no sync, 2 after sixty, none after ninety. Syncing more
+      # often does not fix a calendar that has gone quiet, so report the number
+      # every week whether or not anything changed -- this is the early warning
+      # that the display is heading for an empty event rotation.
+      - name: Report how far ahead the calendar reaches
+        if: always() && steps.creds.outputs.ready == 'true'
+        run: |
+          node -e '
+            const d = require("./content/generated/events.json");
+            const now = Date.now();
+            const ends = d.events.map(e => new Date(e.end || e.start).getTime());
+            const left = n => ends.filter(t => t >= now + n * 864e5).length;
+            const rows = [0, 30, 60, 90].map(n => `| ${n === 0 ? "today" : "+" + n + " days"} | ${left(n)} |`);
+            const zero = left(90) === 0;
+            const out = ["", "### Events still showing, if no further sync runs", "", "| | |", "|---|---|", ...rows, ""];
+            if (zero) out.push("> **The calendar reaches less than 90 days ahead.** Syncing more often will not fix this — it needs events adding at the source.", "");
+            require("node:fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, out.join("\n"));
+            console.log(out.join("\n"));
+          '
