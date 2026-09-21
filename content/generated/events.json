@@ -2,7 +2,7 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-09-20T23:30:48.019Z",
+  "generatedAt": "2026-09-21T11:11:07.576Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
     {
