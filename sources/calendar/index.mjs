@@ -454,7 +454,24 @@ async function main() {
     }
   }
 
-  events.sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+  /*
+   * Tie-broken on id, not just start. Several events legitimately share a
+   * start time — the farm runs concurrent sessions, and the recurring-event
+   * expansion above emits occurrences in whatever order their masters were
+   * parsed. Array.prototype.sort is only guaranteed stable with respect to
+   * the *input* order, and that input order is not itself stable between
+   * runs, so equal-keyed events shuffled every sync: a re-sync with zero
+   * actual changes still moved 8 of 39 events and rewrote the file.
+   *
+   * That matters because content/generated/ is diffed by a human (and by the
+   * scheduled sync task) to decide whether a refresh is worth publishing.
+   * Churn with no information in it is how a real change gets waved through.
+   */
+  events.sort((a, b) => {
+    const byStart = new Date(a.start).getTime() - new Date(b.start).getTime();
+    if (byStart !== 0) return byStart;
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  });
 
   const output = {
     version: 3,

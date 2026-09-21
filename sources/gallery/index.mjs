@@ -18,10 +18,12 @@
  *   4. Drops anything listed in content/gallery-exclude.json (hand-maintained —
  *      a photo that needs context an unattended TV can't provide, spotted in
  *      rotation, gets its id added there and is excluded on every future run).
- *   5. Picks which survivors make the MAX_PHOTOS pool via weighted random
- *      sampling that heavily favors more recent photos (see RECENCY_DECAY),
- *      so re-running this after new gallery photos go up mostly replaces
- *      older ones rather than diluting them 1-in-N forever.
+ *   5. Picks which survivors make the MAX_PHOTOS pool via weighted sampling
+ *      that heavily favors more recent photos (see RECENCY_DECAY), so
+ *      re-running this after new gallery photos go up mostly replaces older
+ *      ones rather than diluting them 1-in-N forever. The sample is seeded
+ *      from the photo ids, so an unchanged gallery produces an identical pool
+ *      and the diff shows only what actually moved.
  *   6. Writes the result to content/generated/gallery.json.
  *
  * This only parses the WebP VP8X container (the format Squarespace's image
@@ -114,15 +116,60 @@ function parseDateFromFilename(url) {
   return isNaN(date.getTime()) ? null : date;
 }
 
+/*
+ * A stable per-photo value in (0,1), derived from the photo's own id rather
+ * than from a random source. FNV-1a, which is plenty for spreading ids evenly
+ * and needs no dependency.
+ *
+ * This is what makes the pool reproducible — see weightedSampleWithoutReplacement.
+ */
+function seededUnitInterval(id) {
+  let h = 0x811c9dc5;
+  const s = String(id);
+  for (let i = 0; i < s.length; i++) {
+    h ^= s.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  // +0.5 keeps the result strictly inside (0,1): an exact 0 would make
+  // Math.pow(0, 1/weight) collapse every low-weight photo to the same key.
+  return ((h >>> 0) + 0.5) / 4294967296;
+}
+
 function weightedSampleWithoutReplacement(itemsWithWeights, n) {
-  // Efraimidis-Spirakis: give each item a random key raised to 1/weight, take
-  // the top N by key. Higher weight -> key stays closer to 1 -> more likely
-  // to win, without the O(n^2) cost of repeatedly re-rolling a weighted pick.
+  /*
+   * Efraimidis-Spirakis: give each item a key raised to 1/weight, take the top
+   * N by key. Higher weight -> key stays closer to 1 -> more likely to win,
+   * without the O(n^2) cost of repeatedly re-rolling a weighted pick.
+   *
+   * The key is seeded from the photo id, NOT Math.random(). With a random key
+   * the sample re-rolls on every sync: a re-run against an unchanged gallery
+   * swapped 23 of 120 photos, rewriting ~550 lines of
+   * content/generated/gallery.json with no new information in it. Two things
+   * were wrong with that.
+   *
+   * First, content/generated/ is committed and diffed — by a human, and by the
+   * scheduled sync task, to decide whether a refresh is worth publishing.
+   * A diff that is ~100% churn is one nobody reads by the third week, which is
+   * how a genuinely bad photo gets waved onto a public wall.
+   *
+   * Second, curation is per-photo and hand-made: 75 crop overrides in
+   * gallery-focus.json, plus the reviewed face-aware crops. A pool that
+   * reshuffles itself applies that work to a moving target — a tuned photo
+   * drops out and an unreviewed one drops in, for no reason anyone chose.
+   *
+   * Nothing is lost by making this stable. The display already cycles the
+   * whole pool before repeating a photo (see drawPhotos in web/js/scenes.js),
+   * so on-screen variety never depended on re-rolling the pool. The sample
+   * still changes when the *source* does: a new photo enters at rank 0 and
+   * pushes everything below it down a rank, which is exactly when the pool
+   * should move.
+   */
   const keyed = itemsWithWeights.map(({ item, weight }) => ({
     item,
-    key: Math.pow(Math.random(), 1 / Math.max(weight, 1e-9))
+    key: Math.pow(seededUnitInterval(item.id), 1 / Math.max(weight, 1e-9))
   }));
-  keyed.sort((a, b) => b.key - a.key);
+  // Tie-break on id so the result is total, not merely deterministic-ish.
+  keyed.sort((a, b) => (b.key - a.key) || (a.item.id < b.item.id ? -1 : a.item.id > b.item.id ? 1 : 0));
   return keyed.slice(0, n).map((k) => k.item);
 }
 
@@ -337,12 +384,26 @@ async function main() {
   );
 
   // Most recent first (missing dates sort last), then weighted-sample the
-  // pool so recent photos dominate without making it 100% deterministic.
-  photos.sort((a, b) => new Date(b.takenAt || 0).getTime() - new Date(a.takenAt || 0).getTime());
+  // pool so recent photos dominate. The sample is seeded from the photo ids,
+  // so an unchanged gallery yields an identical pool run after run.
+  /*
+   * Tie-broken on id, and that tie-break is load-bearing rather than tidiness:
+   * the weight below is derived from a photo's *rank* in this sort, so any
+   * instability here feeds straight through into which photos make the pool.
+   *
+   * Dates are not remotely unique. A page with no per-photo date falls back to
+   * GALLERY_YEAR_FALLBACK, which stamps the whole page with one date — 44 of
+   * the current candidates share 2026-01-01. Left unbroken, those 44 reorder
+   * between runs and drag their weights with them, which was still swapping a
+   * photo per sync even after the sample itself was seeded.
+   */
+  const byRecency = (a, b) =>
+    (new Date(b.takenAt || 0).getTime() - new Date(a.takenAt || 0).getTime()) ||
+    (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+
+  photos.sort(byRecency);
   const weighted = photos.map((item, rank) => ({ item, weight: Math.exp(-rank / settings.recencyDecay) }));
-  const kept = weightedSampleWithoutReplacement(weighted, settings.maxPhotos).sort(
-    (a, b) => new Date(b.takenAt || 0).getTime() - new Date(a.takenAt || 0).getTime()
-  );
+  const kept = weightedSampleWithoutReplacement(weighted, settings.maxPhotos).sort(byRecency);
 
   console.log(`[gallery] kept ${kept.length} of ${photos.length} qualifying photos (>= ${settings.minDimension}px on the long side, capped at ${settings.maxPhotos}, recency-weighted)`);
 
