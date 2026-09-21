@@ -14,7 +14,7 @@ the source of truth; the display is a runtime that must keep working with the PC
 
 ---
 
-## State of play — Sept 20, 2026
+## State of play — Sept 21, 2026
 
 Read this first. It is the handover point for whoever picks the project up next.
 
@@ -126,13 +126,114 @@ use-it-or-delete-it question; M2 (`publish.mjs`) was already done, not upcoming;
 gallery-exclude/per-photo-focus half of D5.1 is addressed, leaving seasonal spread as the one
 genuinely open item there.
 
+### Shipped Sept 21: the two silent failures, and a device that is not what we thought
+
+**The television runs Chromium 138.** `com.amazon.webview.chromium` reports
+`versionName=138.amazon-webview-v138-7204-tv`. Two places in `CLAUDE.md` state that `web/` is
+ES5-only "for the same Fire OS 7 WebView reason" — that inference is wrong, because Amazon updates
+its WebView independently of the OS release. This matters well beyond syntax: the ES5 rule is why
+there is no build step, therefore no content hashing, therefore a Service Worker that can serve a
+stale shell, therefore thread 6 below. One bad assumption, four consequences. **Not yet acted on,
+and it should be verified with an on-device feature probe rather than a version string** — the cost
+of being wrong is a blank television in a public building.
+
+Other device facts, all measured over Tailscale rather than assumed: the panel is physically
+**3840×2160** with Android rendering to a 1920×1080 override; RAM is 1.66 GB with **1.61 GB in use
+and 283 MB of swap already consumed**, so memory is the real constraint and rendering at 4K would
+make it worse; and the load average of 57 seen in `uptime` is an **artifact** — actual CPU is 368%
+idle of 400%. That last one closes a question this document previously listed as unexplained.
+
+**Both sources are now deterministic.** A sync against an unchanged gallery and calendar used to
+rewrite ~550 lines: 23 of 120 photos swapped and 8 of 39 events reordered, none of it meaning
+anything. Events sorted only on `start`, and several events share one, so equal-keyed entries
+reordered between runs. The gallery sampled with `Math.random()`, and — the part that hid — even
+once seeded from the photo id it still churned, because `GALLERY_YEAR_FALLBACK` stamps a whole page
+with one date, 44 candidates shared `2026-01-01`, and their unstable ranks fed straight into the
+sampling weight. Both tie-broken on id. Three consecutive syncs now produce byte-identical output
+apart from `generatedAt`. This turned out to be a prerequisite for the CI sync below, not
+housekeeping: without it, "commit only if something changed" fires every single run.
+
+**Curation survived the one-time pool shift.** Settling the pool moved it once for real — 27 photos
+in, 27 out — which initially cost reviewed crops (62 → 54) because the newcomers had never been
+through `detect-photo-focus.py`. Ran it over the 27 and reviewed every proposal by eye with
+`--sheet`: 14 drew a proposal, 13 had no faces and correctly stayed at the default. Every proposal
+was equal or better, and one fixed a live defect — `photo-jun-13-2026` was cropping two women's
+heads off entirely at `center 35%`. Reviewed crops now stand at **65**, three better than before
+the pool moved. Two notes for next time: OpenCV crashed once mid-batch with a `cv2` bootstrap
+`TypeError` and a plain retry worked, so an unattended run of that script would have failed
+silently; and `--only` matches a single substring, so reviewing an arbitrary set means grouping by
+shared id prefix.
+
+**A display monitor that needs no code on the device.** `scripts/check-display.mjs` plus
+`.github/workflows/display-monitor.yml`. Every probe is a stock adb command run as uid `shell` —
+foreground activity, screen power, logcat crashes, free memory, and a screenshot. Nothing is
+installed on the television, nothing is granted, and it carries no credential; the Tailscale key
+lives in CI.
+
+It **pulls rather than having the page push a heartbeat**, which is a deliberate reversal of what
+thread 1 used to propose. A heartbeat proves the page's JavaScript ran; a screenshot proves what is
+on the screen. Those differ, and this project has already hit the case where they do — after a
+sleep/wake cycle the television came back on the Fire TV launcher with the app perfectly healthy
+behind it, and a heartbeat would have reported everything fine while the display showed Amazon's
+home row. That incident is now a test.
+
+Blankness is judged by PNG size rather than by decoding the image: a real 1920×1080 scene is 1–2 MB
+and flat black compresses to a few KB, so no image library is involved and there is nothing to break
+unattended. The closed-day rule is what keeps it credible — the display deliberately blanks itself
+on the farm's closed days, which is two days in seven where black is correct. The first live run
+proved the point by running on a Monday, finding a genuinely black screen, and classifying it as
+expected. Without that rule it would have cried wolf on its first execution. It **starts in observe
+mode**: records faults, exits 0, so its false-positive rate is known before it is allowed to page
+anyone.
+
+**The content sync moved to CI.** A PC-side scheduled task was created, and then deleted the same
+day after failing three times — every time *quietly*. It wedged on an interactive permission prompt
+for 75 minutes and then recorded itself as `succeeded` having published nothing; a third run started
+unnoticed and re-ran the adapters in the middle of an unrelated publish, so its output was swept
+into someone else's commit. A scheduler whose success signal cannot be trusted is worse than none,
+and two writers in one working tree is a corrupt commit waiting to happen.
+`.github/workflows/sync-content.yml` replaces it: Actions has no interactive approval to wedge on,
+fails loudly, needs nobody's laptop awake, and is free on a public repo.
+
+Two traps had to be designed around, both of which would have produced a sync that looks successful
+and changes nothing on the wall. **A push made with the default `GITHUB_TOKEN` does not trigger
+other workflows**, so `deploy-pages.yml` would never fire — it uses a PAT instead, which also keeps
+`publish.mjs` authoritative rather than reimplementing its sequence in YAML. And **`generatedAt`
+always differs**, so committing on a plain diff would publish every week regardless; the check
+compares with the timestamp stripped.
+
+> This deliberately amends a rule. `CLAUDE.md` says scraping is "PC-side sync/authoring layer only".
+> The intent is that *the television* must never scrape — no dependency on Squarespace or Google
+> being reachable from the building, and no credentials on the device. CI honours that intent
+> completely. The rule should read **"build-side, never device-side"**.
+
+**Two design documents, neither built.** [REDESIGN.md](REDESIGN.md) is the project designed from the
+ground up against measured device facts; [REDESIGN_TREE.md](REDESIGN_TREE.md) is its shape, with
+falsifiable ship gates and an explicit list of what gets deleted. The live system remains the one in
+this file.
+
 ### Open threads, most valuable first
 
-1. **Outbound heartbeat — not built, and the biggest remaining gap.** `web/js/diagnostics.js`
-   already records uptime, error count and last error; nothing sends them anywhere. Remote access
-   made *fixing* cheap but did nothing for *noticing* — a display that dies on a Friday is still
-   dark until someone walks past. Needs a write endpoint that is not Netlify (see below);
-   Cloudflare Workers' free tier fits.
+1. **Noticing a dead display — built, and inert until one secret exists.** This was the biggest
+   remaining gap and the approach changed: instead of the page pushing a heartbeat to a write
+   endpoint, CI pulls over Tailscale and photographs the screen (see Sept 21 above). No code on the
+   device, no new service, no Cloudflare Worker.
+
+   **What is left is a credential.** `.github/workflows/display-monitor.yml` no-ops with a warning
+   until `TS_OAUTH_CLIENT_ID`/`TS_OAUTH_SECRET` (preferred — ephemeral, self-removing nodes) or
+   `TS_AUTHKEY` is set as a repo secret, with a `tag:ci` ACL entry allowing access to the
+   television. It no-ops rather than fails on purpose: a workflow that fails for want of a secret
+   is noise that teaches people to ignore it.
+
+   Then flip `MONITOR_OBSERVE` to `false` once a few days of runs look trustworthy. Detection
+   latency is realistically **20–30 minutes**, not the 15-minute cron — GitHub's scheduler runs late
+   under load. Against the status quo of "a human walks past", where the farm is closed Sunday and
+   Monday and a Friday evening failure could sit dark until Tuesday, that is 60–90 hours down to
+   half an hour.
+
+   The one thing a pull monitor cannot do that a heartbeat could: report when the *tailnet* is down.
+   It cannot tell "television dead" from "network dead" — for this purpose both need someone to walk
+   over, so the distinction is academic.
 
 2. **Publish-loop verification — investigated, blocked, bigger than it looks.** `publish.mjs` ends
    by confirming GitHub Pages serves the new version, then says the television "picks this up on
@@ -140,6 +241,17 @@ genuinely open item there.
    version and read it back over ADB. **That does not work:** Amazon's WebView does not forward
    page console output to logcat without a `WebChromeClient` override in `DisplayActivity`. So this
    is an APK change, not a `web/`-only change. Verified empirically on the device, not assumed.
+
+   **Sept 21 — there is a better route than the `WebChromeClient` one.** `/proc/net/unix` on the
+   television has no devtools socket, which means the app never calls
+   `WebView.setWebContentsDebuggingEnabled(true)`. That single line would give full Chrome DevTools
+   over adb from anywhere on the tailnet — console, DOM, network and JS evaluation against the live
+   display. It answers "which version is the television actually running?" directly, rather than by
+   scraping logcat for a line the page prints about itself, and it would have instantly explained
+   why the panel kept rendering the previous layout after a publish. Still an APK change, but
+   `pm install -r` works over Tailscale, so shipping it costs a remote command rather than a trip to
+   the building. Worth gating to a build flavour if exposing DevTools on the appliance is a concern;
+   it is reachable only from inside the tailnet either way.
 
 3. **Netlify retirement — prepared, undeployable.** `netlify-retired/` holds a redirect to GitHub
    Pages plus a self-unregistering `sw.js` (the old origin registered a Service Worker that would
@@ -153,7 +265,19 @@ genuinely open item there.
    and doc edits made on the PC and not yet published, so this thread is unchanged and, if
    anything, a day further behind.
 
-5. **The events pool has no refresh trigger, and will eventually starve silently.**
+5. **The events pool refresh — built in CI, inert until one secret exists, and the real limit is
+   the calendar itself.** `.github/workflows/sync-content.yml` now runs the sync weekly and no-ops
+   with a warning until `PUBLISH_TOKEN` (a fine-grained PAT with `contents: write`) is set. The
+   PC-side task that used to own this was deleted after three silent failures — see Sept 21 above.
+
+   **The decay below is unchanged and is still the reason this matters**, but measured on Sept 21
+   the binding constraint is not the sync: the calendar has **nothing scheduled past Dec 8**, well
+   inside the 120-day window. Syncing more often cannot fix a calendar that has gone quiet. The CI
+   workflow therefore reports the numbers below every week whether or not anything changed, and
+   says so plainly when the 90-day figure reaches zero — which, today, it does. That is a question
+   for VHF, not for the pipeline.
+
+   The original analysis follows.
    `sources/calendar/index.mjs` windows the synced calendar to the next `windowDays` (120) at
    *sync* time; `upcomingEvents()` in `web/js/scenes.js` correctly filters out anything already
    past at *render* time. Both are right in isolation. But nothing re-runs the sync on its own —
