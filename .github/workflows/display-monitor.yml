@@ -57,14 +57,27 @@ jobs:
       # The job is useless without a way onto the tailnet, and a run that fails
       # for want of a secret is noise that trains people to ignore this
       # workflow. Say so plainly and stop.
+      # Accepts TS_AUTHKEY or TS_AUTH_KEY because both are names a reasonable
+      # person types, and a monitor that silently skips over a one-underscore
+      # difference is precisely the silent failure this workflow exists to stop.
+      # It also reports a *partial* credential distinctly: an OAuth secret with
+      # no client id cannot authenticate, and "no credential configured" would
+      # be a misleading thing to read while staring at a secret you just set.
       - name: Check the Tailscale credential is present
         id: creds
         run: |
-          if [ -z "${{ secrets.TS_OAUTH_CLIENT_ID }}" ] && [ -z "${{ secrets.TS_AUTHKEY }}" ]; then
-            echo "::warning::No Tailscale credential configured — set TS_OAUTH_CLIENT_ID/TS_OAUTH_SECRET (preferred) or TS_AUTHKEY. Skipping."
+          if [ -n "${{ secrets.TS_AUTHKEY }}" ] || [ -n "${{ secrets.TS_AUTH_KEY }}" ]; then
+            echo "Using a Tailscale auth key."
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ secrets.TS_OAUTH_CLIENT_ID }}" ] && [ -n "${{ secrets.TS_OAUTH_SECRET }}" ]; then
+            echo "Using a Tailscale OAuth client."
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ secrets.TS_OAUTH_SECRET }}" ]; then
+            echo "::warning::Found TS_OAUTH_SECRET but no TS_OAUTH_CLIENT_ID — an OAuth client is a pair. Set the client id too, or use TS_AUTHKEY for a plain auth key. Skipping."
             echo "ready=false" >> "$GITHUB_OUTPUT"
           else
-            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::No Tailscale credential configured — set TS_AUTHKEY (or TS_AUTH_KEY), or TS_OAUTH_CLIENT_ID + TS_OAUTH_SECRET. Skipping."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
           fi
 
       - uses: actions/setup-node@v4
@@ -83,8 +96,8 @@ jobs:
         uses: tailscale/github-action@v3
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
-          oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
-          authkey: ${{ secrets.TS_AUTHKEY }}
+          oauth-secret: ${{ secrets.TS_OAUTH_CLIENT_ID && secrets.TS_OAUTH_SECRET }}
+          authkey: ${{ secrets.TS_AUTHKEY || secrets.TS_AUTH_KEY }}
           tags: tag:ci
           version: latest
 
