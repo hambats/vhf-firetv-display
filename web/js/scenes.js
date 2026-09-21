@@ -91,7 +91,36 @@ var VhfScenes = (function () {
   // medicine) draws its wash from the union of those sets instead of one
   // id that can't represent "any of these," so the photo actually matches
   // what the slide is talking about rather than a generic farm photo.
-  function appendWash(scene, data, programId) {
+  /*
+   * ---- D3.2: the photograph chooses the layout ----
+   *
+   * The slide used to put its text in a 1200px box bottom-left and leave the
+   * remaining ~600px as ghosted photo -- too faint to read as a photograph,
+   * too occupied to read as space. DESIGN_PLAN called that the weakest option
+   * and asked for a commitment either way. The commitment is both, chosen by
+   * the shape of the photo that happens to come up:
+   *
+   *   portrait  -> scene--split: the photo takes a panel on the right at full
+   *                strength and the type sits on clean cream beside it
+   *   landscape -> scene--wide:  full-bleed wash, and the type grows into the
+   *                width it was already being given
+   *
+   * This is not variety for its own sake. A fixed panel always crops something
+   * badly, because the pools are split almost evenly between the two shapes --
+   * so the panel only ever gets the portraits it suits, and the 16:9 wash only
+   * ever gets the landscapes it suits. Each photograph gets the treatment built
+   * for its shape, and the loop gets a roughly even mix for free.
+   *
+   * A photo with no dimensions recorded picks neither class and renders exactly
+   * as before, so an un-synced or third-party photo degrades to the old layout
+   * rather than to a broken one.
+   */
+  function shapeClassFor(photo) {
+    if (!photo || !photo.width || !photo.height) return "";
+    return photo.height > photo.width ? " scene--split" : " scene--wide";
+  }
+
+  function appendWash(scene, data, programId, opts) {
     var ids = Array.isArray(programId) ? programId : [programId];
     var curated = [];
     for (var i = 0; i < ids.length; i++) {
@@ -109,6 +138,10 @@ var VhfScenes = (function () {
     var focus = pickFocus(photo);
     if (focus) wash.style.objectPosition = focus;
     scene.appendChild(wash);
+    // Opt-in: event and dates-list scenes have their own tuned compositions
+    // (top-left anchor, registration code, program graphic) and must not be
+    // re-laid-out underneath them.
+    if (opts && opts.shapeLayout) scene.className += shapeClassFor(photo);
   }
 
   /*
@@ -383,7 +416,10 @@ var VhfScenes = (function () {
     // program's own photos as the wash instead of a random farm photo.
     // content.washSources overrides this for a slide that names several
     // programs in its own text rather than being about just one.
-    appendWash(scene, data, content.washSources || item.id);
+    // Shape-chosen layout applies to the story family only. The impact and
+    // crisis families have their own grounds and anchors (D2.1, D5.3) and are
+    // deliberately left alone.
+    appendWash(scene, data, content.washSources || item.id, { shapeLayout: !content.family });
     scene.appendChild(el("div", "scene__fade"));
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", content.eyebrow || "Veterans Healing Farm"));

@@ -1,397 +1,567 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-20T22:58:43.963Z",
+  "generatedAt": "2026-09-21T21:42:52.874Z",
   "sets": {
     "gen-pop-additions": [
       {
         "id": "gen-pop-additions/481342530_660857999943454_792166771420538192_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/481342530_660857999943454_792166771420538192_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/481342530_660857999943454_792166771420538192_n.jpg",
+        "width": 1103,
+        "height": 1638
       },
       {
         "id": "gen-pop-additions/707601183_18582885478062494_3462953070154493362_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/707601183_18582885478062494_3462953070154493362_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/707601183_18582885478062494_3462953070154493362_n.jpg",
+        "width": 1170,
+        "height": 1560
       },
       {
         "id": "gen-pop-additions/708959482_18582885469062494_2121108033776344512_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/708959482_18582885469062494_2121108033776344512_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/708959482_18582885469062494_2121108033776344512_n.jpg",
+        "width": 1170,
+        "height": 1560
       },
       {
         "id": "gen-pop-additions/747736357_18597454000062494_8512043261204854367_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/747736357_18597454000062494_8512043261204854367_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/747736357_18597454000062494_8512043261204854367_n.jpg",
+        "width": 3024,
+        "height": 4032
       },
       {
         "id": "gen-pop-additions/789539159_1631257205095388_6438953601787780788_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/789539159_1631257205095388_6438953601787780788_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/789539159_1631257205095388_6438953601787780788_n.jpg",
+        "width": 2730,
+        "height": 1820
       },
       {
         "id": "gen-pop-additions/789709639_1416103497141029_6158985923501165808_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/789709639_1416103497141029_6158985923501165808_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/789709639_1416103497141029_6158985923501165808_n.jpg",
+        "width": 2048,
+        "height": 2047
       },
       {
         "id": "gen-pop-additions/790317963_1508322750981635_1697643833394297270_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/790317963_1508322750981635_1697643833394297270_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/790317963_1508322750981635_1697643833394297270_n.jpg",
+        "width": 2730,
+        "height": 1820
       },
       {
         "id": "gen-pop-additions/790385780_1385974432904020_7211786284083558236_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/790385780_1385974432904020_7211786284083558236_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/790385780_1385974432904020_7211786284083558236_n.jpg",
+        "width": 2730,
+        "height": 1820
       },
       {
         "id": "gen-pop-additions/814629891_1118738327488750_5074295958667380432_n.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/814629891_1118738327488750_5074295958667380432_n.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/814629891_1118738327488750_5074295958667380432_n.jpg",
+        "width": 1536,
+        "height": 2048
       },
       {
         "id": "gen-pop-additions/IMG_6002.jpeg",
-        "src": "content/artwork/curated/gen-pop-additions/IMG_6002.jpeg"
+        "src": "content/artwork/curated/gen-pop-additions/IMG_6002.jpeg",
+        "width": 4032,
+        "height": 3024
       },
       {
         "id": "gen-pop-additions/IMG_6191.jpeg",
-        "src": "content/artwork/curated/gen-pop-additions/IMG_6191.jpeg"
+        "src": "content/artwork/curated/gen-pop-additions/IMG_6191.jpeg",
+        "width": 4032,
+        "height": 3024
       },
       {
         "id": "gen-pop-additions/pptx-distribution-day-1.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/pptx-distribution-day-1.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/pptx-distribution-day-1.jpg",
+        "width": 1021,
+        "height": 1361
       },
       {
         "id": "gen-pop-additions/pptx-distribution-day-2.jpg",
-        "src": "content/artwork/curated/gen-pop-additions/pptx-distribution-day-2.jpg"
+        "src": "content/artwork/curated/gen-pop-additions/pptx-distribution-day-2.jpg",
+        "width": 1134,
+        "height": 1512
       }
     ],
     "in-uniform": [
       {
         "id": "in-uniform/10308717_1157753160901665_2774371496969394029_n.jpg",
-        "src": "content/artwork/curated/in-uniform/10308717_1157753160901665_2774371496969394029_n.jpg"
+        "src": "content/artwork/curated/in-uniform/10308717_1157753160901665_2774371496969394029_n.jpg",
+        "width": 604,
+        "height": 402
       },
       {
         "id": "in-uniform/491503397_18494813875062494_1984777543171559801_n.jpg",
-        "src": "content/artwork/curated/in-uniform/491503397_18494813875062494_1984777543171559801_n.jpg"
+        "src": "content/artwork/curated/in-uniform/491503397_18494813875062494_1984777543171559801_n.jpg",
+        "width": 1440,
+        "height": 1800
       }
     ],
     "memorial-wall": [
       {
         "id": "memorial-wall/traveling-wall-visitors.webp",
-        "src": "content/artwork/curated/memorial-wall/traveling-wall-visitors.webp"
+        "src": "content/artwork/curated/memorial-wall/traveling-wall-visitors.webp",
+        "width": 660,
+        "height": 372
       }
     ],
     "military-art": [
       {
         "id": "military-art/H-003-1 Asheville's Defiance.jpg",
         "src": "content/artwork/curated/military-art/H-003-1%20Asheville's%20Defiance.jpg",
+        "width": 500,
+        "height": 370,
         "caption": "USS Asheville (PG-21), the first Navy ship named for the city, commissioned in 1920. After years showing the flag from Central America to China, she retreated toward Australia as the Philippines fell, and was sunk south of Java on March 3, 1942, by a Japanese cruiser and two destroyers. Nearly her entire crew was lost."
       },
       {
         "id": "military-art/USS_Asheville_(PG-84)_underway_in_1966.jpg",
         "src": "content/artwork/curated/military-art/USS_Asheville_(PG-84)_underway_in_1966.jpg",
+        "width": 635,
+        "height": 384,
         "caption": "USS Asheville (PG-84), an Asheville-class patrol gunboat commissioned in 1966 and deployed to Vietnam's coastal waters under Operation Market Time, intercepting enemy supply traffic; the second Navy ship to carry the city's name."
       },
       {
         "id": "military-art/USS_Asheville_(SSN-758)_underway_off_Southern_California_2006.jpg",
         "src": "content/artwork/curated/military-art/USS_Asheville_(SSN-758)_underway_off_Southern_California_2006.jpg",
+        "width": 1280,
+        "height": 1024,
         "caption": "USS Asheville (SSN-758), today's Asheville, a Los Angeles-class fast attack submarine commissioned in 1991. Now homeported in Guam with the U.S. Pacific Fleet, she's the third Navy vessel to carry the city's name."
       },
       {
         "id": "military-art/USS_Gallup_(PG-85)_operating_in_the_South_China_Sea_in_June_1967.jpg",
-        "src": "content/artwork/curated/military-art/USS_Gallup_(PG-85)_operating_in_the_South_China_Sea_in_June_1967.jpg"
+        "src": "content/artwork/curated/military-art/USS_Gallup_(PG-85)_operating_in_the_South_China_Sea_in_June_1967.jpg",
+        "width": 1280,
+        "height": 954
       },
       {
         "id": "military-art/thumb-1920-374856.jpg",
         "src": "content/artwork/curated/military-art/thumb-1920-374856.jpg",
+        "width": 1600,
+        "height": 900,
         "caption": "Raising the Flag on Iwo Jima. Joe Rosenthal, Feb. 23, 1945. Six Marines raise the second, larger flag atop Mount Suribachi during the battle for Iwo Jima; one of the most reproduced photographs in history."
       }
     ],
     "our-history": [
       {
         "id": "our-history/founders-john-nicole-mahshie.webp",
-        "src": "content/artwork/curated/our-history/founders-john-nicole-mahshie.webp"
+        "src": "content/artwork/curated/our-history/founders-john-nicole-mahshie.webp",
+        "width": 660,
+        "height": 372
       }
     ],
     "program-5k-fundraiser": [
       {
         "id": "program-5k-fundraiser/VDF_5k_2026Logo_-598x1030.png",
-        "src": "content/artwork/curated/program-5k-fundraiser/VDF_5k_2026Logo_-598x1030.png"
+        "src": "content/artwork/curated/program-5k-fundraiser/VDF_5k_2026Logo_-598x1030.png",
+        "width": 598,
+        "height": 1030
       }
     ],
     "program-acupuncture": [
       {
         "id": "program-acupuncture/20260506_110209.webp",
-        "src": "content/artwork/curated/program-acupuncture/20260506_110209.webp"
+        "src": "content/artwork/curated/program-acupuncture/20260506_110209.webp",
+        "width": 500,
+        "height": 375
       },
       {
         "id": "program-acupuncture/acupuncture-treatment.jpg",
-        "src": "content/artwork/curated/program-acupuncture/acupuncture-treatment.jpg"
+        "src": "content/artwork/curated/program-acupuncture/acupuncture-treatment.jpg",
+        "width": 2500,
+        "height": 1875
       },
       {
         "id": "program-acupuncture/christine-galligan-g2hNOyN18tY-unsplash.jpg",
-        "src": "content/artwork/curated/program-acupuncture/christine-galligan-g2hNOyN18tY-unsplash.jpg"
+        "src": "content/artwork/curated/program-acupuncture/christine-galligan-g2hNOyN18tY-unsplash.jpg",
+        "width": 3968,
+        "height": 2976
       },
       {
         "id": "program-acupuncture/katherine-hanlon-QgcdtM9rA5s-unsplash.jpg",
-        "src": "content/artwork/curated/program-acupuncture/katherine-hanlon-QgcdtM9rA5s-unsplash.jpg"
+        "src": "content/artwork/curated/program-acupuncture/katherine-hanlon-QgcdtM9rA5s-unsplash.jpg",
+        "width": 5100,
+        "height": 3300
       }
     ],
     "program-agritherapy": [
       {
         "id": "program-agritherapy/3941365436047235790_3941363695931774255.jpg",
-        "src": "content/artwork/curated/program-agritherapy/3941365436047235790_3941363695931774255.jpg"
+        "src": "content/artwork/curated/program-agritherapy/3941365436047235790_3941363695931774255.jpg",
+        "width": 3024,
+        "height": 4032
       },
       {
         "id": "program-agritherapy/747062720_18597453850062494_1041087387111916112_n.jpg",
-        "src": "content/artwork/curated/program-agritherapy/747062720_18597453850062494_1041087387111916112_n.jpg"
+        "src": "content/artwork/curated/program-agritherapy/747062720_18597453850062494_1041087387111916112_n.jpg",
+        "width": 3024,
+        "height": 4032
       },
       {
         "id": "program-agritherapy/803101768_2153453515594870_8786830083529345841_n.jpg",
-        "src": "content/artwork/curated/program-agritherapy/803101768_2153453515594870_8786830083529345841_n.jpg"
+        "src": "content/artwork/curated/program-agritherapy/803101768_2153453515594870_8786830083529345841_n.jpg",
+        "width": 1170,
+        "height": 1560
       },
       {
         "id": "program-agritherapy/806473943_1383849137192239_7143479457189237947_n.jpg",
-        "src": "content/artwork/curated/program-agritherapy/806473943_1383849137192239_7143479457189237947_n.jpg"
+        "src": "content/artwork/curated/program-agritherapy/806473943_1383849137192239_7143479457189237947_n.jpg",
+        "width": 1170,
+        "height": 1560
       },
       {
         "id": "program-agritherapy/808008317_1596756888906054_5232756158849350661_n.jpg",
-        "src": "content/artwork/curated/program-agritherapy/808008317_1596756888906054_5232756158849350661_n.jpg"
+        "src": "content/artwork/curated/program-agritherapy/808008317_1596756888906054_5232756158849350661_n.jpg",
+        "width": 1170,
+        "height": 1560
       },
       {
         "id": "program-agritherapy/IMG_5889.jpeg",
-        "src": "content/artwork/curated/program-agritherapy/IMG_5889.jpeg"
+        "src": "content/artwork/curated/program-agritherapy/IMG_5889.jpeg",
+        "width": 4032,
+        "height": 3024
       }
     ],
     "program-beekeeping": [
       {
         "id": "program-beekeeping/3941365436047235790_3941363578256282880.jpg",
-        "src": "content/artwork/curated/program-beekeeping/3941365436047235790_3941363578256282880.jpg"
+        "src": "content/artwork/curated/program-beekeeping/3941365436047235790_3941363578256282880.jpg",
+        "width": 3024,
+        "height": 4032
       },
       {
         "id": "program-beekeeping/hives-and-barn.jpg",
-        "src": "content/artwork/curated/program-beekeeping/hives-and-barn.jpg"
+        "src": "content/artwork/curated/program-beekeeping/hives-and-barn.jpg",
+        "width": 2500,
+        "height": 1875
       },
       {
         "id": "program-beekeeping/pptx-harvesting-frame.png",
-        "src": "content/artwork/curated/program-beekeeping/pptx-harvesting-frame.png"
+        "src": "content/artwork/curated/program-beekeeping/pptx-harvesting-frame.png",
+        "width": 750,
+        "height": 1000
       },
       {
         "id": "program-beekeeping/pptx-suiting-up.jpg",
-        "src": "content/artwork/curated/program-beekeeping/pptx-suiting-up.jpg"
+        "src": "content/artwork/curated/program-beekeeping/pptx-suiting-up.jpg",
+        "width": 794,
+        "height": 1059
       }
     ],
     "program-chair-massage": [
       {
         "id": "program-chair-massage/chair-massage-01.jpg",
-        "src": "content/artwork/curated/program-chair-massage/chair-massage-01.jpg"
+        "src": "content/artwork/curated/program-chair-massage/chair-massage-01.jpg",
+        "width": 680,
+        "height": 385
       }
     ],
     "program-dog-training": [
       {
         "id": "program-dog-training/3968680729664407459_3968679896693132024.jpg",
-        "src": "content/artwork/curated/program-dog-training/3968680729664407459_3968679896693132024.jpg"
+        "src": "content/artwork/curated/program-dog-training/3968680729664407459_3968679896693132024.jpg",
+        "width": 3024,
+        "height": 4032
       },
       {
         "id": "program-dog-training/745524895_18597454009062494_3261715515351296567_n.jpg",
-        "src": "content/artwork/curated/program-dog-training/745524895_18597454009062494_3261715515351296567_n.jpg"
+        "src": "content/artwork/curated/program-dog-training/745524895_18597454009062494_3261715515351296567_n.jpg",
+        "width": 3024,
+        "height": 4032
       }
     ],
     "program-fishing": [
       {
         "id": "program-fishing/clayton-chase-8ILYwYcSbeg-unsplash.jpg",
-        "src": "content/artwork/curated/program-fishing/clayton-chase-8ILYwYcSbeg-unsplash.jpg"
+        "src": "content/artwork/curated/program-fishing/clayton-chase-8ILYwYcSbeg-unsplash.jpg",
+        "width": 5564,
+        "height": 3702
       },
       {
         "id": "program-fishing/fishing1.png",
-        "src": "content/artwork/curated/program-fishing/fishing1.png"
+        "src": "content/artwork/curated/program-fishing/fishing1.png",
+        "width": 1420,
+        "height": 940
       },
       {
         "id": "program-fishing/fishing2.png",
-        "src": "content/artwork/curated/program-fishing/fishing2.png"
+        "src": "content/artwork/curated/program-fishing/fishing2.png",
+        "width": 1422,
+        "height": 949
       },
       {
         "id": "program-fishing/sticker-mule-qNhstTawQrI-unsplash.jpg",
-        "src": "content/artwork/curated/program-fishing/sticker-mule-qNhstTawQrI-unsplash.jpg"
+        "src": "content/artwork/curated/program-fishing/sticker-mule-qNhstTawQrI-unsplash.jpg",
+        "width": 5760,
+        "height": 3840
       }
     ],
     "program-garden-group": [
       {
         "id": "program-garden-group/pptx-direct-seeding.jpg",
-        "src": "content/artwork/curated/program-garden-group/pptx-direct-seeding.jpg"
+        "src": "content/artwork/curated/program-garden-group/pptx-direct-seeding.jpg",
+        "width": 794,
+        "height": 1059
       },
       {
         "id": "program-garden-group/pptx-tarp-planting.jpg",
-        "src": "content/artwork/curated/program-garden-group/pptx-tarp-planting.jpg"
+        "src": "content/artwork/curated/program-garden-group/pptx-tarp-planting.jpg",
+        "width": 908,
+        "height": 1210
       }
     ],
     "program-hendersonville-womans-club": [
       {
         "id": "program-hendersonville-womans-club/hendersonville-womans-club-logo.webp",
-        "src": "content/artwork/curated/program-hendersonville-womans-club/hendersonville-womans-club-logo.webp"
+        "src": "content/artwork/curated/program-hendersonville-womans-club/hendersonville-womans-club-logo.webp",
+        "width": 500,
+        "height": 500
       }
     ],
     "program-herb-squad": [
       {
         "id": "program-herb-squad/477451492_652582924104295_5211534780148118110_n.jpg",
-        "src": "content/artwork/curated/program-herb-squad/477451492_652582924104295_5211534780148118110_n.jpg"
+        "src": "content/artwork/curated/program-herb-squad/477451492_652582924104295_5211534780148118110_n.jpg",
+        "width": 1365,
+        "height": 2048
       },
       {
         "id": "program-herb-squad/489010009_18492103192062494_2284138294184014206_n.jpg",
-        "src": "content/artwork/curated/program-herb-squad/489010009_18492103192062494_2284138294184014206_n.jpg"
+        "src": "content/artwork/curated/program-herb-squad/489010009_18492103192062494_2284138294184014206_n.jpg",
+        "width": 1440,
+        "height": 1669
       },
       {
         "id": "program-herb-squad/489020540_18492103183062494_8314856528364480548_n.jpg",
-        "src": "content/artwork/curated/program-herb-squad/489020540_18492103183062494_8314856528364480548_n.jpg"
+        "src": "content/artwork/curated/program-herb-squad/489020540_18492103183062494_8314856528364480548_n.jpg",
+        "width": 1440,
+        "height": 1675
       },
       {
         "id": "program-herb-squad/489538612_18492103174062494_369641944237549103_n.jpg",
-        "src": "content/artwork/curated/program-herb-squad/489538612_18492103174062494_369641944237549103_n.jpg"
+        "src": "content/artwork/curated/program-herb-squad/489538612_18492103174062494_369641944237549103_n.jpg",
+        "width": 1440,
+        "height": 1669
       },
       {
         "id": "program-herb-squad/pptx-drying-roselle.jpg",
-        "src": "content/artwork/curated/program-herb-squad/pptx-drying-roselle.jpg"
+        "src": "content/artwork/curated/program-herb-squad/pptx-drying-roselle.jpg",
+        "width": 1134,
+        "height": 1512
       },
       {
         "id": "program-herb-squad/pptx-flower-harvest-walk.jpg",
-        "src": "content/artwork/curated/program-herb-squad/pptx-flower-harvest-walk.jpg"
+        "src": "content/artwork/curated/program-herb-squad/pptx-flower-harvest-walk.jpg",
+        "width": 908,
+        "height": 1210
       },
       {
         "id": "program-herb-squad/pptx-sorting-eucalyptus.jpg",
-        "src": "content/artwork/curated/program-herb-squad/pptx-sorting-eucalyptus.jpg"
+        "src": "content/artwork/curated/program-herb-squad/pptx-sorting-eucalyptus.jpg",
+        "width": 1134,
+        "height": 1512
       },
       {
         "id": "program-herb-squad/pptx-sorting-roselle.jpg",
-        "src": "content/artwork/curated/program-herb-squad/pptx-sorting-roselle.jpg"
+        "src": "content/artwork/curated/program-herb-squad/pptx-sorting-roselle.jpg",
+        "width": 794,
+        "height": 1059
       },
       {
         "id": "program-herb-squad/pptx-weeding-flower-bed.jpg",
-        "src": "content/artwork/curated/program-herb-squad/pptx-weeding-flower-bed.jpg"
+        "src": "content/artwork/curated/program-herb-squad/pptx-weeding-flower-bed.jpg",
+        "width": 908,
+        "height": 1210
       }
     ],
     "program-kitchen-medicine": [
       {
         "id": "program-kitchen-medicine/3962408983881923033_3962406124197754111.jpg",
-        "src": "content/artwork/curated/program-kitchen-medicine/3962408983881923033_3962406124197754111.jpg"
+        "src": "content/artwork/curated/program-kitchen-medicine/3962408983881923033_3962406124197754111.jpg",
+        "width": 1170,
+        "height": 1552
       },
       {
         "id": "program-kitchen-medicine/744820096_18597453937062494_2299327115759580921_n.jpg",
-        "src": "content/artwork/curated/program-kitchen-medicine/744820096_18597453937062494_2299327115759580921_n.jpg"
+        "src": "content/artwork/curated/program-kitchen-medicine/744820096_18597453937062494_2299327115759580921_n.jpg",
+        "width": 3024,
+        "height": 4032
       },
       {
         "id": "program-kitchen-medicine/746377738_18597453982062494_9088097764124041514_n.jpg",
-        "src": "content/artwork/curated/program-kitchen-medicine/746377738_18597453982062494_9088097764124041514_n.jpg"
+        "src": "content/artwork/curated/program-kitchen-medicine/746377738_18597453982062494_9088097764124041514_n.jpg",
+        "width": 3024,
+        "height": 4032
       },
       {
         "id": "program-kitchen-medicine/747988310_18597453946062494_7728712236597114737_n.jpg",
-        "src": "content/artwork/curated/program-kitchen-medicine/747988310_18597453946062494_7728712236597114737_n.jpg"
+        "src": "content/artwork/curated/program-kitchen-medicine/747988310_18597453946062494_7728712236597114737_n.jpg",
+        "width": 3024,
+        "height": 4032
       },
       {
         "id": "program-kitchen-medicine/pasta-varieties.jpg",
-        "src": "content/artwork/curated/program-kitchen-medicine/pasta-varieties.jpg"
+        "src": "content/artwork/curated/program-kitchen-medicine/pasta-varieties.jpg",
+        "width": 2000,
+        "height": 1333
       }
     ],
     "program-mushroom-cultivation": [
       {
         "id": "program-mushroom-cultivation/andrew-ridley-6KCS---7jbc-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/andrew-ridley-6KCS---7jbc-unsplash.jpg"
+        "src": "content/artwork/curated/program-mushroom-cultivation/andrew-ridley-6KCS---7jbc-unsplash.jpg",
+        "width": 4547,
+        "height": 3410
       },
       {
         "id": "program-mushroom-cultivation/andrew-ridley-bx0a2yq2hxs-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/andrew-ridley-bx0a2yq2hxs-unsplash.jpg"
+        "src": "content/artwork/curated/program-mushroom-cultivation/andrew-ridley-bx0a2yq2hxs-unsplash.jpg",
+        "width": 4195,
+        "height": 3146
       },
       {
         "id": "program-mushroom-cultivation/hans-veth--Vp8y5L2fKg-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/hans-veth--Vp8y5L2fKg-unsplash.jpg"
+        "src": "content/artwork/curated/program-mushroom-cultivation/hans-veth--Vp8y5L2fKg-unsplash.jpg",
+        "width": 6720,
+        "height": 4320
       },
       {
         "id": "program-mushroom-cultivation/kylli-kittus-gtdyJQqCzsA-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/kylli-kittus-gtdyJQqCzsA-unsplash.jpg"
+        "src": "content/artwork/curated/program-mushroom-cultivation/kylli-kittus-gtdyJQqCzsA-unsplash.jpg",
+        "width": 6058,
+        "height": 4039
       },
       {
         "id": "program-mushroom-cultivation/thanh-soledas-Kf1nBG76Xe8-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/thanh-soledas-Kf1nBG76Xe8-unsplash.jpg"
+        "src": "content/artwork/curated/program-mushroom-cultivation/thanh-soledas-Kf1nBG76Xe8-unsplash.jpg",
+        "width": 3940,
+        "height": 2760
       }
     ],
     "program-pottery": [
       {
         "id": "program-pottery/0.jpg",
-        "src": "content/artwork/curated/program-pottery/0.jpg"
+        "src": "content/artwork/curated/program-pottery/0.jpg",
+        "width": 939,
+        "height": 1305
       },
       {
         "id": "program-pottery/01.jpg",
         "src": "content/artwork/curated/program-pottery/01.jpg",
+        "width": 979,
+        "height": 1305,
         "focus": "center 90%"
       },
       {
         "id": "program-pottery/02.jpg",
-        "src": "content/artwork/curated/program-pottery/02.jpg"
+        "src": "content/artwork/curated/program-pottery/02.jpg",
+        "width": 1717,
+        "height": 966
       },
       {
         "id": "program-pottery/40.jpg",
-        "src": "content/artwork/curated/program-pottery/40.jpg"
+        "src": "content/artwork/curated/program-pottery/40.jpg",
+        "width": 979,
+        "height": 1305
       },
       {
         "id": "program-pottery/696310506_1010016788360905_2321565728474701281_n.jpg",
-        "src": "content/artwork/curated/program-pottery/696310506_1010016788360905_2321565728474701281_n.jpg"
+        "src": "content/artwork/curated/program-pottery/696310506_1010016788360905_2321565728474701281_n.jpg",
+        "width": 1536,
+        "height": 2048
       },
       {
         "id": "program-pottery/IMG_5774.jpeg",
-        "src": "content/artwork/curated/program-pottery/IMG_5774.jpeg"
+        "src": "content/artwork/curated/program-pottery/IMG_5774.jpeg",
+        "width": 2481,
+        "height": 3309
       },
       {
         "id": "program-pottery/IMG_5775.jpeg",
-        "src": "content/artwork/curated/program-pottery/IMG_5775.jpeg"
+        "src": "content/artwork/curated/program-pottery/IMG_5775.jpeg",
+        "width": 4032,
+        "height": 3024
       },
       {
         "id": "program-pottery/IMG_5777.jpeg",
-        "src": "content/artwork/curated/program-pottery/IMG_5777.jpeg"
+        "src": "content/artwork/curated/program-pottery/IMG_5777.jpeg",
+        "width": 4032,
+        "height": 3024
       },
       {
         "id": "program-pottery/IMG_6169.jpeg",
-        "src": "content/artwork/curated/program-pottery/IMG_6169.jpeg"
+        "src": "content/artwork/curated/program-pottery/IMG_6169.jpeg",
+        "width": 3163,
+        "height": 2180
       },
       {
         "id": "program-pottery/Screenshot 2026-09-18 134753.png",
-        "src": "content/artwork/curated/program-pottery/Screenshot%202026-09-18%20134753.png"
+        "src": "content/artwork/curated/program-pottery/Screenshot%202026-09-18%20134753.png",
+        "width": 648,
+        "height": 856
       },
       {
         "id": "program-pottery/Screenshot 2026-09-18 134831.png",
-        "src": "content/artwork/curated/program-pottery/Screenshot%202026-09-18%20134831.png"
+        "src": "content/artwork/curated/program-pottery/Screenshot%202026-09-18%20134831.png",
+        "width": 623,
+        "height": 625
       }
     ],
     "program-quail-hunt": [
       {
         "id": "program-quail-hunt/quail-hunt-01.jpg",
-        "src": "content/artwork/curated/program-quail-hunt/quail-hunt-01.jpg"
+        "src": "content/artwork/curated/program-quail-hunt/quail-hunt-01.jpg",
+        "width": 1920,
+        "height": 1255
       }
     ],
     "program-soap-making": [
       {
         "id": "program-soap-making/aurelia-dubois-6J0MUsmS4fQ-unsplash.jpg",
-        "src": "content/artwork/curated/program-soap-making/aurelia-dubois-6J0MUsmS4fQ-unsplash.jpg"
+        "src": "content/artwork/curated/program-soap-making/aurelia-dubois-6J0MUsmS4fQ-unsplash.jpg",
+        "width": 5120,
+        "height": 3414
       },
       {
         "id": "program-soap-making/delaney-van-jbHZ6S8AcaA-unsplash.jpg",
-        "src": "content/artwork/curated/program-soap-making/delaney-van-jbHZ6S8AcaA-unsplash.jpg"
+        "src": "content/artwork/curated/program-soap-making/delaney-van-jbHZ6S8AcaA-unsplash.jpg",
+        "width": 6240,
+        "height": 4160
       },
       {
         "id": "program-soap-making/freestocks-DlZD4V2j9oM-unsplash.jpg",
-        "src": "content/artwork/curated/program-soap-making/freestocks-DlZD4V2j9oM-unsplash.jpg"
+        "src": "content/artwork/curated/program-soap-making/freestocks-DlZD4V2j9oM-unsplash.jpg",
+        "width": 5847,
+        "height": 3898
       }
     ],
     "program-sourdough": [
       {
         "id": "program-sourdough/sourdough-loaf.jpg",
-        "src": "content/artwork/curated/program-sourdough/sourdough-loaf.jpg"
+        "src": "content/artwork/curated/program-sourdough/sourdough-loaf.jpg",
+        "width": 2500,
+        "height": 3333
       }
     ],
     "program-woodworking": [
       {
         "id": "program-woodworking/cristian-tarzi-KV2KjOCSBB4-unsplash.jpg",
-        "src": "content/artwork/curated/program-woodworking/cristian-tarzi-KV2KjOCSBB4-unsplash.jpg"
+        "src": "content/artwork/curated/program-woodworking/cristian-tarzi-KV2KjOCSBB4-unsplash.jpg",
+        "width": 3691,
+        "height": 2824
       },
       {
         "id": "program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg",
-        "src": "content/artwork/curated/program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg"
+        "src": "content/artwork/curated/program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg",
+        "width": 6000,
+        "height": 4000
       }
     ],
     "vhf-why": [
       {
         "id": "vhf-why/cabbage.jpg",
         "src": "content/artwork/curated/vhf-why/cabbage.jpg",
+        "width": 2500,
+        "height": 3333,
         "focus": [
           "center 18%",
           "center 55%",
@@ -402,7 +572,9 @@
     "volunteer-groups": [
       {
         "id": "volunteer-groups/kids-boardwalk-trail.jpg",
-        "src": "content/artwork/curated/volunteer-groups/kids-boardwalk-trail.jpg"
+        "src": "content/artwork/curated/volunteer-groups/kids-boardwalk-trail.jpg",
+        "width": 2500,
+        "height": 3333
       }
     ]
   }

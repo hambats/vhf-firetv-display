@@ -173,19 +173,55 @@ Live orphans: "Healing from the Ground / **Up**", "Vet for Vets with Canine / **
 - [x] eyeball the longest titles in the playlist and the longest event titles in the feed — verified
       in local preview, see below
 
-### D3.2 The empty right 40%
-Content sits in a 1200px box anchored bottom-left; the rest is ghosted photo, which reads as an
+### D3.2 The empty right 40%  *(decided and built — Sept 21, 2026)*
+Content sat in a 1200px box anchored bottom-left; the rest was ghosted photo, which read as an
 unfinished slide.
-- [ ] commit to a **two-column split** — image panel right, text panel left, hard edge — **or** let
-      the type grow into the space. Pick one; the current in-between is the weakest option.
-      **Not done** — a real layout call, deferred rather than guessed at.
+- [x] **Both, chosen by the shape of the photograph.** The plan asked to pick one; the answer is
+      that either alone is wrong for half the pool, because the photos are split almost evenly
+      between the two shapes — 67 portrait / 53 landscape in the gallery, 44 / 42 in the curated
+      sets. So:
+
+      | Photo | Class | Treatment |
+      |---|---|---|
+      | Portrait | `.scene--split` | The wash becomes a full-strength 800px panel on the right; the type sits on clean cream and is centred against it |
+      | Landscape | `.scene--wide` | Full-bleed wash; content box 1200 → 1560px, title 88 → 116px, body 32 → 38px |
+
+      This is not variety for its own sake — it is what stops a fixed panel cropping the half of
+      the pool it does not suit. The panel only ever gets portraits, and the 16:9 wash only ever
+      gets landscapes. The mix through the loop is a by-product.
+
+      `shapeClassFor` in `web/js/scenes.js` reads `photo.width`/`photo.height`; a photo with no
+      dimensions recorded gets neither class and renders exactly as before, so an unsynced photo
+      degrades to the old layout rather than a broken one.
+
+      **Story-family information slides only.** Event, dates-list, impact and crisis scenes keep
+      their own compositions — they have anchors, registration codes and grounds of their own.
+
+      Curated photos carried no dimensions, so `sources/curated-photos/image-size.mjs` now reads
+      them from the file header — no decode, no dependency. Verified against Pillow on all 86
+      curated photos with zero mismatches, and its tests found a real off-by-one in the JPEG
+      segment walk.
+
+**Reviewed by looking, not by arguing.** The three options were rendered at true 1920×1080 with
+the real tokens, copy and photographs before the call was made.
 
 ### D3.3 Re-aim the wash
 `.scene__fade` is opaque at the bottom and transparent at the top, so the background photo is
 strongest along the top edge where there is no content — a ghosted crowd floating above the message.
-- [ ] invert or re-centre the gradient, or replace with a botanical texture — **not done**; the wash
-      is already faint (16% opacity) and the fix is a subjective art-direction call better made
-      looking at the actual TV, not this pass
+- [x] **Re-aimed left-to-right, on the landscape treatment** (Sept 21). `.scene--wide` runs the fade
+      horizontally — 0.97 white behind the type, 0.05 at the far edge — so the cream sits where the
+      words are and the photograph survives on the side that was doing nothing.
+
+      It also let the wash stop being a watermark: with the gradient holding contrast over the type,
+      `.scene--wide .scene__wash` goes from 16% to 42% opacity and reads as an actual photograph on
+      the exposed third. Text contrast is unchanged, since that column is under 0.92–0.97 white
+      regardless.
+
+      The portrait treatment does not need a fade at all — `.scene--split` sets
+      `.scene__fade { background: none }` because the type is on clean card fill beside the panel,
+      with nothing behind it to veil.
+
+      Bottom-anchored scenes that take neither class keep the original bottom-to-top gradient.
 - [ ] tag a wash-eligible subset — **not done**, needs per-photo curation (see D5.1)
 
 ### D3.4 Vary the anchor by family

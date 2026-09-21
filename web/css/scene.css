@@ -262,6 +262,90 @@ html, body {
   max-width: 1200px;
 }
 
+/* ---------------------------------------------------------------------------
+   D3.2 — the photograph chooses the layout
+
+   The 1200px box above left roughly 600px of ghosted photo doing no work: too
+   faint to read as a photograph, too occupied to read as space. The plan asked
+   for a commitment to a split OR to letting the type grow. It is both, decided
+   by the shape of the photo that comes up (see shapeClassFor in scenes.js),
+   because a fixed choice would always be wrong for half the pool — the photos
+   are split almost evenly between portrait and landscape.
+
+   Story-family information slides only. Event, dates-list, impact and crisis
+   scenes keep their own compositions.
+   --------------------------------------------------------------------------- */
+
+/* Landscape: the wash stays full-bleed and the type grows into the width it
+   was already occupying. Costs nothing to render and reads furthest across a
+   room, which is the display's actual job. */
+.scene--wide .scene__content {
+  max-width: 1560px;
+}
+.scene--wide .scene__title {
+  font-size: 116px;
+  max-width: 16ch;
+}
+.scene--wide .scene__body {
+  font-size: 38px;
+  max-width: 34ch;
+}
+
+/* D3.3 — and with the type this wide, the fade has to stop running bottom-to-
+   top. It was opaque at the bottom and clear at the top, so the photograph was
+   strongest along the edge with no content on it and washed out exactly where
+   the words are. Running it left to right puts the cream behind the type and
+   lets the photograph survive on the side that was doing nothing. */
+.scene--wide .scene__fade {
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0.97) 0%,
+    rgba(255, 255, 255, 0.92) 42%,
+    rgba(255, 255, 255, 0.35) 68%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+}
+
+/* With the gradient holding the cream over the type, the photo no longer has
+   to be faint everywhere to keep the words legible — so it stops being a 16%
+   watermark and becomes a photograph again on the side the gradient leaves
+   clear. The left-hand text column is under 0.92-0.97 white regardless, so
+   contrast there is unchanged. */
+.scene--wide .scene__wash {
+  opacity: 0.42;
+}
+
+/* Portrait: the same <img> becomes a panel on the right at full strength
+   instead of a 16% watermark — no extra element, so the preload, the failed-
+   image handling and the focus override all keep working untouched. A tall
+   photo fills a tall panel without the cover crop throwing two thirds of it
+   away, which is the whole reason this branch exists. */
+.scene--split .scene__wash {
+  left: auto;
+  right: 0;
+  width: 800px;
+  opacity: 1;
+}
+
+/* Nothing to veil: the type sits on clean card fill beside the panel. */
+.scene--split .scene__fade {
+  background: none;
+}
+
+/* Centred against the panel rather than sitting on the baseline. Anchored
+   bottom-left it left a tall empty cream area above the type — the same
+   "unfinished" reading D3.2 objected to, just moved to the other side. A split
+   only works if the two columns answer each other. */
+.scene--split .scene__content {
+  max-width: 880px;
+  top: 50%;
+  bottom: auto;
+  transform: translateY(-50%);
+}
+.scene--split .scene__body {
+  max-width: 26ch;
+}
+
 /* Events/impact families anchor content top-left instead of bottom-left —
    D3.4: vary the anchor by family so the loop doesn't read as the same
    slide with the words swapped, and so the same pixels aren't lit every

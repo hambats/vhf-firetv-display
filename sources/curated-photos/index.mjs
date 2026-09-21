@@ -19,6 +19,7 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { imageSize } from "./image-size.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
@@ -73,15 +74,27 @@ async function main() {
       if (err.code !== "ENOENT") throw err;
     }
 
-    sets[entry.name] = files.map((f) => {
+    /*
+     * Intrinsic dimensions, so the display can pick a slide's layout from the
+     * shape of the photograph on it (DESIGN_PLAN D3.2) without measuring the
+     * image itself. Scraped gallery photos have carried width and height all
+     * along; this brings curated ones level. Header-only and dependency-free --
+     * see image-size.mjs.
+     */
+    sets[entry.name] = await Promise.all(files.map(async (f) => {
       const photo = {
         id: `${entry.name}/${f}`,
         src: `content/artwork/curated/${entry.name}/${encodeURIComponent(f)}`
       };
+      const size = await imageSize(path.join(dir, f));
+      if (size) {
+        photo.width = size.width;
+        photo.height = size.height;
+      }
       if (captions[f]) photo.caption = captions[f];
       if (focus[f]) photo.focus = focus[f];
       return photo;
-    });
+    }));
   }
 
   const output = {
