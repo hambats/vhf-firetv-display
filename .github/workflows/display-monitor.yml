@@ -101,6 +101,24 @@ jobs:
           tags: tag:ci
           version: latest
 
+      # Prove whether the tailnet path exists before blaming the television.
+      # A failed `adb connect` looks identical whether the node never joined,
+      # the ACL refuses the tag, or the display is genuinely down -- and sending
+      # someone to the building on the wrong one of those is expensive.
+      - name: Prove the tailnet path
+        if: steps.creds.outputs.ready == 'true'
+        continue-on-error: true
+        run: |
+          echo "--- this node ---"
+          tailscale status --self --peers=false || true
+          echo "--- can it see the display? ---"
+          tailscale status | grep -i vhf || echo "display not in peer list"
+          echo "--- direct path test ---"
+          tailscale ping --timeout 5s --c 3 100.69.183.1 || echo "tailscale ping failed"
+          echo "--- tcp 5555 ---"
+          timeout 10 bash -c 'cat < /dev/null > /dev/tcp/100.69.183.1/5555' \
+            && echo "port 5555 OPEN" || echo "port 5555 unreachable"
+
       - name: Check the display
         if: steps.creds.outputs.ready == 'true'
         id: check
