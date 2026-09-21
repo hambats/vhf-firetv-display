@@ -75,7 +75,22 @@
     return new Date().getDay();
   }
 
+  /*
+   * `?awake=1` keeps the playlist running on a closed day.
+   *
+   * The display blanks itself on the farm's closed days, which is right on the
+   * wall and wrong for a link. The site is public, so the natural way to show
+   * someone the display is to send them the URL — and on a Sunday or Monday
+   * they open it, see black, and reasonably conclude it is broken.
+   *
+   * Only ever reaches a browser someone opened deliberately: the television
+   * loads a fixed URL compiled into the shell and never carries a query string,
+   * so this cannot light an empty building by accident.
+   */
+  var previewAwake = /[?&]awake=1/.test(location.search);
+
   function isQuietHours(settings) {
+    if (previewAwake) return false;
     if (Date.now() < wakeUntil) return false;
     var closed = closedWeekdays(settings);
     if (closed.length === 0) return false;
