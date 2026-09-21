@@ -105,7 +105,16 @@ export function evaluate(facts) {
   const warn = (code, detail) => findings.push({ severity: "warn", code, detail });
 
   if (!facts.reachable) {
-    fault("unreachable", `no adb connection to ${DEVICE}`);
+    const detail = facts.adbDetail ? ` — ${facts.adbDetail}` : "";
+    if (facts.adbState === "unauthorized" || /unauthorized/i.test(facts.adbDetail || "")) {
+      // Android authorises adb per *client key*, and a CI runner mints a new
+      // one every run. The television answers, then refuses the handshake and
+      // puts an "Allow USB debugging?" prompt on screen that nobody is there to
+      // accept. This is not a dead display and must not be reported as one.
+      fault("adb-unauthorized", `${DEVICE} refused this client's adb key${detail}`);
+    } else {
+      fault("unreachable", `no adb connection to ${DEVICE}${detail}`);
+    }
     return { status: "fault", findings };
   }
 
@@ -151,10 +160,23 @@ export function evaluate(facts) {
 }
 
 async function probe(screenshotPath, closedDay) {
-  await adb(["connect", DEVICE], { timeoutMs: 20000 });
+  const connect = await adb(["connect", DEVICE], { timeoutMs: 20000 });
   const state = await adb(["-s", DEVICE, "get-state"], { timeoutMs: 20000 });
   if (!state.ok || state.out !== "device") {
-    return { reachable: false, closedDay };
+    /*
+     * Keep *why* we could not talk to it, not merely that we could not.
+     * "unauthorized" and "no route" are completely different problems -- the
+     * first is adb's per-client key handshake, the second is the network --
+     * and a monitor that reports both as "unreachable" sends whoever reads it
+     * to the wrong place. This distinction cost an afternoon.
+     */
+    const list = await adb(["devices", "-l"], { timeoutMs: 20000 });
+    return {
+      reachable: false,
+      closedDay,
+      adbState: state.out || null,
+      adbDetail: [connect.out, connect.err, list.out].filter(Boolean).join(" | ").slice(0, 300)
+    };
   }
 
   const [focus, power, mem, logcat, uptime] = await Promise.all([

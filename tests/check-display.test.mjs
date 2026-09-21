@@ -90,3 +90,20 @@ test("no closed days configured means no day is ever excused", () => {
   assert.equal(isClosedDay({ timezone: "America/New_York", hours: {} }), false);
   assert.equal(isClosedDay({}), false);
 });
+
+/*
+ * Added after a CI run reported "unreachable" for what was almost certainly an
+ * adb key handshake refusal. The television was healthy at the time -- checked
+ * by hand twenty minutes earlier -- so the monitor sent the reader looking at
+ * the network when the answer was authorisation.
+ */
+test("an adb key refusal is named as such, not reported as unreachable", () => {
+  const v = evaluate({ reachable: false, closedDay: false, adbState: "unauthorized", adbDetail: "device unauthorized" });
+  assert.equal(v.status, "fault");
+  assert.equal(v.findings[0].code, "adb-unauthorized");
+});
+
+test("a genuine network failure is still reported as unreachable", () => {
+  const v = evaluate({ reachable: false, closedDay: false, adbState: null, adbDetail: "failed to connect" });
+  assert.equal(v.findings[0].code, "unreachable");
+});
