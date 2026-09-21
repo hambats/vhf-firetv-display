@@ -107,11 +107,16 @@ else.
 
 ---
 
-## Appendix: the dormant Fire TV app
+## Appendix: the Fire TV shell app
 
-`app/` holds a Kotlin WebView shell that is **not being developed**. It builds and has never been
-installed on the television. Kept because it is the answer if unattended power-cut recovery ever
-becomes the blocking complaint — see [docs/BUILD_TREE.md](docs/BUILD_TREE.md) §5.
+`app/` holds the Kotlin WebView shell, and **it is what the television runs** — v1.1.0 has been
+installed since Sept 2026. (This appendix described it as dormant and never installed until
+Sept 21, 2026; the status section above had been updated and this had not.)
+
+It is deliberately thin: fullscreen, screen-on, immersive chrome, remote/back lockout, retry after a
+network outage, and relaunch on boot. The scene engine, caching and content refresh all stay in
+`web/`. A content change never needs a rebuild — only a change of publish endpoint does. See
+[docs/BUILD_TREE.md](docs/BUILD_TREE.md) §5 and [docs/DISPLAY_SETUP.md](docs/DISPLAY_SETUP.md).
 
 Building it needs Android Studio (or a standalone Android SDK) with SDK Platform 34, and a JDK 17+.
 The gradle wrapper lives at the project root, not inside `app/`.
@@ -122,6 +127,7 @@ JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew assembleDebug
 
 The output APK is at `app/build/outputs/apk/debug/app-debug.apk`.
 
-Note that installing it would **not** require ADB or a PC-to-TV connection: the standard path is the
-Downloader app from the Fire TV appstore — enable "Apps from Unknown Sources", type a URL, install —
-so the APK can simply be published alongside the content on the live site.
+Installing does **not** require a PC-to-TV cable: the Downloader app from the Fire TV appstore works
+(enable "Apps from Unknown Sources", type a URL, install), and since Sept 19 the television is on
+Tailscale, so `adb -s 100.69.183.1:5555 install -r <apk>` works from anywhere —
+see [docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md).
