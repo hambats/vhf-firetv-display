@@ -861,6 +861,20 @@ html, body {
   background-color: transparent;
 }
 
+/* Lifting the photo above the blurred fill also lifted it above everything
+   appended after it, because neither the fade nor the label carries a z-index
+   of its own — they relied on DOM order, which stops deciding anything once a
+   sibling is given a layer.
+
+   So on exactly the portrait photos the fill exists for, the "Our Members, In
+   Uniform" eyebrow rendered *behind* the photograph, and the legibility fade
+   behind it did nothing. Landscape photos were unaffected, which is why this
+   only showed on some passes. */
+.scene--photo-filled .scene__fade,
+.scene--photo-filled .scene__content--photo-label {
+  z-index: 2;
+}
+
 /* The Ken Burns zoom scales .scene__photo-img past the viewport, which is what
    gives a cover-cropped photo its drift. On a contained portrait that same
    scale eats ~12% of the frame by the end of the dwell -- re-cropping the
