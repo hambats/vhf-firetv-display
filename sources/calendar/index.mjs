@@ -13,9 +13,12 @@
  *   2. Expands every event — including recurring series (weekly workshops,
  *      volunteer shifts) — into concrete occurrences inside a rolling
  *      window (today .. today + windowDays).
- *   3. Drops anything matching content/events-exclude.json (hand-maintained,
- *      substring match against the title) — recurring internal volunteer
- *      shifts, farm-closed days, cancelled/private entries. Everything else
+ *   3. Drops anything matching content/events-exclude.json (hand-maintained):
+ *      excludeTitleContains is a substring match against the title —
+ *      recurring internal volunteer shifts, farm-closed days,
+ *      cancelled/private entries — and excludeIds drops single occurrences
+ *      by generated id, for one cancelled session of a series whose other
+ *      sessions share its title and must stay. Everything else
  *      is included, whether or not it has a registration link: a prior
  *      manual curation pass restricted this file to registration-gated
  *      events only, which is why open-studio/no-signup workshops (e.g. a
@@ -104,13 +107,19 @@ async function loadCalendarSettings() {
   }
 }
 
+// excludeIds is keyed by generated id (same keys as events-time-overrides.json)
+// with the reason as the value, so the note travels with the entry. Like a time
+// override, an entry for a date that has passed is a no-op and can be deleted.
 async function loadExcludeList() {
   try {
     const raw = await fs.readFile(EXCLUDE_PATH, "utf8");
     const doc = JSON.parse(raw);
-    return Array.isArray(doc.excludeTitleContains) ? doc.excludeTitleContains : [];
+    return {
+      terms: Array.isArray(doc.excludeTitleContains) ? doc.excludeTitleContains : [],
+      ids: doc.excludeIds && typeof doc.excludeIds === "object" ? doc.excludeIds : {}
+    };
   } catch {
-    return [];
+    return { terms: [], ids: {} };
   }
 }
 
@@ -395,7 +404,7 @@ function expandEvent(evt, windowStart, windowEnd) {
 
 async function main() {
   const { calendarId, windowDays } = await loadCalendarSettings();
-  const excludeTerms = await loadExcludeList();
+  const { terms: excludeTerms, ids: excludeIds } = await loadExcludeList();
   const timeOverrides = await loadTimeOverrides();
   const icsUrl = `https://calendar.google.com/calendar/ical/${encodeURIComponent(calendarId)}/public/basic.ics`;
 
@@ -428,6 +437,10 @@ async function main() {
         suffix++;
       }
       seenIds.add(id);
+      if (Object.prototype.hasOwnProperty.call(excludeIds, id)) {
+        excludedCount++;
+        continue;
+      }
 
       // 280, not 240: a typical VHF description runs to ~250 characters, and at 240
       // the truncator was discarding a whole second sentence to save a handful of
@@ -485,7 +498,7 @@ async function main() {
   await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await fs.writeFile(OUTPUT_PATH, JSON.stringify(output, null, 2) + "\n", "utf8");
 
-  console.log(`[calendar] wrote ${events.length} upcoming events (excluded ${excludedCount} matched terms) -> ${path.relative(ROOT, OUTPUT_PATH)}`);
+  console.log(`[calendar] wrote ${events.length} upcoming events (excluded ${excludedCount} by title or id) -> ${path.relative(ROOT, OUTPUT_PATH)}`);
 }
 
 main().catch((err) => {

@@ -102,7 +102,13 @@ though they're real calendar entries:
   "excludeTitleContains": [
     "FARM CLOSED",
     "Garden Group"
-  ]
+  ],
+  // optional: drop single occurrences by generated id (same ids as
+  // events-time-overrides.json), for one cancelled session of a series whose
+  // other sessions share its title. The value is the reason.
+  "excludeIds": {
+    "open-pottery-studio-with-sophia-2026-11-21": "why it is excluded"
+  }
 }
 ```
 

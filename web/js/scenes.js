@@ -755,6 +755,66 @@ var VhfScenes = (function () {
     return buildEventScene(evt, data);
   }
 
+  var WEEKDAY_PLURAL = {
+    Sun: "Sundays", Mon: "Mondays", Tue: "Tuesdays", Wed: "Wednesdays",
+    Thu: "Thursdays", Fri: "Fridays", Sat: "Saturdays"
+  };
+  var WEEKDAY_SINGULAR = {
+    Sun: "Sunday", Mon: "Monday", Tue: "Tuesday", Wed: "Wednesday",
+    Thu: "Thursday", Fri: "Friday", Sat: "Saturday"
+  };
+
+  // A recurring series is a handful of time slots repeated week after week, so
+  // one row per occurrence ("WED, OCT 7  1 PM - 3 PM" four times over) makes
+  // the reader find the pattern themselves. Instead, run consecutive
+  // occurrences that share a weekday and time into one block: the slot once,
+  // then just the dates. Only consecutive runs merge, so the blocks stay in
+  // date order even when a series switches slot and later switches back.
+  function scheduleGroups(events) {
+    var groups = [];
+    events.forEach(function (evt) {
+      var date = formatEventDate(evt.start);   // "Wed, Oct 7"
+      var comma = date.indexOf(", ");
+      var weekday = comma === -1 ? "" : date.slice(0, comma);
+      var monthDay = comma === -1 ? date : date.slice(comma + 2);
+      var time = formatEventTimeRange(evt.start, evt.end);
+      var last = groups[groups.length - 1];
+      if (last && last.weekday === weekday && last.time === time) {
+        last.dates.push(monthDay);
+      } else {
+        groups.push({ weekday: weekday, time: time, dates: [monthDay] });
+      }
+    });
+    return groups;
+  }
+
+  // "Oct 7", "Oct 14", "Oct 28", "Nov 4" -> "Oct 7 · 14 · 28 · Nov 4": the
+  // month is only repeated where it changes.
+  function joinDates(dates) {
+    var out = [];
+    var prevMonth = null;
+    dates.forEach(function (d) {
+      var space = d.indexOf(" ");
+      var month = space === -1 ? d : d.slice(0, space);
+      out.push(month === prevMonth ? d.slice(space + 1) : d);
+      prevMonth = month;
+    });
+    return out.join("  ·  ");
+  }
+
+  function buildScheduleGroups(events) {
+    var wrap = el("div", "schedule");
+    scheduleGroups(events).forEach(function (g) {
+      var block = el("div", "schedule__group");
+      var names = g.dates.length > 1 ? WEEKDAY_PLURAL : WEEKDAY_SINGULAR;
+      var slot = [names[g.weekday] || g.weekday, g.time].filter(Boolean).join("  ·  ");
+      block.appendChild(el("p", "schedule__slot", slot));
+      block.appendChild(el("p", "schedule__dates", joinDates(g.dates)));
+      wrap.appendChild(block);
+    });
+    return wrap;
+  }
+
   function renderEvents(item, data) {
     var content = item.content || {};
     var upcoming = upcomingEvents(data, content.limit || 8, content.offset || 0, { titleContains: content.titleContains });
@@ -763,30 +823,35 @@ var VhfScenes = (function () {
     // content.title marks this as a single-series list (every occurrence
     // shares one name, e.g. "Open Studio Pottery with Sophia") rather than a
     // mixed "Upcoming at the Farm" list: one big heading up top instead of
-    // repeating the identical title on every row, and each row shrinks to
-    // just its date/time. content.washSource points the background at that
-    // series' own curated photos instead of the generic gallery pool.
+    // repeating the identical title on every row, and the dates grouped by
+    // time slot (see scheduleGroups). content.washSource points the
+    // background at that series' own curated photos instead of the generic
+    // gallery pool.
     if (content.title) scene.className += " scene--events--series";
     appendWash(scene, data, content.washSource);
     scene.appendChild(el("div", "scene__fade"));
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", content.eyebrow || "Upcoming at the Farm"));
-    if (content.title) body.appendChild(el("h1", "scene__title", content.title));
-    var list = el("div", "events-list" + (content.title ? " events-list--compact" : ""));
-    upcoming.forEach(function (evt) {
-      var row = el("div", "events-list__item");
-      row.appendChild(el("div", "events-list__date", formatEventDate(evt.start).toUpperCase()));
-      var main = el("div", "events-list__main");
-      if (!content.title) main.appendChild(el("div", "events-list__title", evt.title));
-      var metaBits = [];
-      var timeRange = formatEventTimeRange(evt.start, evt.end);
-      if (timeRange) metaBits.push(timeRange);
-      if (evt.location) metaBits.push(evt.location);
-      if (metaBits.length > 0) main.appendChild(el("div", "events-list__meta", metaBits.join(" · ")));
-      row.appendChild(main);
-      list.appendChild(row);
-    });
-    body.appendChild(list);
+    if (content.title) {
+      body.appendChild(el("h1", "scene__title", content.title));
+      body.appendChild(buildScheduleGroups(upcoming));
+    } else {
+      var list = el("div", "events-list");
+      upcoming.forEach(function (evt) {
+        var row = el("div", "events-list__item");
+        row.appendChild(el("div", "events-list__date", formatEventDate(evt.start).toUpperCase()));
+        var main = el("div", "events-list__main");
+        main.appendChild(el("div", "events-list__title", evt.title));
+        var metaBits = [];
+        var timeRange = formatEventTimeRange(evt.start, evt.end);
+        if (timeRange) metaBits.push(timeRange);
+        if (evt.location) metaBits.push(evt.location);
+        if (metaBits.length > 0) main.appendChild(el("div", "events-list__meta", metaBits.join(" · ")));
+        row.appendChild(main);
+        list.appendChild(row);
+      });
+      body.appendChild(list);
+    }
     scene.appendChild(body);
     // A dates list is as registerable as a single event — more so, since it is
     // the recurring programs (Open Studio, the ornament workshop) people most

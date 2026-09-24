@@ -2,23 +2,9 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-09-21T16:08:24.728Z",
+  "generatedAt": "2026-09-24T13:06:01.339Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
-    {
-      "id": "chair-massage-with-lisa-10a-3p-2026-09-23",
-      "title": "Chair Massage with Lisa - 10a-3p",
-      "start": "2026-09-23T14:00:00.000Z",
-      "end": "2026-09-23T19:00:00.000Z",
-      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands. Sessions can be 15 or 30 minutes, it uses a specialized ergonomic chair to provide targeted acupressure and Swedish massage techniques.",
-      "programId": "program-chair-massage"
-    },
-    {
-      "id": "va-donation-day-2026-09-24",
-      "title": "VA donation Day",
-      "start": "2026-09-24T13:00:00.000Z",
-      "end": "2026-09-24T14:00:00.000Z"
-    },
     {
       "id": "wellness-retreat-day-2026-09-26",
       "title": "Wellness Retreat Day",
@@ -131,14 +117,6 @@
       "programId": "program-woodworking"
     },
     {
-      "id": "chair-massage-with-lisa-2026-10-14",
-      "title": "Chair Massage with Lisa",
-      "start": "2026-10-14T14:00:00.000Z",
-      "end": "2026-10-14T19:00:00.000Z",
-      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands. Sessions can be 15 or 30 minutes, it uses a specialized ergonomic chair to provide targeted acupressure and Swedish massage techniques.",
-      "programId": "program-chair-massage"
-    },
-    {
       "id": "meal-prep-workshop-with-sam-2026-10-14",
       "title": "Meal Prep Workshop with Sam",
       "start": "2026-10-14T14:00:00.000Z",
@@ -235,6 +213,13 @@
       "programId": "program-pottery"
     },
     {
+      "id": "herbal-holiday-gift-making-part-1-with-rebecca-2026-11-06",
+      "title": "Herbal Holiday Gift Making Part 1-with Rebecca",
+      "start": "2026-11-06T17:00:00.000Z",
+      "end": "2026-11-06T20:00:00.000Z",
+      "description": "The holidays are the perfect time to share your love of herbs with your friends and family! Gifts you prepare yourself are often more meaningful than anything you can buy at the store."
+    },
+    {
       "id": "fly-tying-for-beginners-2026-11-07",
       "title": "Fly Tying for Beginners",
       "start": "2026-11-07T15:00:00.000Z",
@@ -276,6 +261,14 @@
       "programId": "program-pottery"
     },
     {
+      "id": "woodworking-2-part-workshop-with-chris-from-forest-project-w-2026-11-11",
+      "title": "Woodworking 2 part workshop with Chris from Forest Project Woodworking",
+      "start": "2026-11-11T18:00:00.000Z",
+      "end": "2026-11-11T21:00:00.000Z",
+      "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing.",
+      "programId": "program-woodworking"
+    },
+    {
       "id": "oyster-mushroom-cultivation-workshop-2026-11-13",
       "title": "Oyster Mushroom Cultivation Workshop",
       "start": "2026-11-13T15:00:00.000Z",
@@ -300,12 +293,64 @@
       "programId": "program-pottery"
     },
     {
-      "id": "open-pottery-studio-with-sophia-2026-11-21",
-      "title": "Open Pottery Studio with Sophia",
-      "start": "2026-11-21T15:00:00.000Z",
-      "end": "2026-11-21T17:00:00.000Z",
-      "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "programId": "program-pottery"
+      "id": "sourdough-discard-with-patrina-2026-11-14",
+      "title": "Sourdough Discard with Patrina",
+      "start": "2026-11-14T15:00:00.000Z",
+      "end": "2026-11-14T18:00:00.000Z",
+      "description": "Do you love sourdough? Ever wonder what to do with the leftover starter that you wind up with? Come and learn the many ways to put it to use. We will make crackers, chocolate bread, and other goodies using leftover soudough starter.",
+      "programId": "program-sourdough"
+    },
+    {
+      "id": "chair-massage-with-lisa-2026-11-18",
+      "title": "Chair Massage with Lisa",
+      "start": "2026-11-18T15:00:00.000Z",
+      "end": "2026-11-18T19:30:00.000Z",
+      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands. Sessions can be 15 or 30 minutes, it uses a specialized ergonomic chair to provide targeted acupressure and Swedish massage techniques.",
+      "programId": "program-chair-massage"
+    },
+    {
+      "id": "beeswax-candles-with-jessica-2026-11-18",
+      "title": "Beeswax Candles with Jessica",
+      "start": "2026-11-18T17:00:00.000Z",
+      "end": "2026-11-18T21:00:00.000Z",
+      "description": "A beeswax candle making workshop is a hands-on crafting class where participants learn to create eco-friendly, natural candles using pure beeswax from local hives"
+    },
+    {
+      "id": "woodworking-2-park-workshop-with-chris-from-forest-project-w-2026-11-18",
+      "title": "Woodworking 2 park workshop with Chris from Forest Project Woodworking",
+      "start": "2026-11-18T18:00:00.000Z",
+      "end": "2026-11-18T21:00:00.000Z",
+      "location": "forest Project Woodworking",
+      "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing.",
+      "programId": "program-woodworking"
+    },
+    {
+      "id": "acupuncture-with-daoist-clinic-2026-11-20",
+      "title": "Acupuncture with Daoist Clinic",
+      "start": "2026-11-20T14:00:00.000Z",
+      "end": "2026-11-20T18:00:00.000Z",
+      "description": "The Daoist Traditions Acupuncture Clinic is located in Asheville NC. Their clinical interns are in the final phase of a rigorous four-year academic program and treat patients under the direct supervision of clinical faculty who are NC licensed acupuncturists.",
+      "programId": "program-acupuncture"
+    },
+    {
+      "id": "wreath-making-with-maddie-2026-11-20",
+      "title": "Wreath Making with Maddie",
+      "start": "2026-11-20T21:00:00.000Z",
+      "end": "2026-11-20T23:00:00.000Z",
+      "description": "We'll spread holiday cheer at the farm by making wreaths and holiday decor using natural products. Participants will learn the basics of wreath building and then supplement their wreaths with dried florals and textural elements grown in the VHF gardens."
+    },
+    {
+      "id": "friendsgiving-2026-11-21",
+      "title": "Friendsgiving",
+      "start": "2026-11-21T19:00:00.000Z",
+      "end": "2026-11-21T21:00:00.000Z"
+    },
+    {
+      "id": "holiday-candle-making-with-peaks-and-petals-2026-12-05",
+      "title": "Holiday Candle Making with Peaks and Petals",
+      "start": "2026-12-05T15:00:00.000Z",
+      "end": "2026-12-05T17:00:00.000Z",
+      "description": "Come learn how to make your own organic soy candles with Peaks and Petals Candle Making. You’ll get to select your jar, your choice of holiday scent and florals for the top. You will be guided through each step of the process & no prior experience is required."
     },
     {
       "id": "hendersonville-women-s-club-meeting-2026-12-08",

@@ -604,42 +604,44 @@ html, body {
   color: var(--vhf-text-caption);
 }
 
-/* A single-series list (content.title set — see renderEvents): one big
-   heading already names the series, so every row is just its own date and
-   time, smaller and tighter than the mixed-list default above. */
-.events-list--compact {
-  gap: 10px;
-  margin-top: 24px;
-}
-
-.events-list--compact .events-list__item {
-  gap: 28px;
-}
-
-/* The date has to be a real column, not just text followed by a gap, or every
-   row starts its time wherever that row's own date happened to end — "SAT,
-   NOV 7" and "WED, OCT 28" differ by ~30px, so seven rows gave seven
-   different left edges for the times.
-
-   formatEventDate produces at most "WED, SEPT 28"-shaped text: a 3-letter
-   short weekday, a 3-letter short month and two digits, uppercased at
-   --vhf-size-caption with 0.08em tracking, which measures ~190px. This must
-   stay wider than that; it was 150px, which is narrower than *every* real
-   date, so it never applied at all. */
-.events-list--compact .events-list__date {
-  font-size: var(--vhf-size-caption);
-  min-width: 205px;
-}
-
-.events-list--compact .events-list__meta {
-  font-size: var(--vhf-size-caption);
-  opacity: 0.85;
-}
-
 /* ---- Single-series events scene (see renderEvents / scene--events--series) ---- */
 
+/* A series slide groups its dates by time slot (scheduleGroups): each block
+   names the slot once in small caps, then lists just the dates at reading
+   size. The dates are what someone walks up to check, so they get the
+   weight; the old one-row-per-date list set them at caption size, seven rows
+   deep, repeating the same two time slots. */
 .scene--events--series .scene__title {
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.schedule {
+  display: flex;
+  flex-direction: column;
+  gap: 64px;
+  margin-top: 64px;
+}
+
+.schedule__group {
+  border-left: 4px solid var(--vhf-terracotta);
+  padding-left: 32px;
+}
+
+.schedule__slot {
+  font-family: var(--vhf-font-ui);
+  font-size: var(--vhf-size-events-date);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vhf-cream);
+  margin: 0 0 14px;
+}
+
+.schedule__dates {
+  font-size: 60px;
+  line-height: 1.1;
+  color: var(--vhf-text-on-events);
+  margin: 0;
+  white-space: pre;
 }
 
 /* ---- Announcement scene ---- */

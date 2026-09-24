@@ -13,5 +13,8 @@
     "past students",
     "prior sessions",
     "returning students only"
-  ]
+  ],
+  "excludeIds": {
+    "open-pottery-studio-with-sophia-2026-11-21": "Taken off the display at Rob's request 2026-09-24; still on the Google Calendar. Delete this line once the date has passed or the calendar entry is removed."
+  }
 }
