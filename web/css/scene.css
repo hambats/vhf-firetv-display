@@ -130,19 +130,114 @@ html, body {
   75% { transform: translateX(-50%) translate(2px, 2px); }
 }
 
-@keyframes vhf-fade-up {
-  from { opacity: 0; transform: translateY(12px); }
+/* ---- Title sequence (D4.2, revised) ----
+
+   One choreography for every titled scene, timed against the 900ms layer
+   crossfade so the type lands as the picture resolves rather than before it:
+
+     180ms  the accent rule draws out from the left edge of the column
+     320ms  the eyebrow rises out of its mask
+     440ms  the title, one masked line at a time, 120ms apart (scenes.js reveal)
+     ~900ms subtitle, body and caption settle in underneath
+
+   A single decelerating curve throughout (expo-out: quick off the mark, a
+   long soft landing) is most of what makes it read as designed rather than
+   as a default. Leaving is the reverse priority: the words go first, in
+   450ms, and the photograph dissolves after them.
+
+   transform/opacity only, CSS-driven, so it stays on the compositor. */
+
+@keyframes vhf-rule-draw {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes vhf-line-rise {
+  from { opacity: 0; transform: translateY(120%); }
+  30% { opacity: 1; }
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Staggered text entrance (D4.2): eyebrow, then title, then body/subtitle,
-   each ~120ms apart. Costs nothing and makes every information/event scene
-   feel authored instead of just appearing. */
-.scene__eyebrow { animation: vhf-fade-up 400ms ease-out both; }
-.scene__title { animation: vhf-fade-up 400ms ease-out 120ms both; }
-.scene__subtitle,
-.scene__body { animation: vhf-fade-up 400ms ease-out 240ms both; }
-.scene__caption { animation: vhf-fade-up 400ms ease-out 360ms both; }
+@keyframes vhf-settle {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.scene {
+  --vhf-ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Before (or without) the line split, eyebrow and title settle in whole —
+   still correct if reveal() never runs. */
+.scene__eyebrow { animation: vhf-settle 900ms var(--vhf-ease-out) 320ms both; }
+.scene__title { animation: vhf-settle 1000ms var(--vhf-ease-out) 440ms both; }
+.scene__eyebrow.is-revealing,
+.scene__title.is-revealing { animation: none; }
+
+/* Each line clips its own rise. The padding widens the clip past the line box
+   so descenders and accents are not shaved off at the mask edge; the equal
+   negative margin gives the space back, so line spacing is unchanged. */
+.reveal-line {
+  display: block;
+  overflow: hidden;
+  padding: 0.06em 0 0.16em;
+  margin: -0.06em 0 -0.16em;
+}
+.reveal-line__inner {
+  display: inline-block;
+  animation: vhf-line-rise 1100ms var(--vhf-ease-out) both;
+}
+
+/* The accent rule: a short stroke in the eyebrow's own colour, so it follows
+   each family's palette (terracotta on cream, cream on navy) without any
+   per-family rule. Not on the photo label, which sits over a photograph with
+   no column to head. */
+.scene__content:not(.scene__content--photo-label) .scene__eyebrow::before {
+  content: "";
+  display: block;
+  width: 72px;
+  height: 4px;
+  margin-bottom: 22px;
+  background: currentColor;
+  transform-origin: left center;
+  animation: vhf-rule-draw 900ms var(--vhf-ease-out) 180ms both;
+}
+.scene--crisis .scene__content .scene__eyebrow::before {
+  margin-left: auto;
+  margin-right: auto;
+  transform-origin: center;
+}
+
+.scene__subtitle { animation: vhf-settle 900ms var(--vhf-ease-out) 820ms both; }
+.scene__subtitle + .scene__subtitle { animation-delay: 900ms; }
+.scene__body { animation: vhf-settle 900ms var(--vhf-ease-out) 960ms both; }
+.scene__caption { animation: vhf-settle 900ms var(--vhf-ease-out) 1080ms both; }
+.schedule,
+.events-list { animation: vhf-settle 1000ms var(--vhf-ease-out) 960ms both; }
+
+/* Exit. The transition sits on the hidden state only, so it applies on the
+   way out and never on the way in (a scene is built into an already-hidden
+   layer, and newly inserted nodes do not transition). opacity only:
+   .scene__content carries its own centring transforms on some layouts. */
+.stage__layer:not(.stage__layer--visible) .scene__content {
+  opacity: 0;
+  transition: opacity 450ms ease-in;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene__eyebrow,
+  .scene__title,
+  .reveal-line__inner,
+  .scene__eyebrow::before,
+  .scene__subtitle,
+  .scene__body,
+  .scene__caption,
+  .schedule,
+  .events-list {
+    animation-duration: 1ms !important;
+    animation-delay: 0ms !important;
+  }
+}
 
 /* A very slow, near-subliminal breathing scale instead of any blink/pulse —
    this is a calm organisation (D4.5). */

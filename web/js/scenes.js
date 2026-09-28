@@ -890,8 +890,77 @@ var VhfScenes = (function () {
     return fn(item, data);
   }
 
+  /*
+   * Title sequence (D4.2, revised). Each rendered line of the eyebrow and the
+   * title rises out of its own mask, one after another — the broadcast
+   * lower-third move, rather than the whole block fading up at once.
+   *
+   * It has to be the lines the browser actually laid out, not words or a
+   * guess: the title wraps by max-width and text-wrap: balance, and only the
+   * browser knows where. So this runs from the engine once the scene is in
+   * the DOM — its layer still at opacity 0, so nobody sees the rebuild — and
+   * reads each word's offsetTop to recover the breaks.
+   *
+   * Lines, not words, because each masked span is a compositor layer while
+   * it moves: a title is two or three lines but eight or nine words, and D4
+   * caps the television at a handful of animated layers at once.
+   *
+   * Anything that goes wrong here leaves the text exactly as rendered, which
+   * CSS still animates in as a single block (the unsplit fallback).
+   */
+  var REVEAL_TARGETS = [
+    { selector: ".scene__eyebrow", startMs: 320 },
+    { selector: ".scene__title", startMs: 440 }
+  ];
+  var REVEAL_LINE_STEP_MS = 120;
+
+  function splitIntoLines(node, startMs) {
+    var words = (node.textContent || "").split(/\s+/).filter(function (w) { return w; });
+    if (words.length === 0) return;
+    node.textContent = "";
+    var spans = [];
+    for (var i = 0; i < words.length; i++) {
+      if (i > 0) node.appendChild(document.createTextNode(" "));
+      spans.push(node.appendChild(el("span", null, words[i])));
+    }
+    var lines = [];
+    var lineTop = null;
+    for (var j = 0; j < spans.length; j++) {
+      var top = spans[j].offsetTop;
+      if (lineTop === null || Math.abs(top - lineTop) > 2) {
+        lines.push([]);
+        lineTop = top;
+      }
+      lines[lines.length - 1].push(words[j]);
+    }
+    node.textContent = "";
+    for (var k = 0; k < lines.length; k++) {
+      var mask = el("span", "reveal-line");
+      var inner = el("span", "reveal-line__inner", lines[k].join(" "));
+      inner.style.animationDelay = startMs + k * REVEAL_LINE_STEP_MS + "ms";
+      mask.appendChild(inner);
+      node.appendChild(mask);
+    }
+    node.className += " is-revealing";
+  }
+
+  function reveal(scene) {
+    if (!scene || !scene.querySelectorAll) return;
+    for (var t = 0; t < REVEAL_TARGETS.length; t++) {
+      var nodes = scene.querySelectorAll(REVEAL_TARGETS[t].selector);
+      for (var n = 0; n < nodes.length; n++) {
+        try {
+          splitIntoLines(nodes[n], REVEAL_TARGETS[t].startMs);
+        } catch (err) {
+          console.error("[VHF] title reveal failed", err);
+        }
+      }
+    }
+  }
+
   return {
     render: render,
+    reveal: reveal,
     renderError: renderError,
     renderBlank: renderBlank,
     markImageFailed: markImageFailed,

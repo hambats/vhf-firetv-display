@@ -360,6 +360,17 @@
     next.innerHTML = "";
     next.appendChild(node);
 
+    // Needs layout, so it can only run once the node is in the DOM. The
+    // layer is still transparent here. Cosmetic: never allowed to stop a
+    // scene from showing.
+    if (typeof VhfScenes.reveal === "function") {
+      try {
+        VhfScenes.reveal(node);
+      } catch (err) {
+        console.error("[VHF] reveal failed", err);
+      }
+    }
+
     // Force layout so the opacity transition actually runs.
     void next.offsetWidth;
 
