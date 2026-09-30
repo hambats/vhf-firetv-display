@@ -73,7 +73,8 @@ const PROGRAM_KEYWORDS = [
   { programId: "program-equine-therapy", patterns: ["equine therapy", "horse sense"] },
   { programId: "program-sunset-yoga", patterns: ["sunset yoga"] },
   { programId: "program-art-therapy", patterns: ["art class", "art workshop", "acrylic pouring", "creative canvas", "botanical sketchbook", "mixed media"] },
-  { programId: "program-blacksmithing", patterns: ["blacksmith"] }
+  { programId: "program-blacksmithing", patterns: ["blacksmith"] },
+  { programId: "program-wreath-making", patterns: ["wreath"] }
 ];
 
 // A recurring partner-org meeting's calendar description is usually just

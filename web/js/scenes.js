@@ -935,6 +935,9 @@ var VhfScenes = (function () {
     }
     node.textContent = "";
     for (var k = 0; k < lines.length; k++) {
+      // Invisible between block lines, but keeps textContent reading as
+      // words ("Candle Making", not "CandleMaking") for diagnostics.
+      if (k > 0) node.appendChild(document.createTextNode(" "));
       var mask = el("span", "reveal-line");
       var inner = el("span", "reveal-line__inner", lines[k].join(" "));
       inner.style.animationDelay = startMs + k * REVEAL_LINE_STEP_MS + "ms";

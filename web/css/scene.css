@@ -338,6 +338,41 @@ html, body {
   );
 }
 
+/* The event families used to show their photo the way the story slides once
+   did: a 16% watermark under that dark veil, on navy — which reads as a flat
+   blue card with no photograph at all, next to story slides that now show
+   theirs at strength (D3.2/D3.3). Same answer as .scene--wide: the photo at
+   full strength, and a navy gradient running left to right that holds solid
+   behind the text column and clears toward the right edge, where only the
+   registration card and the corner mark sit. The brand navy itself, so the
+   family keeps its ground colour; at 0.9 over the brightest photo, cream
+   text still clears 4.5:1. */
+.scene--event .scene__wash,
+.scene--events .scene__wash {
+  opacity: 1;
+}
+.scene--event .scene__fade {
+  background: linear-gradient(
+    to right,
+    rgba(63, 90, 120, 0.94) 0%,
+    rgba(63, 90, 120, 0.9) 48%,
+    rgba(63, 90, 120, 0.5) 74%,
+    rgba(63, 90, 120, 0.22) 100%
+  );
+}
+/* A dates list runs most of the way across the slide (max-width 1500px), so
+   the veil has to hold further right than on a single event before it lets
+   the photo through. */
+.scene--events .scene__fade {
+  background: linear-gradient(
+    to right,
+    rgba(63, 90, 120, 0.94) 0%,
+    rgba(63, 90, 120, 0.9) 62%,
+    rgba(63, 90, 120, 0.62) 86%,
+    rgba(63, 90, 120, 0.4) 100%
+  );
+}
+
 /* Photo scenes have no caption/title overlay, so the fade only needs to be
    just strong enough to keep the top-right brand mark legible over a bright
    photo — not a full text-readability veil. Anchored to the top, where the
