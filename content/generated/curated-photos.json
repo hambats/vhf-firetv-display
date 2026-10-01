@@ -1,7 +1,7 @@
 {
   "version": 1,
-  "source": "content/artwork/curated (hand-curated, PC-side only)",
-  "generatedAt": "2026-09-21T21:42:52.874Z",
+  "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
+  "generatedAt": "2026-10-01T01:09:59.569Z",
   "sets": {
     "gen-pop-additions": [
       {

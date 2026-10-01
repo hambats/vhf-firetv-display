@@ -46,8 +46,17 @@ var VhfScenes = (function () {
     if (src) failedSrc[src] = true;
   }
 
+  // photo.expires is set on Drive flyers (sources/drive): a flyer for a past
+  // class must stop showing even if the daily sync that would retire it has
+  // not run, so the display checks the date itself.
+  function isExpired(photo) {
+    if (!photo.expires) return false;
+    var t = Date.parse(photo.expires);
+    return !isNaN(t) && Date.now() >= t;
+  }
+
   function isUsablePhoto(photo) {
-    return !!(photo && photo.src && !failedSrc[photo.src]);
+    return !!(photo && photo.src && !failedSrc[photo.src] && !isExpired(photo));
   }
 
   function usablePhotos(photos) {
@@ -518,9 +527,12 @@ var VhfScenes = (function () {
     return /format=\d+w/.test(src) ? src.replace(/format=\d+w/, "format=750w") : src;
   }
 
-  function applyPortraitFill(scene, photo, src) {
+  // always: a designed flyer is shown whole whatever its shape, so it takes
+  // the fill treatment at any aspect -- which also stops the Ken Burns zoom
+  // from slowly cropping the text at its edges (see .scene--photo-filled).
+  function applyPortraitFill(scene, photo, src, always) {
     if (!photo.naturalWidth || !photo.naturalHeight) return;
-    if (photo.naturalWidth / photo.naturalHeight > PORTRAIT_FILL_MAX_ASPECT) return;
+    if (!always && photo.naturalWidth / photo.naturalHeight > PORTRAIT_FILL_MAX_ASPECT) return;
     if (scene.querySelector(".scene__photo-fill")) return;
     var fill = img("scene__photo-fill", lowResVariant(src), "decoration");
     scene.insertBefore(fill, scene.firstChild);
@@ -552,11 +564,12 @@ var VhfScenes = (function () {
     }
     // A cached image can already be complete before the listener attaches, in
     // which case no load event is ever coming.
+    var fillAlways = fit === "contain";
     if (photo.complete) {
-      applyPortraitFill(scene, photo, src);
+      applyPortraitFill(scene, photo, src, fillAlways);
     } else {
       photo.addEventListener("load", function () {
-        applyPortraitFill(scene, photo, src);
+        applyPortraitFill(scene, photo, src, fillAlways);
       });
     }
     scene.appendChild(photo);
@@ -619,7 +632,10 @@ var VhfScenes = (function () {
 
     var photo = drawPhotos(poolKey, photos, 1)[0];
     if (!photo) throw new Error("photo pool has no usable photos left");
-    return buildPhotoScene(photo.src, "cover", photo.focus || null, content.eyebrow, photo.id, photo.caption, photo.zoom, photo.pan);
+    // content.fit "contain" is for a pool of designed graphics (Drive flyers),
+    // which must never be cropped; every photo pool stays "cover".
+    var fit = content.fit === "contain" ? "contain" : "cover";
+    return buildPhotoScene(photo.src, fit, photo.focus || null, content.eyebrow, photo.id, photo.caption, photo.zoom, photo.pan);
   }
 
   function renderCustom(item) {

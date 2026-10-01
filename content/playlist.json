@@ -41,6 +41,16 @@
       }
     },
     {
+      "id": "drive-flyers-1",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {
+        "source": "drive-flyers",
+        "fit": "contain"
+      }
+    },
+    {
       "id": "in-uniform-pool",
       "type": "photo-pool",
       "duration": 9,
@@ -237,6 +247,16 @@
           "open pottery studio",
           "create your ornaments"
         ]
+      }
+    },
+    {
+      "id": "drive-flyers-2",
+      "type": "photo-pool",
+      "duration": 12,
+      "enabled": true,
+      "content": {
+        "source": "drive-flyers",
+        "fit": "contain"
       }
     },
     {

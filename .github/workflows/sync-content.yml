@@ -13,16 +13,23 @@
 # reachable from the building, and must carry no credentials. CI honours that
 # intent completely. The rule should read "build-side, never device-side".
 #
-# Both sources are public, so nothing here needs a credential to read them.
+# The gallery and calendar are public, so neither needs a credential. The Google
+# Drive feed (sources/drive) reads a folder shared as "anyone with the link" and
+# needs two repo secrets: DRIVE_FOLDER_ID and DRIVE_API_KEY. Without them that
+# one adapter skips and everything else syncs as before. Neither ever reaches
+# the television.
 
 name: sync content
 
 on:
   schedule:
-    # Mondays, roughly 09:00 in the farm's own time zone. GitHub cron is UTC and
+    # Daily, roughly 09:00 in the farm's own time zone. GitHub cron is UTC and
     # does not follow US daylight saving, so this drifts an hour in winter. That
-    # is fine for a weekly content sync and not worth a workaround.
-    - cron: "0 13 * * 1"
+    # is fine for a content sync and not worth a workaround. Daily rather than
+    # the original weekly because photos now arrive from Drive: a class's
+    # photos should be on the wall the next day, not up to a week later. A day
+    # where nothing moved costs one empty run and no commit.
+    - cron: "0 13 * * *"
   workflow_dispatch:
     inputs:
       dry_run:
@@ -76,8 +83,11 @@ jobs:
       - run: npm ci
         if: steps.creds.outputs.ready == 'true'
 
-      - name: Re-scrape the gallery and re-fetch the calendar
+      - name: Pull Drive, re-scrape the gallery, re-fetch the calendar
         if: steps.creds.outputs.ready == 'true'
+        env:
+          DRIVE_FOLDER_ID: ${{ secrets.DRIVE_FOLDER_ID }}
+          DRIVE_API_KEY: ${{ secrets.DRIVE_API_KEY }}
         run: npm run sync-sources
 
       # The adapters are deterministic (commit f2a9a15): unchanged sources
@@ -94,7 +104,15 @@ jobs:
         run: |
           node -e '
             const cp = require("node:child_process");
-            const files = ["content/generated/gallery.json", "content/generated/events.json"];
+            const files = [
+              "content/generated/gallery.json",
+              "content/generated/events.json",
+              "content/generated/drive.json",
+              "content/generated/curated-photos.json"
+            ];
+            const countOf = (doc) => doc.photos ? doc.photos.length
+              : doc.events ? doc.events.length
+              : Object.values(doc.sets || {}).reduce((n, s) => n + (Array.isArray(s) ? s.length : (s.photos || []).length), 0);
             const strip = (o) => { const c = JSON.parse(JSON.stringify(o)); delete c.generatedAt; return JSON.stringify(c); };
             let changed = false;
             const notes = [];
@@ -103,8 +121,7 @@ jobs:
               const after = JSON.parse(require("node:fs").readFileSync(f, "utf8"));
               const differs = strip(before) !== strip(after);
               if (differs) changed = true;
-              const key = f.includes("gallery") ? "photos" : "events";
-              notes.push(`${f.split("/").pop()}: ${differs ? "CHANGED" : "no change"} (${(before[key] || []).length} -> ${(after[key] || []).length})`);
+              notes.push(`${f.split("/").pop()}: ${differs ? "CHANGED" : "no change"} (${countOf(before)} -> ${countOf(after)})`);
             }
             console.log(notes.join("\n"));
             require("node:fs").appendFileSync(process.env.GITHUB_OUTPUT, "changed=" + changed + "\n");
@@ -116,7 +133,8 @@ jobs:
       - name: Discard a timestamp-only rewrite
         if: steps.creds.outputs.ready == 'true' && steps.diff.outputs.changed != 'true'
         run: |
-          git checkout -- content/generated/
+          git checkout -- content/generated/ content/artwork/drive/
+          git clean -fdq -- content/artwork/drive/
           echo "No content change — nothing to publish." >> "$GITHUB_STEP_SUMMARY"
 
       - name: Publish
@@ -126,9 +144,10 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           npm run publish -- -m "Sync gallery and calendar
 
-          Scheduled content refresh. Only content/generated changed; the
-          adapters are deterministic, so this run is here because something in
-          the gallery or the calendar actually moved."
+          Scheduled content refresh. Only content/generated and the Drive
+          feed's images changed; the adapters are deterministic, so this run
+          is here because something in the gallery, the calendar or the
+          shared Drive folder actually moved."
 
       - name: Report a dry run
         if: steps.creds.outputs.ready == 'true' && steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run == 'true'
@@ -159,3 +178,14 @@ jobs:
             require("node:fs").appendFileSync(process.env.GITHUB_STEP_SUMMARY, out.join("\n"));
             console.log(out.join("\n"));
           '
+
+      # Checked last on purpose: a Drive failure must not stop the calendar
+      # publishing above, but it must still turn the run red, or a revoked
+      # share would silently freeze every Drive-fed slide.
+      - name: Fail if the Google Drive sync failed
+        if: always() && steps.creds.outputs.ready == 'true'
+        run: |
+          if [ -f .cache/drive-sync-failed ]; then
+            echo "::error title=Google Drive sync failed::$(cat .cache/drive-sync-failed)"
+            exit 1
+          fi

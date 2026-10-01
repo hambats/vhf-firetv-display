@@ -86,9 +86,37 @@ const PROGRAM_DESCRIPTION_OVERRIDES = {
   "program-hendersonville-womans-club": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service."
 };
 
-function matchProgramId(title) {
+/*
+ * A class folder in the Google Drive feed (sources/drive) is a program too:
+ * "Classes/Beeswax Candles" should put its photos behind "Beeswax Candles with
+ * Jessica" without anyone adding a row above. Its folder name becomes one more
+ * pattern, checked after every hand-written one, so the table above stays in
+ * charge wherever the two disagree.
+ */
+const DRIVE_MANIFEST_PATH = path.join(ROOT, "content", "generated", "drive.json");
+let driveKeywords = [];
+
+function driveKeywordsFrom(manifest) {
+  const out = [];
+  for (const [programId, set] of Object.entries((manifest && manifest.sets) || {})) {
+    if (set.section !== "classes" || !set.keyword || !(set.photos || []).length) continue;
+    out.push({ programId, patterns: [set.keyword] });
+  }
+  return out;
+}
+
+async function loadDriveKeywords() {
+  try {
+    driveKeywords = driveKeywordsFrom(JSON.parse(await fs.readFile(DRIVE_MANIFEST_PATH, "utf8")));
+  } catch (err) {
+    if (err.code !== "ENOENT") throw err;
+    driveKeywords = [];
+  }
+}
+
+function matchProgramId(title, extra = driveKeywords) {
   const lower = (title || "").toLowerCase();
-  for (const { programId, patterns } of PROGRAM_KEYWORDS) {
+  for (const { programId, patterns } of PROGRAM_KEYWORDS.concat(extra)) {
     if (patterns.some((p) => lower.includes(p))) return programId;
   }
   return undefined;
@@ -404,6 +432,7 @@ function expandEvent(evt, windowStart, windowEnd) {
 }
 
 async function main() {
+  await loadDriveKeywords();
   const { calendarId, windowDays } = await loadCalendarSettings();
   const { terms: excludeTerms, ids: excludeIds } = await loadExcludeList();
   const timeOverrides = await loadTimeOverrides();

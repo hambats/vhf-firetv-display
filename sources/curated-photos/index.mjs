@@ -18,17 +18,51 @@
  */
 import { promises as fs } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
+import { fileURLToPath, pathToFileURL } from "node:url";
 import { imageSize } from "./image-size.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
 const CURATED_DIR = path.join(ROOT, "content", "artwork", "curated");
 const OUTPUT_PATH = path.join(ROOT, "content", "generated", "curated-photos.json");
+const DRIVE_MANIFEST_PATH = path.join(ROOT, "content", "generated", "drive.json");
 
 const IMAGE_EXTS = new Set([".jpg", ".jpeg", ".png", ".webp"]);
 
-async function main() {
+/*
+ * Folds the Google Drive feed (sources/drive, content/generated/drive.json)
+ * into the same sets. A Drive "Classes/Pottery" folder lands in
+ * program-pottery beside the hand-curated pottery photos rather than as a
+ * separate set, so every slide that already shows pottery picks them up with
+ * no change to the playlist or the display. Hand-curated photos come first;
+ * order is otherwise irrelevant, since the display shuffles each set.
+ */
+export function mergeDriveSets(sets, driveManifest) {
+  for (const [setId, set] of Object.entries((driveManifest && driveManifest.sets) || {})) {
+    const photos = (set.photos || []).map((p) => {
+      const photo = { id: `drive/${p.driveId}`, src: p.src };
+      if (p.width) photo.width = p.width;
+      if (p.height) photo.height = p.height;
+      if (p.caption) photo.caption = p.caption;
+      if (p.expires) photo.expires = p.expires;
+      return photo;
+    });
+    if (photos.length === 0) continue;
+    sets[setId] = (sets[setId] || []).concat(photos);
+  }
+  return sets;
+}
+
+async function readDriveManifest() {
+  try {
+    return JSON.parse(await fs.readFile(DRIVE_MANIFEST_PATH, "utf8"));
+  } catch (err) {
+    if (err.code === "ENOENT") return null;
+    throw err;
+  }
+}
+
+export async function buildCuratedPhotos() {
   const sets = {};
   let entries;
   try {
@@ -97,9 +131,11 @@ async function main() {
     }));
   }
 
+  mergeDriveSets(sets, await readDriveManifest());
+
   const output = {
     version: 1,
-    source: "content/artwork/curated (hand-curated, PC-side only)",
+    source: "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
     generatedAt: new Date().toISOString(),
     sets
   };
@@ -111,7 +147,9 @@ async function main() {
   console.log(`[curated-photos] wrote ${Object.keys(sets).length} set(s) -> ${path.relative(ROOT, OUTPUT_PATH)}${summary ? ": " + summary : ""}`);
 }
 
-main().catch((err) => {
-  console.error("[curated-photos] failed:", err);
-  process.exit(1);
-});
+if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
+  buildCuratedPhotos().catch((err) => {
+    console.error("[curated-photos] failed:", err);
+    process.exit(1);
+  });
+}

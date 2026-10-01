@@ -49,7 +49,12 @@ export const PUBLISHED_CONTENT = [
   "generated/gallery.json",
   "generated/curated-photos.json",
   "artwork/brand",
-  "artwork/curated"
+  "artwork/curated",
+  // The Google Drive feed's images (sources/drive). Its manifest,
+  // generated/drive.json, stays off the site: the display reads these through
+  // curated-photos.json, and the manifest's skip list names files in a folder
+  // that is nobody's business on a public URL.
+  "artwork/drive"
 ];
 
 async function copyPublishedContent(src, dest) {

@@ -42,6 +42,16 @@ var SHELL_CACHE = "vhf-shell-" + BUILD;
  */
 var IMAGE_CACHE = "vhf-images-v1";
 var LOCAL_IMAGE_CACHE = "vhf-local-images-v1";
+/*
+ * DRIVE: photos and flyers from the Google Drive feed (sources/drive). Our own
+ * files like LOCAL, but not finite: they are added and deleted every week, and
+ * an uncapped cache keyed by URL keeps every photo that ever passed through
+ * until the television runs out of storage. Same-origin, so they are not
+ * padded like the gallery's opaque entries and the cap can sit well above the
+ * feed's working size. Oldest-first eviction, as for the gallery.
+ */
+var DRIVE_IMAGE_CACHE = "vhf-drive-images-v1";
+var MAX_DRIVE_IMAGES = 200;
 
 /*
  * Photos are ~2500px gallery originals and cross-origin, so they cache as
@@ -110,10 +120,11 @@ self.addEventListener("activate", function (event) {
 
 /* Keep the image cache bounded. Cache.keys() returns entries in insertion
    order, so the front of the list is the oldest — evict from there. */
-function trimImageCache(cache) {
+function trimImageCache(cache, max) {
+  var limit = max || MAX_IMAGES;
   return cache.keys().then(function (keys) {
-    if (keys.length <= MAX_IMAGES) return null;
-    var excess = keys.slice(0, keys.length - MAX_IMAGES);
+    if (keys.length <= limit) return null;
+    var excess = keys.slice(0, keys.length - limit);
     return Promise.all(
       excess.map(function (key) {
         return cache.delete(key);
@@ -149,13 +160,15 @@ function cacheImage(request, response) {
 /* Cache-first with a background refresh: the display paints from cache
    immediately (which is the whole point on a restart), and the next start gets
    whatever was republished since. */
-function staleWhileRevalidate(request, cacheName) {
+function staleWhileRevalidate(request, cacheName, max) {
   return caches.open(cacheName).then(function (cache) {
     return cache.match(request).then(function (cached) {
       var network = fetch(request)
         .then(function (response) {
           if (response && (response.ok || response.type === "opaque")) {
-            cache.put(request, response.clone()).catch(function () {});
+            cache.put(request, response.clone()).then(function () {
+              return max ? trimImageCache(cache, max) : null;
+            }).catch(function () {});
           }
           return response;
         })
@@ -202,6 +215,10 @@ self.addEventListener("fetch", function (event) {
 
   if (isImage(request, url)) {
     if (url.origin === self.location.origin) {
+      if (url.pathname.indexOf("/content/artwork/drive/") !== -1) {
+        event.respondWith(staleWhileRevalidate(request, DRIVE_IMAGE_CACHE, MAX_DRIVE_IMAGES));
+        return;
+      }
       event.respondWith(staleWhileRevalidate(request, LOCAL_IMAGE_CACHE));
       return;
     }

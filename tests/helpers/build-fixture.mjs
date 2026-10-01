@@ -4,7 +4,7 @@
  * touching the real content/ to prove a point.
  *
  * The artwork payload is filtered out: tens of megabytes of photographs make
- * every test slow and prove nothing. The two published artwork directories
+ * every test slow and prove nothing. The three published artwork directories
  * still have to exist, because the build treats a missing entry in its
  * allowlist as an error.
  */
@@ -38,6 +38,7 @@ export async function makeFixture() {
   await fs.cp(path.join(ROOT, "web"), path.join(dir, "web"), { recursive: true });
   await fs.mkdir(path.join(dir, "content", "artwork", "brand"), { recursive: true });
   await fs.mkdir(path.join(dir, "content", "artwork", "curated"), { recursive: true });
+  await fs.mkdir(path.join(dir, "content", "artwork", "drive"), { recursive: true });
   return dir;
 }
 

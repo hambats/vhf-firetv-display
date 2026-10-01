@@ -116,8 +116,9 @@ not a code style tool.
 - **`scripts/`** (Node ESM, `.mjs`) — `build-site.mjs` (validates then copies `web/` + the
   publishable subset of `content/`, per the `PUBLISHED_CONTENT` allowlist, into `dist/`;
   `validate-content.mjs` (schema validator against [docs/CONTENT_SCHEMA.md](docs/CONTENT_SCHEMA.md),
-  exports `validateContentDir`, reused by build, admin, and tests); `sync-sources.mjs` (PC-side
-  gallery/calendar adapters, writes only to `content/generated/`); `publish.mjs` (the single publish
+  exports `validateContentDir`, reused by build, admin, and tests); `sync-sources.mjs` (build-side
+  Drive/curated-photos/gallery/calendar adapters, writes only to `content/generated/` and the Drive
+  mirror `content/artwork/drive/` — see [docs/DRIVE_FEED.md](docs/DRIVE_FEED.md)); `publish.mjs` (the single publish
   transport — see Commands above); `generate-qr.mjs` (registration QR SVGs from
   `content/settings.json`); `detect-photo-focus.py` and `generate-app-icons.py` (one-off Python
   helpers, not part of the normal build).

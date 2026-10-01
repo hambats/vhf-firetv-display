@@ -279,6 +279,27 @@ test("local artwork does not share the capped cache with the gallery", async () 
   );
 });
 
+test("Drive feed photos get their own cache, capped, so a weekly churn cannot fill the TV", async () => {
+  const source = await stampedSw();
+  const { listeners, caches } = await loadSw(source, serving("imgbytes", { status: 200 }));
+  await fireLifecycle(listeners, "install");
+
+  for (let i = 0; i < 205; i++) {
+    const req = new Request(ORIGIN + `/content/artwork/drive/program-pottery/photo${i}.jpg`);
+    Object.defineProperty(req, "destination", { value: "image" });
+    await fireFetch(listeners, req);
+    // The put and the trim run after the response is handed back.
+    await new Promise((r) => setTimeout(r, 0));
+  }
+
+  const drive = await caches.open("vhf-drive-images-v1");
+  const keys = await drive.keys();
+  assert.equal(keys.length, 200, "the Drive cache stays at its cap");
+  assert.ok(!keys.some((k) => k.url.endsWith("/photo0.jpg")), "the oldest entry is the one evicted");
+  const local = await caches.open("vhf-local-images-v1");
+  assert.equal((await local.keys()).length, 0, "Drive photos must not land in the uncapped local cache");
+});
+
 test("activating clears the previous build's shell but keeps the photos", async () => {
   const source = await stampedSw();
   const { listeners, caches } = await loadSw(source, serving("ok", { status: 200 }));
