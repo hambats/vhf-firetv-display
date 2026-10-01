@@ -1,7 +1,132 @@
 {
   "version": 1,
   "source": "Google Drive shared folder (build-side only; see sources/drive)",
-  "generatedAt": null,
-  "sets": {},
+  "generatedAt": "2026-10-01T02:12:28.192Z",
+  "sets": {
+    "gen-pop-additions": {
+      "section": "farm",
+      "folder": "Farm Photos",
+      "dir": "farm-photos",
+      "photos": []
+    },
+    "drive-flyers": {
+      "section": "flyers",
+      "folder": "Flyers",
+      "dir": "flyers",
+      "photos": []
+    },
+    "program-quail-hunt": {
+      "section": "classes",
+      "folder": "Quail Hunt",
+      "dir": "program-quail-hunt",
+      "photos": [],
+      "keyword": "quail hunt"
+    },
+    "program-chair-massage": {
+      "section": "classes",
+      "folder": "Chair Massage",
+      "dir": "program-chair-massage",
+      "photos": [],
+      "keyword": "chair massage"
+    },
+    "program-mushroom-cultivation": {
+      "section": "classes",
+      "folder": "Mushroom Cultivation",
+      "dir": "program-mushroom-cultivation",
+      "photos": [],
+      "keyword": "mushroom cultivation"
+    },
+    "program-beekeeping": {
+      "section": "classes",
+      "folder": "Beekeeping",
+      "dir": "program-beekeeping",
+      "photos": [],
+      "keyword": "beekeeping"
+    },
+    "program-soap-making": {
+      "section": "classes",
+      "folder": "Soap Making",
+      "dir": "program-soap-making",
+      "photos": [],
+      "keyword": "soap making"
+    },
+    "program-acupuncture": {
+      "section": "classes",
+      "folder": "Acupuncture",
+      "dir": "program-acupuncture",
+      "photos": [],
+      "keyword": "acupuncture"
+    },
+    "program-sourdough": {
+      "section": "classes",
+      "folder": "Sourdough",
+      "dir": "program-sourdough",
+      "photos": [],
+      "keyword": "sourdough"
+    },
+    "program-fishing": {
+      "section": "classes",
+      "folder": "Fishing",
+      "dir": "program-fishing",
+      "photos": [],
+      "keyword": "fishing"
+    },
+    "program-kitchen-medicine": {
+      "section": "classes",
+      "folder": "Kitchen Medicine",
+      "dir": "program-kitchen-medicine",
+      "photos": [],
+      "keyword": "kitchen medicine"
+    },
+    "program-dog-training": {
+      "section": "classes",
+      "folder": "Dog Training",
+      "dir": "program-dog-training",
+      "photos": [],
+      "keyword": "dog training"
+    },
+    "program-woodworking": {
+      "section": "classes",
+      "folder": "Woodworking",
+      "dir": "program-woodworking",
+      "photos": [],
+      "keyword": "woodworking"
+    },
+    "program-pottery": {
+      "section": "classes",
+      "folder": "Pottery",
+      "dir": "program-pottery",
+      "photos": [],
+      "keyword": "pottery"
+    },
+    "program-herbal-holiday-gift-making": {
+      "section": "classes",
+      "folder": "Herbal Holiday Gift Making",
+      "dir": "program-herbal-holiday-gift-making",
+      "photos": [],
+      "keyword": "herbal holiday gift making"
+    },
+    "program-holiday-candle-making": {
+      "section": "classes",
+      "folder": "Holiday Candle Making",
+      "dir": "program-holiday-candle-making",
+      "photos": [],
+      "keyword": "holiday candle making"
+    },
+    "program-beeswax-candles": {
+      "section": "classes",
+      "folder": "Beeswax Candles",
+      "dir": "program-beeswax-candles",
+      "photos": [],
+      "keyword": "beeswax candles"
+    },
+    "program-wreath-making": {
+      "section": "classes",
+      "folder": "Wreath Making",
+      "dir": "program-wreath-making",
+      "photos": [],
+      "keyword": "wreath making"
+    }
+  },
   "skipped": []
 }

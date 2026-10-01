@@ -2,25 +2,9 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-09-24T13:06:01.339Z",
+  "generatedAt": "2026-10-01T02:12:33.480Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
-    {
-      "id": "wellness-retreat-day-2026-09-26",
-      "title": "Wellness Retreat Day",
-      "start": "2026-09-26T14:00:00.000Z",
-      "end": "2026-09-26T19:00:00.000Z",
-      "description": "Come out to the farm for a full day of wellness! All sessions are free and lunch is provided! Yoga 10-11 Acupuncture or massage Lunch 12-1230 Sound Therapy 1-2 Acupuncture or massage",
-      "programId": "program-wellness-retreat"
-    },
-    {
-      "id": "kitchen-medicine-series-nourishing-broths-seaweed-medicine-w-2026-10-02",
-      "title": "Kitchen Medicine Series Nourishing Broths & Seaweed Medicine with Rebecca",
-      "start": "2026-10-02T17:00:00.000Z",
-      "end": "2026-10-02T20:00:00.000Z",
-      "description": "Kitchen Medicine Series Nourishing Broths & Seaweed Medicine Herbal broths and soups are one of the most powerful, everyday ways to deliver deep nutrition and medicine to your body with very little effort.",
-      "programId": "program-kitchen-medicine"
-    },
     {
       "id": "half-day-trout-fishing-with-southern-appalachian-anglers-2026-10-03",
       "title": "Half Day Trout Fishing with Southern Appalachian Anglers",
@@ -106,6 +90,14 @@
       "end": "2026-10-13T16:00:00.000Z",
       "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service.",
       "programId": "program-hendersonville-womans-club"
+    },
+    {
+      "id": "kitchen-medicine-series-nourishing-broths-seaweed-medicine-w-2026-10-13",
+      "title": "Kitchen Medicine Series Nourishing Broths & Seaweed Medicine with Rebecca",
+      "start": "2026-10-13T17:00:00.000Z",
+      "end": "2026-10-13T20:00:00.000Z",
+      "description": "Herbal broths and soups are one of the most powerful, everyday ways to deliver deep nutrition and medicine to your body with very little effort.",
+      "programId": "program-kitchen-medicine"
     },
     {
       "id": "woodworking-workshop-with-chris-from-forest-project-woodwork-2026-10-14",
@@ -325,19 +317,20 @@
       "programId": "program-woodworking"
     },
     {
+      "id": "wreath-making-with-maddie-2026-11-19",
+      "title": "Wreath Making with Maddie",
+      "start": "2026-11-19T21:00:00.000Z",
+      "end": "2026-11-19T23:00:00.000Z",
+      "description": "We'll spread holiday cheer at the farm by making wreaths and holiday decor using natural products. Participants will learn the basics of wreath building and then supplement their wreaths with dried florals and textural elements grown in the VHF gardens.",
+      "programId": "program-wreath-making"
+    },
+    {
       "id": "acupuncture-with-daoist-clinic-2026-11-20",
       "title": "Acupuncture with Daoist Clinic",
       "start": "2026-11-20T14:00:00.000Z",
       "end": "2026-11-20T18:00:00.000Z",
       "description": "The Daoist Traditions Acupuncture Clinic is located in Asheville NC. Their clinical interns are in the final phase of a rigorous four-year academic program and treat patients under the direct supervision of clinical faculty who are NC licensed acupuncturists.",
       "programId": "program-acupuncture"
-    },
-    {
-      "id": "wreath-making-with-maddie-2026-11-20",
-      "title": "Wreath Making with Maddie",
-      "start": "2026-11-20T21:00:00.000Z",
-      "end": "2026-11-20T23:00:00.000Z",
-      "description": "We'll spread holiday cheer at the farm by making wreaths and holiday decor using natural products. Participants will learn the basics of wreath building and then supplement their wreaths with dried florals and textural elements grown in the VHF gardens."
     },
     {
       "id": "friendsgiving-2026-11-21",
