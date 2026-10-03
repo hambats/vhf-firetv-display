@@ -2,33 +2,9 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-10-01T02:12:33.480Z",
+  "generatedAt": "2026-10-03T16:52:08.837Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
-    {
-      "id": "half-day-trout-fishing-with-southern-appalachian-anglers-2026-10-03",
-      "title": "Half Day Trout Fishing with Southern Appalachian Anglers",
-      "start": "2026-10-03T11:00:00.000Z",
-      "end": "2026-10-03T15:00:00.000Z",
-      "description": "Half Day Trout Wade: 5 anglers at Southern Appalachian Anglers LLC - Asheville Fly Fishing Guide Service, no previous experience necessary. Location and more information will be available closer to the date. A meetup location and time will be given via email.",
-      "programId": "program-fishing"
-    },
-    {
-      "id": "pottery-with-resident-potter-sophia-2026-10-03",
-      "title": "Pottery with resident potter Sophia",
-      "start": "2026-10-03T14:00:00.000Z",
-      "end": "2026-10-03T16:00:00.000Z",
-      "description": "4 Week Handbuilding Pottery Workshop In this 4 week class, you’ll learn the basics of hand building with clay. Come unwind, learn something new and connect with creativity.",
-      "programId": "program-pottery"
-    },
-    {
-      "id": "soap-making-with-grace-2026-10-03",
-      "title": "Soap Making with Grace",
-      "start": "2026-10-03T16:00:00.000Z",
-      "end": "2026-10-03T18:00:00.000Z",
-      "description": "A soap pour workshop (commonly called a melt-and-pour soap making class) is a fun, hands-on, and beginner-friendly crafting class where participants learn to design and create custom soap bars using a pre-made soap base.",
-      "programId": "program-soap-making"
-    },
     {
       "id": "appalachian-dog-training-observation-only-2026-10-07",
       "title": "Appalachian Dog Training - Observation ONLY",
