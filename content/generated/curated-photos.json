@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-10-06T16:38:20.517Z",
+  "generatedAt": "2026-10-06T16:46:56.521Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -300,25 +300,64 @@
         "id": "program-friendsgiving/friendsgiving-civil-war-camp-sketch.jpg",
         "src": "content/artwork/curated/program-friendsgiving/friendsgiving-civil-war-camp-sketch.jpg",
         "width": 1024,
-        "height": 748
+        "height": 748,
+        "caption": "Thanksgiving in camp, 1861 · Library of Congress"
+      },
+      {
+        "id": "program-friendsgiving/friendsgiving-guadalcanal-cake.jpg",
+        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-guadalcanal-cake.jpg",
+        "width": 960,
+        "height": 747,
+        "caption": "Thanksgiving at Guadalcanal, 1942 · Marine Corps Archives"
       },
       {
         "id": "program-friendsgiving/friendsgiving-korea-marines-dinner.jpg",
         "src": "content/artwork/curated/program-friendsgiving/friendsgiving-korea-marines-dinner.jpg",
         "width": 840,
-        "height": 657
+        "height": 657,
+        "caption": "Marines enjoy Thanksgiving dinner in Korea"
       },
       {
         "id": "program-friendsgiving/friendsgiving-navy-galley-turkey.jpg",
         "src": "content/artwork/curated/program-friendsgiving/friendsgiving-navy-galley-turkey.jpg",
         "width": 1024,
-        "height": 681
+        "height": 681,
+        "caption": "Thanksgiving dinner from a Navy ship's galley"
+      },
+      {
+        "id": "program-friendsgiving/friendsgiving-vhf-gathering-buffet.jpg",
+        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-vhf-gathering-buffet.jpg",
+        "width": 500,
+        "height": 648,
+        "caption": "Sharing a meal together at Veterans Healing Farm"
+      },
+      {
+        "id": "program-friendsgiving/friendsgiving-vhf-gathering-conversation.jpg",
+        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-vhf-gathering-conversation.jpg",
+        "width": 500,
+        "height": 405,
+        "caption": "Sharing a meal together at Veterans Healing Farm"
+      },
+      {
+        "id": "program-friendsgiving/friendsgiving-vhf-gathering-long-table.jpg",
+        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-vhf-gathering-long-table.jpg",
+        "width": 500,
+        "height": 375,
+        "caption": "Sharing a meal together at Veterans Healing Farm"
+      },
+      {
+        "id": "program-friendsgiving/friendsgiving-vhf-gathering-potluck-counter.jpg",
+        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-vhf-gathering-potluck-counter.jpg",
+        "width": 500,
+        "height": 375,
+        "caption": "Sharing a meal together at Veterans Healing Farm"
       },
       {
         "id": "program-friendsgiving/friendsgiving-ww2-turkey-oven.jpg",
         "src": "content/artwork/curated/program-friendsgiving/friendsgiving-ww2-turkey-oven.jpg",
         "width": 950,
-        "height": 762
+        "height": 762,
+        "caption": "Thanksgiving turkey in the field, World War II"
       }
     ],
     "program-garden-group": [

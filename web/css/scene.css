@@ -1048,3 +1048,20 @@ html, body {
 .scene--seasonal--harvest .scene__content .scene__eyebrow::before {
   background: var(--vhf-harvest-gold);
 }
+
+/* Small photo caption on a seasonal frame: bottom-left, clear of the
+   registration card and corner mark on the right. */
+.scene__photo-caption {
+  position: absolute;
+  left: 120px;
+  bottom: 56px;
+  max-width: 900px;
+  margin: 0;
+  font-family: var(--vhf-font-ui);
+  font-size: 22px;
+  line-height: 1.3;
+  color: var(--vhf-cream);
+  opacity: 0.85;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
+  z-index: 2;
+}

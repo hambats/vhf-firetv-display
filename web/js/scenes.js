@@ -136,7 +136,7 @@ var VhfScenes = (function () {
       curated = curated.concat(usablePhotos(curatedSet(data, ids[i])));
     }
     var photos = curated.length > 0 ? curated : usablePhotos((data && data.gallery && data.gallery.photos) || []);
-    if (photos.length === 0) return;
+    if (photos.length === 0) return null;
     var photo = photos[Math.floor(Math.random() * photos.length)];
     var wash = img("scene__wash", photo.src, "decoration", photo.id);
     // A wash is a cover crop, so a photo whose subject sits low in the frame
@@ -151,6 +151,7 @@ var VhfScenes = (function () {
     // (top-left anchor, registration code, program graphic) and must not be
     // re-laid-out underneath them.
     if (opts && opts.shapeLayout) scene.className += shapeClassFor(photo);
+    return photo;
   }
 
   /*
@@ -716,15 +717,21 @@ var VhfScenes = (function () {
     // the right edge: with a card present the code has to go below it rather
     // than on top of it, which is exactly what it was doing.
     var hasGraphic = false;
+    var washPhoto = null;
     if (LOGO_PROGRAM_IDS.indexOf(evt.programId) !== -1) {
       if (!appendPartnerLogo(scene, data, evt.programId)) appendWash(scene, data, evt.programId);
     } else if (GRAPHIC_PROGRAM_IDS.indexOf(evt.programId) !== -1) {
       hasGraphic = appendEventGraphic(scene, data, evt.programId);
       if (!hasGraphic) appendWash(scene, data, evt.programId);
     } else {
-      appendWash(scene, data, evt.programId);
+      washPhoto = appendWash(scene, data, evt.programId);
     }
     scene.appendChild(el("div", "scene__fade"));
+    // A seasonal frame's photos are real historical pictures, so each carries
+    // its own small caption (captions.json beside the images).
+    if (seasonal && washPhoto && washPhoto.caption) {
+      scene.appendChild(el("p", "scene__photo-caption", washPhoto.caption));
+    }
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", seasonal ? seasonal.eyebrow : "What's Happening at the Farm"));
     body.appendChild(el("h1", "scene__title", evt.title));

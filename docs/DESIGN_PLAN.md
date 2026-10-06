@@ -331,7 +331,13 @@ action and no republish to turn them off. Built in two steps; only D6.1 is in sc
       (`.scene--seasonal--harvest`) and its eyebrow text. Next year's event picks it up unchanged.
 - [x] Wash photos: `content/artwork/curated/program-friendsgiving/` — five historical
       military-Thanksgiving photos supplied by Rob (Oct 6; AI stand-ins were tried and rejected).
-      **Provenance not yet confirmed** — record each source and rights status before publishing.
+      Source gallery: <https://www.defensemedianetwork.com/photos/military-thanksgiving-photo-gallery/>
+      (Defense Media Network), which credits its images to U.S. military / government archives
+      (Library of Congress, National Archives, U.S. Army/Navy/Marine Corps). Likely public-domain
+      government works, but the gallery doesn't attribute each file individually and I haven't
+      matched every photo to its exact original: the Civil War sketch is the Library of Congress
+      item; the WWII turkey-oven, Navy galley and Korea Marines photos are U.S. military images.
+      Confirm per-photo origin if VHF ever needs formal attribution.
       After adding or removing photos, run `node sources/curated-photos/index.mjs`.
 - [ ] Check on the television, not just the preview (as with D4).
 
