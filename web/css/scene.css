@@ -1088,34 +1088,69 @@ html, body {
 }
 
 /* ---- Cabbage title (scenes.js unfoldTitle) ----
-   Each letter starts tucked in toward the middle of the title, small, tilted
-   back and leaf-green, then unfurls to its place; the delay grows with the
-   distance from the centre so the heart opens first and the outer leaves
-   peel away after it. */
-@keyframes vhf-leaf-unfold {
+   Each word is a leaf. It starts curled shut over the cabbage in the photo
+   (--dx/--dy, measured in scenes.js), tiny and tipped forward, travels to its
+   place in the title, swings open from its base past flat and settles back.
+   Inner words first, outer after (the delay is set per word).
+
+   The colour is a leaf: a veined green copy of each word fades off the
+   charcoal one as it opens (below). Only where text clipping is supported;
+   elsewhere the leaves still move, in plain title colour. */
+@keyframes vhf-leaf-open {
   0% {
     opacity: 0;
-    transform: translateX(var(--dx, 0)) rotateZ(var(--rot, 0deg)) rotateX(80deg) scale(0.15);
-    color: #6f9150;
+    transform: translate(var(--dx, 0), var(--dy, 0)) rotateZ(var(--rot, 0deg)) rotateX(84deg) scale(0.18);
   }
-  35% { opacity: 1; }
-  70% { color: #6f9150; }
+  18% { opacity: 1; }
+  62% {
+    transform: translate(0, 0) rotateZ(0deg) rotateX(-14deg) scale(1.04);
+  }
+  80% {
+    transform: translate(0, 0) rotateZ(0deg) rotateX(5deg) scale(0.995);
+  }
   100% {
     opacity: 1;
-    transform: translateX(0) rotateZ(0deg) rotateX(0deg) scale(1);
-    color: inherit;
+    transform: translate(0, 0) rotateZ(0deg) rotateX(0deg) scale(1);
   }
 }
-.scene--title-unfold .scene__title {
-  perspective: 900px;
+@keyframes vhf-leaf-drain {
+  0%, 40% { opacity: 1; }
+  100% { opacity: 0; }
 }
-.unfold-word {
+.scene--title-unfold .scene__title {
+  perspective: 1100px;
+}
+.unfold-word,
+.unfold-leaf {
   display: inline-block;
   white-space: nowrap;
 }
-.unfold-char {
-  display: inline-block;
+.unfold-leaf {
   transform-origin: 50% 100%;
-  animation: vhf-leaf-unfold 1250ms var(--vhf-ease-out) both;
+  animation: vhf-leaf-open 1500ms cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: transform, opacity;
+}
+/* The green: a second copy of the word (::after, from data-leaf) painted
+   once with a veined gradient clipped to its glyphs, laid exactly over the
+   charcoal word and faded out. Only opacity animates, so the browser never
+   repaints the gradient text mid-animation; an animated background-position
+   on clipped text did, every frame, and stalled the page. */
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .unfold-leaf {
+    position: relative;
+  }
+  .unfold-leaf::after {
+    content: attr(data-leaf);
+    position: absolute;
+    left: 0;
+    top: 0;
+    background-image: linear-gradient(172deg, #a8c47c 0%, #7d9d58 40%, #5b7c3f 72%, #48652f 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    animation: vhf-leaf-drain 1900ms ease-out both;
+    animation-delay: inherit;
+    pointer-events: none;
+  }
 }

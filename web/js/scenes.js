@@ -987,39 +987,65 @@ var VhfScenes = (function () {
   }
 
   /*
-   * "It's Not About the Cabbage": the title opens like a cabbage. The heart
-   * of the line unfurls first and the outer leaves peel away from it in
-   * rings — each letter starts tucked toward the centre of the title,
-   * small, tilted and cabbage-green, and settles into place on its own
-   * delay, longer the further it sits from the middle.
+   * "It's Not About the Cabbage": the title opens like a cabbage. Each word
+   * is one leaf. The leaves start curled shut over the cabbage in the photo,
+   * small and green, then travel out to the title and hinge open from their
+   * base with a little overshoot, the way a leaf flops back and settles. The
+   * innermost word opens first and the outer ones peel away after it, in
+   * layers, and the green drains out of each leaf to the normal title colour
+   * as it lands (.unfold-leaf in scene.css).
    *
-   * Letter positions come from the string, not from measuring the layout, so
-   * it needs no reflow pass. transform/opacity do the movement; colour is the
-   * only other animated property and it covers a couple of dozen glyphs.
+   * Runs once the scene is in the DOM (its layer still invisible), so the
+   * word and photo positions are real layout values (see centreWithin).
    */
-  var UNFOLD_STEP_MS = 55;
+  var UNFOLD_LAYER_MS = 210;
 
-  function unfoldTitle(node, startMs) {
+  // Centre of a node in the scene's own (unscaled) pixels. Measured from
+  // the rendered boxes rather than offsetTop/offsetLeft, which ignore the
+  // transforms that centre the text column; dividing by the scene's own
+  // rendered scale undoes the 16:9 scale-to-fit.
+  function centreWithin(node, root) {
+    var r = node.getBoundingClientRect();
+    var rr = root.getBoundingClientRect();
+    var scale = root.offsetWidth ? rr.width / root.offsetWidth : 1;
+    if (!scale) scale = 1;
+    return {
+      x: (r.left - rr.left + r.width / 2) / scale,
+      y: (r.top - rr.top + r.height / 2) / scale
+    };
+  }
+
+  function unfoldTitle(node, scene, startMs) {
     var text = (node.textContent || "").replace(/^\s+|\s+$/g, "");
     if (!text) return;
     var words = text.split(/\s+/);
-    var total = text.replace(/\s+/g, "").length;
-    var mid = (total - 1) / 2;
     node.textContent = "";
-    var index = 0;
+    var leaves = [];
     for (var w = 0; w < words.length; w++) {
       if (w > 0) node.appendChild(document.createTextNode(" "));
-      var word = el("span", "unfold-word");
-      for (var c = 0; c < words[w].length; c++) {
-        var off = index - mid;
-        var ch = el("span", "unfold-char", words[w].charAt(c));
-        ch.style.setProperty("--dx", (-off * 0.62).toFixed(2) + "em");
-        ch.style.setProperty("--rot", (off * 5).toFixed(1) + "deg");
-        ch.style.animationDelay = startMs + Math.abs(off) * UNFOLD_STEP_MS + "ms";
-        word.appendChild(ch);
-        index += 1;
-      }
-      node.appendChild(word);
+      // Plain inline-block first, so the measurements below see each word
+      // at rest; the animated class goes on after.
+      leaves.push(node.appendChild(el("span", "unfold-word", words[w])));
+    }
+
+    // Where the leaves come from: the middle of the photo, which on this
+    // slide is the cabbage. Without a photo, the middle of the title.
+    var wash = scene.querySelector(".scene__wash");
+    var origin = centreWithin(wash && wash.offsetWidth ? wash : node, scene);
+
+    var mid = (leaves.length - 1) / 2;
+    for (var i = 0; i < leaves.length; i++) {
+      var leaf = leaves[i];
+      var c = centreWithin(leaf, scene);
+      var dx = origin.x - c.x;
+      var dy = origin.y - c.y;
+      var layer = Math.round(Math.abs(i - mid));
+      leaf.className = "unfold-leaf";
+      leaf.setAttribute("data-leaf", leaf.textContent);
+      leaf.style.setProperty("--dx", Math.round(dx) + "px");
+      leaf.style.setProperty("--dy", Math.round(dy) + "px");
+      leaf.style.setProperty("--rot", ((i - mid) * 9).toFixed(1) + "deg");
+      leaf.style.animationDelay = startMs + layer * UNFOLD_LAYER_MS + "ms";
     }
     node.className += " is-revealing is-unfolding";
   }
@@ -1032,7 +1058,7 @@ var VhfScenes = (function () {
       for (var n = 0; n < nodes.length; n++) {
         try {
           if (unfold && REVEAL_TARGETS[t].selector === ".scene__title") {
-            unfoldTitle(nodes[n], REVEAL_TARGETS[t].startMs);
+            unfoldTitle(nodes[n], scene, REVEAL_TARGETS[t].startMs);
             continue;
           }
           splitIntoLines(nodes[n], REVEAL_TARGETS[t].startMs);
