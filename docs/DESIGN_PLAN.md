@@ -22,6 +22,7 @@ of this is judged by eye and needs a stated bar.
 | **D3** | Layout and typography | no | a day — **mostly done** |
 | **D4** | Motion | no | a day, plus TV verification — **CSS done, unverified on TV** |
 | **D5** | Curation and pacing | no | ongoing |
+| **D6** | Seasonal themes | no | D6.1 done; D6.2 future |
 
 **Dependencies.** D0 stands alone and should ship immediately. **D1–D3 should be done as one pass**
 — they all rewrite the same rules in `web/css/scene.css`, and splitting them means touching the same
@@ -311,6 +312,47 @@ same visual weight as "Founded in 2013".
       Studio Pottery and ornament-workshop date lists), and it breaks up the one-event-at-a-time
       rhythm exactly as hoped.
 - [ ] `custom` (artwork) — still unused in `playlist.json`. Use it or delete it.
+
+---
+
+## D6 — Seasonal themes
+
+Holiday and seasonal looks that switch on and off by themselves from the calendar, with no staff
+action and no republish to turn them off. Built in two steps; only D6.1 is in scope today.
+
+### D6.1 The Friendsgiving event frame  *(built — Oct 6, 2026)*
+
+- [x] One event frame gets a seasonal look: deep walnut ground (`--vhf-bg-harvest`), gold eyebrow
+      and rule (`--vhf-harvest-gold`), the same left-to-right veil shape as the navy event frame.
+      The layout, registration card and corner mark are untouched.
+- [x] Driven by `programId`, not hardcoded to a date: `PROGRAM_KEYWORDS` in
+      `sources/calendar/index.mjs` maps "friendsgiving" / "thanksgiving" to `program-friendsgiving`,
+      and `SEASONAL_PROGRAMS` in `web/js/scenes.js` maps that id to the CSS modifier
+      (`.scene--seasonal--harvest`) and its eyebrow text. Next year's event picks it up unchanged.
+- [x] Wash photos: `content/artwork/curated/program-friendsgiving/` — five historical
+      military-Thanksgiving photos supplied by Rob (Oct 6; AI stand-ins were tried and rejected).
+      **Provenance not yet confirmed** — record each source and rights status before publishing.
+      After adding or removing photos, run `node sources/curated-photos/index.mjs`.
+- [ ] Check on the television, not just the preview (as with D4).
+
+### D6.2 Whole-slideshow seasons  *(future — not started)*
+
+The wider idea: from two weeks before a seasonal event, the *whole* playlist shifts to that
+season's look, and returns to normal afterwards.
+
+- A generic `seasons` list rather than a Thanksgiving special case. Each entry: name, the event
+  keyword that triggers it, lead time (14 days to start), palette overrides, optional extra slides.
+- Trigger is the calendar: a matching event within the lead time turns the season on; the event
+  passing turns it off. Evaluated in `engine.js` alongside the existing 6-hour reload and version
+  polling, so no new timers.
+- Palette applied as a token override on the document (the D6.1 `--vhf-*-harvest` tokens are the
+  starting set), so every scene family re-skins without per-scene rules.
+- Optional season slides in `playlist.json` (for example a countdown or thank-you slide) that are
+  enabled only while the season is on.
+- Open decisions before building: how far the palette swap goes on non-event slides (full re-skin
+  vs accent only), which extra slides, and whether Christmas / Veterans Day get the same treatment.
+- Needs tests (fake-clock `engine.js` tests already exist) and a dated preview, and it is a
+  television-visible change, so it rides the normal publish path.
 
 ---
 

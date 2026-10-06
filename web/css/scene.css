@@ -1025,3 +1025,26 @@ html, body {
   animation-duration: var(--vhf-scene-duration, 12s);
   transform-origin: center;
 }
+
+/* ---- Seasonal frames (D6) ----
+   A modifier on .scene--event: same layout and registration card, a different
+   ground. The veil is the same left-to-right shape as the navy one, in walnut,
+   and the eyebrow rule and eyebrow text take the gold accent. */
+.scene--seasonal--harvest {
+  background-color: var(--vhf-bg-harvest);
+}
+.scene--event.scene--seasonal--harvest .scene__fade {
+  background: linear-gradient(
+    to right,
+    rgba(var(--vhf-harvest-veil), 0.95) 0%,
+    rgba(var(--vhf-harvest-veil), 0.9) 48%,
+    rgba(var(--vhf-harvest-veil), 0.45) 74%,
+    rgba(var(--vhf-harvest-veil), 0.15) 100%
+  );
+}
+.scene--seasonal--harvest .scene__eyebrow {
+  color: var(--vhf-harvest-gold);
+}
+.scene--seasonal--harvest .scene__content .scene__eyebrow::before {
+  background: var(--vhf-harvest-gold);
+}

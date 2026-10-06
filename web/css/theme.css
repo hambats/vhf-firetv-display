@@ -45,6 +45,12 @@
      watermark rather than a photo. */
   --vhf-wash-opacity: 0.16;
 
+  /* Seasonal "harvest" frame (Friendsgiving / Thanksgiving events) — D6 in
+     docs/DESIGN_PLAN.md. Deep walnut ground, gold accent, cream text. */
+  --vhf-bg-harvest: #3a2418;
+  --vhf-harvest-veil: 58, 36, 24;
+  --vhf-harvest-gold: #e0a93f;
+
   /* Text */
   --vhf-text-title: var(--vhf-charcoal);
   --vhf-text-body: var(--vhf-charcoal);

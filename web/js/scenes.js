@@ -697,8 +697,17 @@ var VhfScenes = (function () {
     container.appendChild(block);
   }
 
+  // Programs whose event frame gets a seasonal look instead of the navy
+  // default (docs/DESIGN_PLAN.md D6). Keyed by the programId that
+  // sources/calendar/index.mjs assigns from the title, so the theme follows
+  // the event on the calendar and drops away when the event does.
+  var SEASONAL_PROGRAMS = {
+    "program-friendsgiving": { className: "scene--seasonal scene--seasonal--harvest", eyebrow: "Join Us at the Farm" }
+  };
+
   function buildEventScene(evt, data) {
-    var scene = el("div", "scene scene--event");
+    var seasonal = SEASONAL_PROGRAMS[evt.programId];
+    var scene = el("div", seasonal ? "scene scene--event " + seasonal.className : "scene scene--event");
     // evt.programId is set PC-side (sources/calendar/index.mjs) by matching
     // the event title against a known program's keywords, so a "Pottery
     // with resident potter Sophia" event shows an actual pottery photo
@@ -717,7 +726,7 @@ var VhfScenes = (function () {
     }
     scene.appendChild(el("div", "scene__fade"));
     var body = el("div", "scene__content");
-    body.appendChild(el("p", "scene__eyebrow", "What's Happening at the Farm"));
+    body.appendChild(el("p", "scene__eyebrow", seasonal ? seasonal.eyebrow : "What's Happening at the Farm"));
     body.appendChild(el("h1", "scene__title", evt.title));
     body.appendChild(el("p", "scene__subtitle", formatEventDate(evt.start)));
     body.appendChild(el("p", "scene__subtitle", formatEventTimeRange(evt.start, evt.end)));
