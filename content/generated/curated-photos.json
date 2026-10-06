@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-10-06T16:47:43.549Z",
+  "generatedAt": "2026-10-06T17:13:38.262Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -591,6 +591,32 @@
         "src": "content/artwork/curated/program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg",
         "width": 6000,
         "height": 4000
+      }
+    ],
+    "program-wreath-making": [
+      {
+        "id": "program-wreath-making/program-wreath-making-ai-01.jpg",
+        "src": "content/artwork/curated/program-wreath-making/program-wreath-making-ai-01.jpg",
+        "width": 1408,
+        "height": 800
+      },
+      {
+        "id": "program-wreath-making/program-wreath-making-ai-02.jpg",
+        "src": "content/artwork/curated/program-wreath-making/program-wreath-making-ai-02.jpg",
+        "width": 1408,
+        "height": 800
+      },
+      {
+        "id": "program-wreath-making/program-wreath-making-ai-03.jpg",
+        "src": "content/artwork/curated/program-wreath-making/program-wreath-making-ai-03.jpg",
+        "width": 1408,
+        "height": 800
+      },
+      {
+        "id": "program-wreath-making/program-wreath-making-ai-04.jpg",
+        "src": "content/artwork/curated/program-wreath-making/program-wreath-making-ai-04.jpg",
+        "width": 1408,
+        "height": 800
       }
     ],
     "vhf-why": [
