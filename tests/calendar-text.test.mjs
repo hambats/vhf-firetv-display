@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { normalizeDashes, normalizeSentenceSpacing, truncateText } from "../sources/calendar/text.mjs";
+import { normalizeDashes, normalizeSentenceSpacing, normalizeTitleJoins, truncateText } from "../sources/calendar/text.mjs";
 
 /*
  * The string that caused this: the Meal Prep Workshop description, as Google
@@ -91,4 +91,18 @@ test("an en dash range keeps its meaning and loses its shape", () => {
 test("text with no dashes is returned untouched", () => {
   const text = "Come learn the easiest sourdough bread baking ever!";
   assert.equal(normalizeDashes(text), text);
+});
+
+test("an instructor glued on with '-with' gets its spaces back", () => {
+  assert.equal(
+    normalizeTitleJoins("Herbal Holiday Gift Making Part 1-with Rebecca"),
+    "Herbal Holiday Gift Making Part 1 with Rebecca"
+  );
+  assert.equal(normalizeTitleJoins("Wreaths - with Maddie"), "Wreaths with Maddie");
+});
+
+test("real hyphenated words in a title are left alone", () => {
+  assert.equal(normalizeTitleJoins("1-on-1 Coaching"), "1-on-1 Coaching");
+  assert.equal(normalizeTitleJoins("2-part Woodworking"), "2-part Woodworking");
+  assert.equal(normalizeTitleJoins("Pottery with Sophia"), "Pottery with Sophia");
 });

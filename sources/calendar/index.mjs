@@ -30,7 +30,7 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import ical from "node-ical";
-import { normalizeDashes, normalizeSentenceSpacing, truncateText } from "./text.mjs";
+import { normalizeDashes, normalizeSentenceSpacing, truncateText, normalizeTitleJoins } from "./text.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..", "..");
@@ -488,7 +488,7 @@ async function main() {
       }
       events.push(applyTimeOverride({
         id,
-        title: cleanText(title, 120),
+        title: cleanText(normalizeTitleJoins(title), 120),
         start: occ.start.toISOString(),
         end: occ.end ? occ.end.toISOString() : undefined,
         location: cleanLocation(occ.source.location),

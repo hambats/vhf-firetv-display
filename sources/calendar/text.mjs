@@ -79,3 +79,14 @@ export function normalizeDashes(text) {
     .replace(/\s+–\s+/g, " - ")
     .replace(/–/g, "-");
 }
+
+/*
+ * Event titles sometimes glue the instructor on with a hyphen and no spaces:
+ * "Herbal Holiday Gift Making Part 1-with Rebecca". On the display that reads
+ * as one mangled word. Only the "-with" join is repaired, because it is never
+ * a real hyphenated word, while "1-on-1", "2-part" or "3-day" are and must be
+ * left alone.
+ */
+export function normalizeTitleJoins(text) {
+  return String(text).replace(/(\w)\s*-\s*(with)\b/gi, "$1 $2");
+}

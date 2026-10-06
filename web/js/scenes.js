@@ -730,13 +730,14 @@ var VhfScenes = (function () {
       washPhoto = appendWash(scene, data, evt.programId);
     }
     scene.appendChild(el("div", "scene__fade"));
-    // A seasonal frame's photos are real historical pictures, so each carries
-    // its own small caption (captions.json beside the images).
     if (seasonal && seasonal.badge) {
       scene.appendChild(img("scene__seasonal-badge", seasonal.badge, "decoration"));
       scene.className += " scene--has-badge";
     }
-    if (seasonal && washPhoto && washPhoto.caption) {
+    // A photo's own caption (captions.json beside the images) is shown small
+    // in the corner: the historical pictures on a seasonal frame, and the
+    // credit line a CC-licensed photo requires.
+    if (washPhoto && washPhoto.caption) {
       scene.appendChild(el("p", "scene__photo-caption", washPhoto.caption));
     }
     var body = el("div", "scene__content");

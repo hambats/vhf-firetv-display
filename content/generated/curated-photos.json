@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-10-06T17:13:38.262Z",
+  "generatedAt": "2026-10-06T18:06:20.118Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -249,10 +249,11 @@
     ],
     "program-chair-massage": [
       {
-        "id": "program-chair-massage/chair-massage-01.jpg",
-        "src": "content/artwork/curated/program-chair-massage/chair-massage-01.jpg",
-        "width": 680,
-        "height": 385
+        "id": "program-chair-massage/chair-massage-commons-01.jpg",
+        "src": "content/artwork/curated/program-chair-massage/chair-massage-commons-01.jpg",
+        "width": 3840,
+        "height": 2880,
+        "caption": "Photo: Choikwangmo9 / CC0, via Wikimedia Commons"
       }
     ],
     "program-dog-training": [
@@ -444,34 +445,32 @@
     ],
     "program-mushroom-cultivation": [
       {
-        "id": "program-mushroom-cultivation/andrew-ridley-6KCS---7jbc-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/andrew-ridley-6KCS---7jbc-unsplash.jpg",
-        "width": 4547,
-        "height": 3410
+        "id": "program-mushroom-cultivation/oyster-mushroom-01.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/oyster-mushroom-01.jpg",
+        "width": 3840,
+        "height": 2560,
+        "caption": "Photo: Zinnmann / CC BY-SA 3.0, via Wikimedia Commons"
       },
       {
-        "id": "program-mushroom-cultivation/andrew-ridley-bx0a2yq2hxs-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/andrew-ridley-bx0a2yq2hxs-unsplash.jpg",
-        "width": 4195,
-        "height": 3146
+        "id": "program-mushroom-cultivation/oyster-mushroom-02.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/oyster-mushroom-02.jpg",
+        "width": 3840,
+        "height": 2743,
+        "caption": "Photo: schizoform / CC BY 4.0, via Wikimedia Commons"
       },
       {
-        "id": "program-mushroom-cultivation/hans-veth--Vp8y5L2fKg-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/hans-veth--Vp8y5L2fKg-unsplash.jpg",
-        "width": 6720,
-        "height": 4320
+        "id": "program-mushroom-cultivation/oyster-mushroom-03.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/oyster-mushroom-03.jpg",
+        "width": 3840,
+        "height": 2880,
+        "caption": "Photo: Nativeplants garden / CC BY-SA 4.0, via Wikimedia Commons"
       },
       {
-        "id": "program-mushroom-cultivation/kylli-kittus-gtdyJQqCzsA-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/kylli-kittus-gtdyJQqCzsA-unsplash.jpg",
-        "width": 6058,
-        "height": 4039
-      },
-      {
-        "id": "program-mushroom-cultivation/thanh-soledas-Kf1nBG76Xe8-unsplash.jpg",
-        "src": "content/artwork/curated/program-mushroom-cultivation/thanh-soledas-Kf1nBG76Xe8-unsplash.jpg",
-        "width": 3940,
-        "height": 2760
+        "id": "program-mushroom-cultivation/oyster-mushroom-04.jpg",
+        "src": "content/artwork/curated/program-mushroom-cultivation/oyster-mushroom-04.jpg",
+        "width": 3693,
+        "height": 2854,
+        "caption": "Photo: Dominicus Johannes Bergsma / CC BY-SA 4.0, via Wikimedia Commons"
       }
     ],
     "program-pottery": [
@@ -549,6 +548,27 @@
         "src": "content/artwork/curated/program-quail-hunt/quail-hunt-01.jpg",
         "width": 1920,
         "height": 1255
+      },
+      {
+        "id": "program-quail-hunt/quail-hunt-commons-01.jpg",
+        "src": "content/artwork/curated/program-quail-hunt/quail-hunt-commons-01.jpg",
+        "width": 2400,
+        "height": 1350,
+        "caption": "Photo: panza.rayada / CC BY-SA 3.0, via Wikimedia Commons"
+      },
+      {
+        "id": "program-quail-hunt/quail-hunt-commons-02.jpg",
+        "src": "content/artwork/curated/program-quail-hunt/quail-hunt-commons-02.jpg",
+        "width": 2420,
+        "height": 1818,
+        "caption": "Photo: DickDaniels / CC BY-SA 3.0, via Wikimedia Commons"
+      },
+      {
+        "id": "program-quail-hunt/quail-hunt-commons-03.jpg",
+        "src": "content/artwork/curated/program-quail-hunt/quail-hunt-commons-03.jpg",
+        "width": 3840,
+        "height": 2583,
+        "caption": "Photo: U.S. Fish and Wildlife Service / Public domain, via Wikimedia Commons"
       }
     ],
     "program-soap-making": [
@@ -573,6 +593,34 @@
     ],
     "program-sourdough": [
       {
+        "id": "program-sourdough/sourdough-commons-01.jpg",
+        "src": "content/artwork/curated/program-sourdough/sourdough-commons-01.jpg",
+        "width": 3840,
+        "height": 2880,
+        "caption": "Photo: Agelaia / CC BY 4.0, via Wikimedia Commons"
+      },
+      {
+        "id": "program-sourdough/sourdough-commons-02.jpg",
+        "src": "content/artwork/curated/program-sourdough/sourdough-commons-02.jpg",
+        "width": 3840,
+        "height": 2880,
+        "caption": "Photo: Nutrition, Food Safety & Health / CC0, via Wikimedia Commons"
+      },
+      {
+        "id": "program-sourdough/sourdough-commons-03.jpg",
+        "src": "content/artwork/curated/program-sourdough/sourdough-commons-03.jpg",
+        "width": 3633,
+        "height": 3024,
+        "caption": "Photo: Nutrition, Food Safety & Health / CC0, via Wikimedia Commons"
+      },
+      {
+        "id": "program-sourdough/sourdough-commons-04.jpg",
+        "src": "content/artwork/curated/program-sourdough/sourdough-commons-04.jpg",
+        "width": 3840,
+        "height": 2560,
+        "caption": "Photo: Kim Cruickshanks helloimkim / CC0, via Wikimedia Commons"
+      },
+      {
         "id": "program-sourdough/sourdough-loaf.jpg",
         "src": "content/artwork/curated/program-sourdough/sourdough-loaf.jpg",
         "width": 2500,
@@ -581,16 +629,32 @@
     ],
     "program-woodworking": [
       {
-        "id": "program-woodworking/cristian-tarzi-KV2KjOCSBB4-unsplash.jpg",
-        "src": "content/artwork/curated/program-woodworking/cristian-tarzi-KV2KjOCSBB4-unsplash.jpg",
-        "width": 3691,
-        "height": 2824
+        "id": "program-woodworking/woodworking-commons-01.jpg",
+        "src": "content/artwork/curated/program-woodworking/woodworking-commons-01.jpg",
+        "width": 3840,
+        "height": 2563,
+        "caption": "Photo: Ian Schneider goian / CC0, via Wikimedia Commons"
       },
       {
-        "id": "program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg",
-        "src": "content/artwork/curated/program-woodworking/jon-sailer-xaIjEfYpzX4-unsplash.jpg",
-        "width": 6000,
-        "height": 4000
+        "id": "program-woodworking/woodworking-commons-02.jpg",
+        "src": "content/artwork/curated/program-woodworking/woodworking-commons-02.jpg",
+        "width": 3840,
+        "height": 2563,
+        "caption": "Photo: Shixart1985 / CC BY 2.0, via Wikimedia Commons"
+      },
+      {
+        "id": "program-woodworking/woodworking-commons-03.jpg",
+        "src": "content/artwork/curated/program-woodworking/woodworking-commons-03.jpg",
+        "width": 3840,
+        "height": 2461,
+        "caption": "Photo: s w wengenroad / CC0, via Wikimedia Commons"
+      },
+      {
+        "id": "program-woodworking/woodworking-commons-04.jpg",
+        "src": "content/artwork/curated/program-woodworking/woodworking-commons-04.jpg",
+        "width": 3840,
+        "height": 2550,
+        "caption": "Photo: Greg Grossmeier / CC BY-SA 2.0, via Wikimedia Commons"
       }
     ],
     "program-wreath-making": [
