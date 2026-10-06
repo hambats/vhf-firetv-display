@@ -420,6 +420,9 @@ var VhfScenes = (function () {
     // instead of the default story treatment — see docs/DESIGN_PLAN.md D2.1.
     if (content.family === "impact") className += " scene--impact";
     if (content.family === "crisis") className += " scene--crisis";
+    // content.titleEffect opts one slide into a custom title animation
+    // instead of the shared line-by-line rise (see unfoldTitle).
+    if (content.titleEffect === "unfold") className += " scene--title-unfold";
     var scene = el("div", className);
     // Information slides for a specific program (id "program-agritherapy"
     // etc., matching a content/artwork/curated/ folder 1:1) get that
@@ -983,12 +986,55 @@ var VhfScenes = (function () {
     node.className += " is-revealing";
   }
 
+  /*
+   * "It's Not About the Cabbage": the title opens like a cabbage. The heart
+   * of the line unfurls first and the outer leaves peel away from it in
+   * rings — each letter starts tucked toward the centre of the title,
+   * small, tilted and cabbage-green, and settles into place on its own
+   * delay, longer the further it sits from the middle.
+   *
+   * Letter positions come from the string, not from measuring the layout, so
+   * it needs no reflow pass. transform/opacity do the movement; colour is the
+   * only other animated property and it covers a couple of dozen glyphs.
+   */
+  var UNFOLD_STEP_MS = 55;
+
+  function unfoldTitle(node, startMs) {
+    var text = (node.textContent || "").replace(/^\s+|\s+$/g, "");
+    if (!text) return;
+    var words = text.split(/\s+/);
+    var total = text.replace(/\s+/g, "").length;
+    var mid = (total - 1) / 2;
+    node.textContent = "";
+    var index = 0;
+    for (var w = 0; w < words.length; w++) {
+      if (w > 0) node.appendChild(document.createTextNode(" "));
+      var word = el("span", "unfold-word");
+      for (var c = 0; c < words[w].length; c++) {
+        var off = index - mid;
+        var ch = el("span", "unfold-char", words[w].charAt(c));
+        ch.style.setProperty("--dx", (-off * 0.62).toFixed(2) + "em");
+        ch.style.setProperty("--rot", (off * 5).toFixed(1) + "deg");
+        ch.style.animationDelay = startMs + Math.abs(off) * UNFOLD_STEP_MS + "ms";
+        word.appendChild(ch);
+        index += 1;
+      }
+      node.appendChild(word);
+    }
+    node.className += " is-revealing is-unfolding";
+  }
+
   function reveal(scene) {
     if (!scene || !scene.querySelectorAll) return;
+    var unfold = (scene.className || "").indexOf("scene--title-unfold") !== -1;
     for (var t = 0; t < REVEAL_TARGETS.length; t++) {
       var nodes = scene.querySelectorAll(REVEAL_TARGETS[t].selector);
       for (var n = 0; n < nodes.length; n++) {
         try {
+          if (unfold && REVEAL_TARGETS[t].selector === ".scene__title") {
+            unfoldTitle(nodes[n], REVEAL_TARGETS[t].startMs);
+            continue;
+          }
           splitIntoLines(nodes[n], REVEAL_TARGETS[t].startMs);
         } catch (err) {
           console.error("[VHF] title reveal failed", err);

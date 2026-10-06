@@ -1086,3 +1086,36 @@ html, body {
 .scene--seasonal .scene__photo-caption {
   max-width: 620px;
 }
+
+/* ---- Cabbage title (scenes.js unfoldTitle) ----
+   Each letter starts tucked in toward the middle of the title, small, tilted
+   back and leaf-green, then unfurls to its place; the delay grows with the
+   distance from the centre so the heart opens first and the outer leaves
+   peel away after it. */
+@keyframes vhf-leaf-unfold {
+  0% {
+    opacity: 0;
+    transform: translateX(var(--dx, 0)) rotateZ(var(--rot, 0deg)) rotateX(80deg) scale(0.15);
+    color: #6f9150;
+  }
+  35% { opacity: 1; }
+  70% { color: #6f9150; }
+  100% {
+    opacity: 1;
+    transform: translateX(0) rotateZ(0deg) rotateX(0deg) scale(1);
+    color: inherit;
+  }
+}
+.scene--title-unfold .scene__title {
+  perspective: 900px;
+}
+.unfold-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.unfold-char {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  animation: vhf-leaf-unfold 1250ms var(--vhf-ease-out) both;
+  will-change: transform, opacity;
+}
