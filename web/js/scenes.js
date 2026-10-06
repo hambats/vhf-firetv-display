@@ -703,7 +703,7 @@ var VhfScenes = (function () {
   // sources/calendar/index.mjs assigns from the title, so the theme follows
   // the event on the calendar and drops away when the event does.
   var SEASONAL_PROGRAMS = {
-    "program-friendsgiving": { className: "scene--seasonal scene--seasonal--harvest", eyebrow: "Join Us at the Farm" }
+    "program-friendsgiving": { className: "scene--seasonal scene--seasonal--harvest", eyebrow: "Join Us at the Farm", badge: "content/artwork/brand/friendsgiving-badge.webp" }
   };
 
   function buildEventScene(evt, data) {
@@ -729,6 +729,10 @@ var VhfScenes = (function () {
     scene.appendChild(el("div", "scene__fade"));
     // A seasonal frame's photos are real historical pictures, so each carries
     // its own small caption (captions.json beside the images).
+    if (seasonal && seasonal.badge) {
+      scene.appendChild(img("scene__seasonal-badge", seasonal.badge, "decoration"));
+      scene.className += " scene--has-badge";
+    }
     if (seasonal && washPhoto && washPhoto.caption) {
       scene.appendChild(el("p", "scene__photo-caption", washPhoto.caption));
     }

@@ -40,6 +40,15 @@
         "note": "A drop-off drive, not a class — there is nothing to register for, so a registration code would send people somewhere irrelevant."
       },
       {
+        "id": "friendsgiving",
+        "titleContains": [
+          "friendsgiving",
+          "thanksgiving"
+        ],
+        "hide": true,
+        "note": "A community meal, not a class: the general workshop signup would be the wrong place to send people. Add a url here instead of hide if Friendsgiving gets its own registration page."
+      },
+      {
         "id": "hendersonville-womens-club",
         "titleContains": [
           "hendersonville women"

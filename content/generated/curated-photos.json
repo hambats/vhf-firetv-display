@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-10-06T16:46:56.521Z",
+  "generatedAt": "2026-10-06T16:47:43.549Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -323,34 +323,6 @@
         "width": 1024,
         "height": 681,
         "caption": "Thanksgiving dinner from a Navy ship's galley"
-      },
-      {
-        "id": "program-friendsgiving/friendsgiving-vhf-gathering-buffet.jpg",
-        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-vhf-gathering-buffet.jpg",
-        "width": 500,
-        "height": 648,
-        "caption": "Sharing a meal together at Veterans Healing Farm"
-      },
-      {
-        "id": "program-friendsgiving/friendsgiving-vhf-gathering-conversation.jpg",
-        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-vhf-gathering-conversation.jpg",
-        "width": 500,
-        "height": 405,
-        "caption": "Sharing a meal together at Veterans Healing Farm"
-      },
-      {
-        "id": "program-friendsgiving/friendsgiving-vhf-gathering-long-table.jpg",
-        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-vhf-gathering-long-table.jpg",
-        "width": 500,
-        "height": 375,
-        "caption": "Sharing a meal together at Veterans Healing Farm"
-      },
-      {
-        "id": "program-friendsgiving/friendsgiving-vhf-gathering-potluck-counter.jpg",
-        "src": "content/artwork/curated/program-friendsgiving/friendsgiving-vhf-gathering-potluck-counter.jpg",
-        "width": 500,
-        "height": 375,
-        "caption": "Sharing a meal together at Veterans Healing Farm"
       },
       {
         "id": "program-friendsgiving/friendsgiving-ww2-turkey-oven.jpg",

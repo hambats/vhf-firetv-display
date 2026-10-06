@@ -1065,3 +1065,24 @@ html, body {
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.7);
   z-index: 2;
 }
+
+/* The seasonal badge (e.g. the Friendsgiving roundel) is centred along the
+   bottom edge, clear of the text column (top-left) and the registration code
+   (right). The small corner mark is dropped on seasonal frames: the badge is
+   the identifier there. */
+.scene__seasonal-badge {
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  transform: translateX(-50%);
+  width: 340px;
+  height: 340px;
+  z-index: 2;
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.5));
+}
+.scene--seasonal .scene__brand {
+  display: none;
+}
+.scene--seasonal .scene__photo-caption {
+  max-width: 620px;
+}
