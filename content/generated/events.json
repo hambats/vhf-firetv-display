@@ -2,33 +2,9 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-10-06T18:41:52.325Z",
+  "generatedAt": "2026-10-07T19:08:14.559Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
-    {
-      "id": "appalachian-dog-training-observation-only-2026-10-07",
-      "title": "Appalachian Dog Training - Observation ONLY",
-      "start": "2026-10-07T13:00:00.000Z",
-      "end": "2026-10-07T21:00:00.000Z",
-      "programId": "program-dog-training"
-    },
-    {
-      "id": "woodworking-workshop-with-chris-from-forest-project-woodwork-2026-10-07",
-      "title": "Woodworking Workshop with Chris from Forest Project Woodworking",
-      "start": "2026-10-07T13:30:00.000Z",
-      "end": "2026-10-07T16:30:00.000Z",
-      "location": "Forest Project Woodworking 141 Holland Rd Pisgah Forest NC 28768",
-      "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing.",
-      "programId": "program-woodworking"
-    },
-    {
-      "id": "open-studio-pottery-with-sophia-2026-10-07",
-      "title": "Open Studio Pottery with Sophia",
-      "start": "2026-10-07T17:00:00.000Z",
-      "end": "2026-10-07T19:00:00.000Z",
-      "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
-      "programId": "program-pottery"
-    },
     {
       "id": "appalachian-dog-training-observation-only-2026-10-08",
       "title": "Appalachian Dog Training - Observation ONLY",
