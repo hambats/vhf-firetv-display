@@ -1,19 +1,131 @@
 {
   "version": 1,
   "source": "Google Drive shared folder (build-side only; see sources/drive)",
-  "generatedAt": "2026-10-11T17:50:47.351Z",
+  "generatedAt": "2026-10-13T19:38:49.287Z",
   "sets": {
     "gen-pop-additions": {
       "section": "farm",
       "folder": "Farm Photos",
       "dir": "farm-photos",
-      "photos": []
+      "photos": [
+        {
+          "driveId": "18eVanHj3xpU0_DZTb5FfoQJSbaZtBuKz",
+          "name": "Photo Jun 13 2026, 2 33 32 PM.jpg",
+          "modifiedTime": "2026-07-14T15:01:33.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/18eVanHj3xpU0_DZTb5FfoQJSbaZtBuKz.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "1SIIC5J3HBxkIoTwWX0nBDnWiqHB_a-zp",
+          "name": "Photo Jun 13 2026, 2 34 01 PM.jpg",
+          "modifiedTime": "2026-07-14T15:01:29.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/1SIIC5J3HBxkIoTwWX0nBDnWiqHB_a-zp.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "17eZQH-1ge8AgE3YoQvMJ_6SDWyhmG76Y",
+          "name": "Photo May 13 2026, 11 52 56 AM.jpg",
+          "modifiedTime": "2026-07-14T15:12:45.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/17eZQH-1ge8AgE3YoQvMJ_6SDWyhmG76Y.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "16K8vOKkcmiU7F_RyXs-rIoyKYKYMGx8c",
+          "name": "Photo May 14 2026, 10 26 30 AM.jpg",
+          "modifiedTime": "2026-07-14T15:12:40.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/16K8vOKkcmiU7F_RyXs-rIoyKYKYMGx8c.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "161HNGyfIB7scDu5c-tEvv02EptrubXeu",
+          "name": "Photo May 14 2026, 10 54 21 AM.jpg",
+          "modifiedTime": "2026-07-14T15:12:37.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/161HNGyfIB7scDu5c-tEvv02EptrubXeu.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "1VnlB2IjLLEQiWckWskhSiPX0lNuAEVZ7",
+          "name": "Photo May 24 2026, 5 14 29 PM.jpg",
+          "modifiedTime": "2026-07-14T15:05:44.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/1VnlB2IjLLEQiWckWskhSiPX0lNuAEVZ7.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "15NsD_4BArEjstKx12DBB-dMqfh2m6w8n",
+          "name": "Photo May 25 2026, 7 52 15 PM.jpg",
+          "modifiedTime": "2026-07-14T15:05:41.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/15NsD_4BArEjstKx12DBB-dMqfh2m6w8n.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "1FBu7iWjnZFn-jmhucnF6LfQknaXd2fI_",
+          "name": "Photo May 26 2026, 5 46 05 PM.jpg",
+          "modifiedTime": "2026-07-14T15:05:35.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/1FBu7iWjnZFn-jmhucnF6LfQknaXd2fI_.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "1NAJKl3Lhhp2IWowv37P_nKeLzyt3pHn5",
+          "name": "Photo May 26 2026, 5 52 01 PM.jpg",
+          "modifiedTime": "2026-07-14T15:05:38.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/1NAJKl3Lhhp2IWowv37P_nKeLzyt3pHn5.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "1ykz4B4afcS5Mhr-vVPm8_gqsG5HQ5boj",
+          "name": "Photo May 27 2026, 5 38 12 PM.jpg",
+          "modifiedTime": "2026-07-14T15:05:34.000Z",
+          "dir": "farm-photos",
+          "src": "content/artwork/drive/farm-photos/1ykz4B4afcS5Mhr-vVPm8_gqsG5HQ5boj.jpg",
+          "width": 1440,
+          "height": 1920
+        }
+      ]
     },
     "drive-flyers": {
       "section": "flyers",
       "folder": "Flyers",
       "dir": "flyers",
-      "photos": []
+      "photos": [
+        {
+          "driveId": "1Vq320T1N4ugVJJ6JwFEMzLSjoX0kwTri",
+          "name": "VHF Slide 1.jpg",
+          "modifiedTime": "2026-10-13T14:54:21.591Z",
+          "dir": "flyers",
+          "src": "content/artwork/drive/flyers/1Vq320T1N4ugVJJ6JwFEMzLSjoX0kwTri.jpg",
+          "width": 1920,
+          "height": 1920,
+          "expires": "2026-11-12T15:01:42.084Z"
+        },
+        {
+          "driveId": "12WBmbLRAbipQiBRU_KMKkivnb0v0T4GM",
+          "name": "VHF Slide 2.jpg",
+          "modifiedTime": "2026-10-13T14:54:25.111Z",
+          "dir": "flyers",
+          "src": "content/artwork/drive/flyers/12WBmbLRAbipQiBRU_KMKkivnb0v0T4GM.jpg",
+          "width": 1920,
+          "height": 1920,
+          "expires": "2026-11-12T15:01:44.774Z"
+        }
+      ]
     },
     "program-quail-hunt": {
       "section": "classes",
@@ -40,7 +152,44 @@
       "section": "classes",
       "folder": "Beekeeping",
       "dir": "program-beekeeping",
-      "photos": [],
+      "photos": [
+        {
+          "driveId": "1SR77RH8ZfnC85Y2JhV5fGzmxcbNYSN1E",
+          "name": "0e3593f2-dcd9-421c-8a54-c872ba74031d.JPG",
+          "modifiedTime": "2026-08-05T22:05:29.000Z",
+          "dir": "program-beekeeping",
+          "src": "content/artwork/drive/program-beekeeping/1SR77RH8ZfnC85Y2JhV5fGzmxcbNYSN1E.jpg",
+          "width": 1200,
+          "height": 1600
+        },
+        {
+          "driveId": "1NmATsKUksvK5nvXrhpacGAPZdeu2Skkf",
+          "name": "33207c99-f671-47d5-9d70-d9ff66e78c7c.JPG",
+          "modifiedTime": "2026-08-05T22:05:21.000Z",
+          "dir": "program-beekeeping",
+          "src": "content/artwork/drive/program-beekeeping/1NmATsKUksvK5nvXrhpacGAPZdeu2Skkf.jpg",
+          "width": 1132,
+          "height": 1920
+        },
+        {
+          "driveId": "18qP4Hnxuz5MZD7sKR0jug2J3WnBhSALC",
+          "name": "4ecad44e-ac2d-40d8-a981-bdad4e734f5b.JPG",
+          "modifiedTime": "2026-08-05T22:05:24.000Z",
+          "dir": "program-beekeeping",
+          "src": "content/artwork/drive/program-beekeeping/18qP4Hnxuz5MZD7sKR0jug2J3WnBhSALC.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "1uqAkIVL4Ln-77q6N9zVysXjesxofwZrl",
+          "name": "75b195fa-be62-47e1-be21-2ad94978334c.JPG",
+          "modifiedTime": "2026-08-05T22:05:28.000Z",
+          "dir": "program-beekeeping",
+          "src": "content/artwork/drive/program-beekeeping/1uqAkIVL4Ln-77q6N9zVysXjesxofwZrl.jpg",
+          "width": 1920,
+          "height": 1440
+        }
+      ],
       "keyword": "beekeeping"
     },
     "program-soap-making": {
@@ -68,7 +217,53 @@
       "section": "classes",
       "folder": "Fishing",
       "dir": "program-fishing",
-      "photos": [],
+      "photos": [
+        {
+          "driveId": "1AZVq4ydSsX6qXv6v8oADedg6A8JSxWGm",
+          "name": "IMG_4906.JPG",
+          "modifiedTime": "2026-08-25T16:02:25.000Z",
+          "dir": "program-fishing",
+          "src": "content/artwork/drive/program-fishing/1AZVq4ydSsX6qXv6v8oADedg6A8JSxWGm.jpg",
+          "width": 1024,
+          "height": 768
+        },
+        {
+          "driveId": "1dHxPxNdpD43Rkcy-aYzm9Z53OA9KLjSr",
+          "name": "IMG_4907.JPG",
+          "modifiedTime": "2026-08-25T16:02:27.000Z",
+          "dir": "program-fishing",
+          "src": "content/artwork/drive/program-fishing/1dHxPxNdpD43Rkcy-aYzm9Z53OA9KLjSr.jpg",
+          "width": 768,
+          "height": 1024
+        },
+        {
+          "driveId": "1ElEcOIXwiblt2sANOgnOpNHwM8GeqeTq",
+          "name": "IMG_4908.JPG",
+          "modifiedTime": "2026-08-25T16:02:27.000Z",
+          "dir": "program-fishing",
+          "src": "content/artwork/drive/program-fishing/1ElEcOIXwiblt2sANOgnOpNHwM8GeqeTq.jpg",
+          "width": 1912,
+          "height": 1920
+        },
+        {
+          "driveId": "1oq_gf151OjemsN05DCw1Ghq6Lif4To-A",
+          "name": "IMG_4909.JPG",
+          "modifiedTime": "2026-08-25T16:02:28.000Z",
+          "dir": "program-fishing",
+          "src": "content/artwork/drive/program-fishing/1oq_gf151OjemsN05DCw1Ghq6Lif4To-A.jpg",
+          "width": 1421,
+          "height": 1920
+        },
+        {
+          "driveId": "1P1ZCxVnmMKlidylSHgbcSKj7gaxMnkVq",
+          "name": "IMG_4909.JPG",
+          "modifiedTime": "2026-08-25T16:02:28.000Z",
+          "dir": "program-fishing",
+          "src": "content/artwork/drive/program-fishing/1P1ZCxVnmMKlidylSHgbcSKj7gaxMnkVq.jpg",
+          "width": 1421,
+          "height": 1920
+        }
+      ],
       "keyword": "fishing"
     },
     "program-kitchen-medicine": {
@@ -82,7 +277,26 @@
       "section": "classes",
       "folder": "Dog Training",
       "dir": "program-dog-training",
-      "photos": [],
+      "photos": [
+        {
+          "driveId": "1yXXiuHl4Fg0aSzKjnEEED0fN-v9sFOMh",
+          "name": "IMG_6122.JPG",
+          "modifiedTime": "2026-10-13T18:04:57.000Z",
+          "dir": "program-dog-training",
+          "src": "content/artwork/drive/program-dog-training/1yXXiuHl4Fg0aSzKjnEEED0fN-v9sFOMh.jpg",
+          "width": 1440,
+          "height": 1920
+        },
+        {
+          "driveId": "1RZxkxA6MBP8VANA12bL3FgvT55dhGi-0",
+          "name": "IMG_6153.JPG",
+          "modifiedTime": "2026-10-13T18:05:16.000Z",
+          "dir": "program-dog-training",
+          "src": "content/artwork/drive/program-dog-training/1RZxkxA6MBP8VANA12bL3FgvT55dhGi-0.jpg",
+          "width": 1440,
+          "height": 1920
+        }
+      ],
       "keyword": "dog training"
     },
     "program-woodworking": {
@@ -124,9 +338,32 @@
       "section": "classes",
       "folder": "Wreath Making",
       "dir": "program-wreath-making",
-      "photos": [],
+      "photos": [
+        {
+          "driveId": "1zzDHinAptihE2DVWHJikeGi8LnQiJQY9",
+          "name": "IMG_7551.jpg",
+          "modifiedTime": "2026-10-13T18:07:21.179Z",
+          "dir": "program-wreath-making",
+          "src": "content/artwork/drive/program-wreath-making/1zzDHinAptihE2DVWHJikeGi8LnQiJQY9.jpg",
+          "width": 1440,
+          "height": 1920
+        }
+      ],
       "keyword": "wreath making"
     }
   },
-  "skipped": []
+  "skipped": [
+    {
+      "path": "Classes/Fishing/16539.JPG",
+      "reason": "too small for the TV (360x480, needs 1000px on the long side)"
+    },
+    {
+      "path": "Classes/Fishing/16552.JPG",
+      "reason": "too small for the TV (360x480, needs 1000px on the long side)"
+    },
+    {
+      "path": "Classes/Fishing/16551.JPG",
+      "reason": "too small for the TV (360x480, needs 1000px on the long side)"
+    }
+  ]
 }

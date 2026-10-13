@@ -2,25 +2,9 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-10-11T17:50:51.045Z",
+  "generatedAt": "2026-10-13T19:39:16.596Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
-    {
-      "id": "hendersonville-women-s-club-meeting-2026-10-13",
-      "title": "Hendersonville Women's Club Meeting",
-      "start": "2026-10-13T14:00:00.000Z",
-      "end": "2026-10-13T16:00:00.000Z",
-      "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service.",
-      "programId": "program-hendersonville-womans-club"
-    },
-    {
-      "id": "kitchen-medicine-series-nourishing-broths-seaweed-medicine-w-2026-10-13",
-      "title": "Kitchen Medicine Series Nourishing Broths & Seaweed Medicine with Rebecca",
-      "start": "2026-10-13T17:00:00.000Z",
-      "end": "2026-10-13T20:00:00.000Z",
-      "description": "Herbal broths and soups are one of the most powerful, everyday ways to deliver deep nutrition and medicine to your body with very little effort.",
-      "programId": "program-kitchen-medicine"
-    },
     {
       "id": "woodworking-workshop-with-chris-from-forest-project-woodwork-2026-10-14",
       "title": "Woodworking Workshop with Chris from Forest Project Woodworking",

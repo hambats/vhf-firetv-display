@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-10-11T17:50:50.365Z",
+  "generatedAt": "2026-10-13T19:39:15.312Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -81,6 +81,66 @@
         "src": "content/artwork/curated/gen-pop-additions/pptx-distribution-day-2.jpg",
         "width": 1134,
         "height": 1512
+      },
+      {
+        "id": "drive/18eVanHj3xpU0_DZTb5FfoQJSbaZtBuKz",
+        "src": "content/artwork/drive/farm-photos/18eVanHj3xpU0_DZTb5FfoQJSbaZtBuKz.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/1SIIC5J3HBxkIoTwWX0nBDnWiqHB_a-zp",
+        "src": "content/artwork/drive/farm-photos/1SIIC5J3HBxkIoTwWX0nBDnWiqHB_a-zp.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/17eZQH-1ge8AgE3YoQvMJ_6SDWyhmG76Y",
+        "src": "content/artwork/drive/farm-photos/17eZQH-1ge8AgE3YoQvMJ_6SDWyhmG76Y.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/16K8vOKkcmiU7F_RyXs-rIoyKYKYMGx8c",
+        "src": "content/artwork/drive/farm-photos/16K8vOKkcmiU7F_RyXs-rIoyKYKYMGx8c.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/161HNGyfIB7scDu5c-tEvv02EptrubXeu",
+        "src": "content/artwork/drive/farm-photos/161HNGyfIB7scDu5c-tEvv02EptrubXeu.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/1VnlB2IjLLEQiWckWskhSiPX0lNuAEVZ7",
+        "src": "content/artwork/drive/farm-photos/1VnlB2IjLLEQiWckWskhSiPX0lNuAEVZ7.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/15NsD_4BArEjstKx12DBB-dMqfh2m6w8n",
+        "src": "content/artwork/drive/farm-photos/15NsD_4BArEjstKx12DBB-dMqfh2m6w8n.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/1FBu7iWjnZFn-jmhucnF6LfQknaXd2fI_",
+        "src": "content/artwork/drive/farm-photos/1FBu7iWjnZFn-jmhucnF6LfQknaXd2fI_.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/1NAJKl3Lhhp2IWowv37P_nKeLzyt3pHn5",
+        "src": "content/artwork/drive/farm-photos/1NAJKl3Lhhp2IWowv37P_nKeLzyt3pHn5.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/1ykz4B4afcS5Mhr-vVPm8_gqsG5HQ5boj",
+        "src": "content/artwork/drive/farm-photos/1ykz4B4afcS5Mhr-vVPm8_gqsG5HQ5boj.jpg",
+        "width": 1440,
+        "height": 1920
       }
     ],
     "in-uniform": [
@@ -245,6 +305,30 @@
         "src": "content/artwork/curated/program-beekeeping/pptx-suiting-up.jpg",
         "width": 794,
         "height": 1059
+      },
+      {
+        "id": "drive/1SR77RH8ZfnC85Y2JhV5fGzmxcbNYSN1E",
+        "src": "content/artwork/drive/program-beekeeping/1SR77RH8ZfnC85Y2JhV5fGzmxcbNYSN1E.jpg",
+        "width": 1200,
+        "height": 1600
+      },
+      {
+        "id": "drive/1NmATsKUksvK5nvXrhpacGAPZdeu2Skkf",
+        "src": "content/artwork/drive/program-beekeeping/1NmATsKUksvK5nvXrhpacGAPZdeu2Skkf.jpg",
+        "width": 1132,
+        "height": 1920
+      },
+      {
+        "id": "drive/18qP4Hnxuz5MZD7sKR0jug2J3WnBhSALC",
+        "src": "content/artwork/drive/program-beekeeping/18qP4Hnxuz5MZD7sKR0jug2J3WnBhSALC.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/1uqAkIVL4Ln-77q6N9zVysXjesxofwZrl",
+        "src": "content/artwork/drive/program-beekeeping/1uqAkIVL4Ln-77q6N9zVysXjesxofwZrl.jpg",
+        "width": 1920,
+        "height": 1440
       }
     ],
     "program-chair-massage": [
@@ -268,6 +352,18 @@
         "src": "content/artwork/curated/program-dog-training/745524895_18597454009062494_3261715515351296567_n.jpg",
         "width": 3024,
         "height": 4032
+      },
+      {
+        "id": "drive/1yXXiuHl4Fg0aSzKjnEEED0fN-v9sFOMh",
+        "src": "content/artwork/drive/program-dog-training/1yXXiuHl4Fg0aSzKjnEEED0fN-v9sFOMh.jpg",
+        "width": 1440,
+        "height": 1920
+      },
+      {
+        "id": "drive/1RZxkxA6MBP8VANA12bL3FgvT55dhGi-0",
+        "src": "content/artwork/drive/program-dog-training/1RZxkxA6MBP8VANA12bL3FgvT55dhGi-0.jpg",
+        "width": 1440,
+        "height": 1920
       }
     ],
     "program-fishing": [
@@ -294,6 +390,36 @@
         "src": "content/artwork/curated/program-fishing/sticker-mule-qNhstTawQrI-unsplash.jpg",
         "width": 5760,
         "height": 3840
+      },
+      {
+        "id": "drive/1AZVq4ydSsX6qXv6v8oADedg6A8JSxWGm",
+        "src": "content/artwork/drive/program-fishing/1AZVq4ydSsX6qXv6v8oADedg6A8JSxWGm.jpg",
+        "width": 1024,
+        "height": 768
+      },
+      {
+        "id": "drive/1dHxPxNdpD43Rkcy-aYzm9Z53OA9KLjSr",
+        "src": "content/artwork/drive/program-fishing/1dHxPxNdpD43Rkcy-aYzm9Z53OA9KLjSr.jpg",
+        "width": 768,
+        "height": 1024
+      },
+      {
+        "id": "drive/1ElEcOIXwiblt2sANOgnOpNHwM8GeqeTq",
+        "src": "content/artwork/drive/program-fishing/1ElEcOIXwiblt2sANOgnOpNHwM8GeqeTq.jpg",
+        "width": 1912,
+        "height": 1920
+      },
+      {
+        "id": "drive/1oq_gf151OjemsN05DCw1Ghq6Lif4To-A",
+        "src": "content/artwork/drive/program-fishing/1oq_gf151OjemsN05DCw1Ghq6Lif4To-A.jpg",
+        "width": 1421,
+        "height": 1920
+      },
+      {
+        "id": "drive/1P1ZCxVnmMKlidylSHgbcSKj7gaxMnkVq",
+        "src": "content/artwork/drive/program-fishing/1P1ZCxVnmMKlidylSHgbcSKj7gaxMnkVq.jpg",
+        "width": 1421,
+        "height": 1920
       }
     ],
     "program-friendsgiving": [
@@ -681,6 +807,12 @@
         "src": "content/artwork/curated/program-wreath-making/program-wreath-making-ai-04.jpg",
         "width": 1408,
         "height": 800
+      },
+      {
+        "id": "drive/1zzDHinAptihE2DVWHJikeGi8LnQiJQY9",
+        "src": "content/artwork/drive/program-wreath-making/1zzDHinAptihE2DVWHJikeGi8LnQiJQY9.jpg",
+        "width": 1440,
+        "height": 1920
       }
     ],
     "vhf-why": [
@@ -702,6 +834,22 @@
         "src": "content/artwork/curated/volunteer-groups/kids-boardwalk-trail.jpg",
         "width": 2500,
         "height": 3333
+      }
+    ],
+    "drive-flyers": [
+      {
+        "id": "drive/1Vq320T1N4ugVJJ6JwFEMzLSjoX0kwTri",
+        "src": "content/artwork/drive/flyers/1Vq320T1N4ugVJJ6JwFEMzLSjoX0kwTri.jpg",
+        "width": 1920,
+        "height": 1920,
+        "expires": "2026-11-12T15:01:42.084Z"
+      },
+      {
+        "id": "drive/12WBmbLRAbipQiBRU_KMKkivnb0v0T4GM",
+        "src": "content/artwork/drive/flyers/12WBmbLRAbipQiBRU_KMKkivnb0v0T4GM.jpg",
+        "width": 1920,
+        "height": 1920,
+        "expires": "2026-11-12T15:01:44.774Z"
       }
     ]
   }
