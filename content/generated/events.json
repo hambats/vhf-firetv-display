@@ -2,7 +2,7 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-10-14T17:41:17.532Z",
+  "generatedAt": "2026-10-14T22:25:39.683Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
     {
@@ -108,15 +108,6 @@
       "end": "2026-11-07T17:00:00.000Z",
       "description": "Open Studio Pottery If you have taken a pottery session with us, or have prior pottery experience, register for our open studio. During this time, our resident potter Sophia will be present to help with any questions.",
       "programId": "program-pottery"
-    },
-    {
-      "id": "2026-veterans-day-5k-vhf-fundraiser-2026-11-08",
-      "title": "2026 Veterans Day 5K VHF Fundraiser",
-      "start": "2026-11-08T13:00:00.000Z",
-      "end": "2026-11-08T17:00:00.000Z",
-      "location": "Mills River Park, 124 Town Center Dr, Mills River, NC 28759, USA",
-      "description": "The 5k starts at 10AM and the Fun Run Loop starts at 9:45AM. The 5K course follows the family-friendly greenway at Mills River Park, that welcomes runners and walkers of all ages and abilities. This is a flat course with surrounding mountain views.",
-      "programId": "program-5k-fundraiser"
     },
     {
       "id": "hendersonville-women-s-club-meeting-2026-11-10",
