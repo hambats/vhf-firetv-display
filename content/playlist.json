@@ -24,7 +24,7 @@
       "id": "announcements",
       "type": "announcement",
       "duration": 13,
-      "enabled": true,
+      "enabled": false,
       "content": {}
     },
     {

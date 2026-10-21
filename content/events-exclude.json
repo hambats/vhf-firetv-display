@@ -12,10 +12,12 @@
     "Veggie Volunteers",
     "past students",
     "prior sessions",
-    "returning students only"
+    "returning students only",
+    "5K",
+    "Fun Run"
   ],
   "excludeIds": {
     "open-pottery-studio-with-sophia-2026-11-21": "Taken off the display at Rob's request 2026-09-24; still on the Google Calendar. Delete this line once the date has passed or the calendar entry is removed.",
-    "2026-veterans-day-5k-vhf-fundraiser-2026-11-08": "Taken off the display at Rob's request 2026-10-14 (not certain the event is happening). Delete this line once the date has passed, or to restore it."
+    "2026-veterans-day-5k-vhf-fundraiser-2026-11-08": "Taken off the display at Rob's request 2026-10-14 (not certain the event is happening). 2026-10-21: Rob asked to hide the 5K completely, so the \"5K\" and \"Fun Run\" title terms above now catch every 5K calendar entry, and the playlist's \"announcements\" scene is disabled (its only announcement is the 5K registration slide). To restore it, delete this line and those two terms, and set \"announcements\" back to enabled: true."
   }
 }
