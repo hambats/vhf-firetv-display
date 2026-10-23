@@ -55,6 +55,14 @@
         ],
         "hide": true,
         "note": "An external group that books the space; there is nothing for a viewer to register for."
+      },
+      {
+        "id": "beekeeping",
+        "titleContains": [
+          "beekeeping"
+        ],
+        "hide": true,
+        "note": "No registration for Beekeeping (Rob, 2026-10-23). Its calendar entry carries the Fly Casting Clinic's regpack link, copied by mistake."
       }
     ]
   }
