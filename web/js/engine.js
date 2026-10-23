@@ -550,13 +550,15 @@
    * The id is the one sources/calendar/index.mjs gives the event
    * (`<slugified title>-<UTC start date>`), which the website derives from the
    * same Google Calendar entry; `?slide=next` means the next upcoming event
-   * the playlist's event pool would show.
+   * the playlist's event pool would show. Several comma-separated ids take
+   * turns (runSlide), and ids the display doesn't know are dropped.
    *
    * None of the appliance machinery runs here: no loop, no quiet hours, no
    * version poll, no watchdog, no reload. A page embedded in someone else's
    * site has no business reloading itself. The embedding page learns the
-   * outcome by postMessage — "ready" once the slide is on screen, "missing"
-   * when the event is unknown or has passed — and keeps the frame hidden
+   * outcome by postMessage — "ready" with the event's id each time a slide
+   * comes on screen, "missing" when none of the
+   * events is known or upcoming — and keeps the frame hidden
    * until it hears "ready", so a stale link shows nothing rather than an
    * error card.
    *
@@ -597,40 +599,79 @@
     };
   }
 
+  function buildSlide(data, id) {
+    var random = Math.random;
+    Math.random = seededRandom(id);
+    try {
+      var node = VhfScenes.render({ id: "slide", type: "event", content: { eventId: id } }, data);
+      // Long enough that the slow photo drift plays out rather than stopping
+      // short.
+      node.style.setProperty("--vhf-scene-duration", "30s");
+      return node;
+    } catch (err) {
+      console.warn("[VHF] slide " + id + " could not be built", err);
+      return null;
+    } finally {
+      Math.random = random;
+    }
+  }
+
+  // The comma-separated ids in `?slide=` that can actually be shown, in
+  // order, without repeats. "next" stands for the next upcoming event.
+  function slideIds(data) {
+    var ids = [];
+    var parts = slideParam.split(",");
+    for (var i = 0; i < parts.length; i++) {
+      var id = parts[i];
+      if (id === "next") {
+        var next = VhfScenes.upcomingEvents(data, 1, 0, { excludeTitleContains: eventPoolExcludes(data.playlist) })[0];
+        id = next ? next.id : "";
+      }
+      if (id && ids.indexOf(id) === -1 && buildSlide(data, id)) ids.push(id);
+    }
+    return ids;
+  }
+
+  /*
+   * One id holds still. Several take turns, SLIDE_CYCLE_SECONDS each, with
+   * the next one built and its photo warmed during the current one's turn so
+   * the crossfade never reveals an empty frame — the loop's own rule, at a
+   * fraction of its machinery. Each slide is rebuilt when it comes round
+   * again: the title reveal splits the heading into lines and only runs on a
+   * freshly built node.
+   */
+  var SLIDE_CYCLE_SECONDS = 10;
+
   function runSlide(data) {
     VhfScenes.setTimeZone(data.settings && data.settings.timezone);
-    var id = slideParam;
-    if (id === "next") {
-      var next = VhfScenes.upcomingEvents(data, 1, 0, { excludeTitleContains: eventPoolExcludes(data.playlist) })[0];
-      id = next ? next.id : null;
-    }
-
-    var node = null;
-    if (id) {
-      var random = Math.random;
-      Math.random = seededRandom(id);
-      try {
-        node = VhfScenes.render({ id: "slide", type: "event", content: { eventId: id } }, data);
-      } catch (err) {
-        console.warn("[VHF] slide " + id + " could not be built", err);
-      } finally {
-        Math.random = random;
-      }
-    }
-    if (!node) {
+    VhfScenes.setEmbedded(true);
+    var ids = slideIds(data);
+    if (ids.length === 0) {
       log("slide " + slideParam + ": no such upcoming event");
       postToEmbedder("missing", slideParam);
       return;
     }
 
-    // Long enough that the slow photo drift plays out rather than stopping
-    // short; nothing replaces the slide when it ends.
-    node.style.setProperty("--vhf-scene-duration", "30s");
-    warmImages(node, MAX_PRELOAD_MS).then(function () {
-      showLayer(node);
-      log("showing slide " + id);
-      postToEmbedder("ready", id);
-    });
+    function prepare(index) {
+      var node = buildSlide(data, ids[index]);
+      return { index: index, node: node, warmed: warmImages(node, MAX_PRELOAD_MS) };
+    }
+
+    function show(slide) {
+      slide.warmed.then(function () {
+        var id = ids[slide.index];
+        showLayer(slide.node);
+        log("showing slide " + id);
+        postToEmbedder("ready", id);
+        if (ids.length < 2) return;
+        var next = prepare((slide.index + 1) % ids.length);
+        window.setTimeout(function () {
+          show(next);
+        }, SLIDE_CYCLE_SECONDS * 1000);
+      });
+    }
+
+    show(prepare(0));
   }
 
   function start() {

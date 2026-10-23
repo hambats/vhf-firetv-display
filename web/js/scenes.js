@@ -685,7 +685,17 @@ var VhfScenes = (function () {
     return { asset: "img/register-qr.svg", label: reg.label };
   }
 
+  // A scannable code is for a wall across the room. On a web page, where the
+  // visitor can just click, the embedding page draws its own Register button
+  // from the event's calendar entry instead.
+  var embedded = false;
+
+  function setEmbedded(on) {
+    embedded = !!on;
+  }
+
   function appendRegistration(container, data, title, opts) {
+    if (embedded) return;
     var reg = (data && data.settings && data.settings.registration) || null;
     if (!reg || !reg.url) return;
     // null means a `hide` override matched: an event nobody can register for
@@ -1073,6 +1083,7 @@ var VhfScenes = (function () {
   return {
     render: render,
     upcomingEvents: upcomingEvents,
+    setEmbedded: setEmbedded,
     reveal: reveal,
     renderError: renderError,
     renderBlank: renderBlank,

@@ -158,6 +158,7 @@ function makeContext(clock, tracking, search) {
     upcomingEvents() {
       return [{ id: "next-event-2026-11-01" }];
     },
+    setEmbedded() {},
     setTimeZone() {},
     markImageFailed() {}
   };
@@ -291,7 +292,9 @@ test("?slide= shows the one event and arms no timers", async () => {
 
   assert.deepEqual(tracking.shown, ["event:beekeeping-101-2026-10-24"]);
   assert.equal(clock.size(), 0, "no loop, version poll, watchdog or reload timers in slide mode");
-  assert.deepEqual(JSON.parse(JSON.stringify(tracking.posted)), [{ source: "vhf-tv-slide", status: "ready", id: "beekeeping-101-2026-10-24" }]);
+  assert.deepEqual(JSON.parse(JSON.stringify(tracking.posted)), [
+    { source: "vhf-tv-slide", status: "ready", id: "beekeeping-101-2026-10-24" }
+  ]);
 });
 
 test("?slide=next shows the next upcoming event", async () => {
@@ -307,4 +310,21 @@ test("?slide= for an unknown event posts missing and shows nothing", async () =>
   assert.deepEqual(tracking.shown, [], "no error card inside the website's frame");
   assert.equal(clock.size(), 0);
   assert.deepEqual(JSON.parse(JSON.stringify(tracking.posted)), [{ source: "vhf-tv-slide", status: "missing", id: "gone" }]);
+});
+
+test("?slide=a,b cycles through the known events and drops unknown ones", async () => {
+  const { clock, tracking } = await bootEngine("?slide=a-2026-11-01,gone,b-2026-11-02");
+
+  assert.deepEqual(tracking.shown, ["event:a-2026-11-01"]);
+  assert.equal(clock.size(), 1, "exactly one timer: the next slide's turn");
+
+  clock.fire([...clock.ids()][0]);
+  await flush();
+  assert.deepEqual(tracking.shown, ["event:a-2026-11-01", "event:b-2026-11-02"]);
+
+  clock.fire([...clock.ids()][0]);
+  await flush();
+  assert.deepEqual(tracking.shown, ["event:a-2026-11-01", "event:b-2026-11-02", "event:a-2026-11-01"], "wraps round");
+  assert.equal(clock.size(), 1);
+  assert.deepEqual(tracking.posted.map((m) => m.id), ["a-2026-11-01", "b-2026-11-02", "a-2026-11-01"]);
 });
