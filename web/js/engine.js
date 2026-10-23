@@ -542,12 +542,108 @@
     advance();
   }
 
+  /*
+   * ---- `?slide=<event-id>`: one event's slide, held still ----
+   *
+   * The website's events page frames the display's own slide for an event, so
+   * an event looks the same on veteranshealingfarm.org as it does on the wall.
+   * The id is the one sources/calendar/index.mjs gives the event
+   * (`<slugified title>-<UTC start date>`), which the website derives from the
+   * same Google Calendar entry; `?slide=next` means the next upcoming event
+   * the playlist's event pool would show.
+   *
+   * None of the appliance machinery runs here: no loop, no quiet hours, no
+   * version poll, no watchdog, no reload. A page embedded in someone else's
+   * site has no business reloading itself. The embedding page learns the
+   * outcome by postMessage — "ready" once the slide is on screen, "missing"
+   * when the event is unknown or has passed — and keeps the frame hidden
+   * until it hears "ready", so a stale link shows nothing rather than an
+   * error card.
+   *
+   * Like `?awake=1`, only a browser someone opened deliberately carries this;
+   * the television's URL never has a query string.
+   */
+  var slideParam = (function () {
+    var match = /[?&]slide=([^&#]*)/.exec((location && location.search) || "");
+    return match ? decodeURIComponent(match[1]) : null;
+  })();
+
+  function postToEmbedder(status, id) {
+    if (!window.parent || window.parent === window) return;
+    window.parent.postMessage({ source: "vhf-tv-slide", status: status, id: id }, "*");
+  }
+
+  function eventPoolExcludes(playlist) {
+    var items = activeItems(playlist);
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type === "event-pool") return (items[i].content || {}).excludeTitleContains;
+    }
+    return undefined;
+  }
+
+  // A wash photo is normally drawn at random, which suits a wall that shows
+  // the slide a hundred times a day and not a web page: the same event would
+  // change photo on every visit. Seeding from the event id gives each event
+  // one photo, the same one for everybody.
+  function seededRandom(seed) {
+    var h = 2166136261;
+    for (var i = 0; i < seed.length; i++) {
+      h ^= seed.charCodeAt(i);
+      h = (h * 16777619) >>> 0;
+    }
+    return function () {
+      h = (h * 1664525 + 1013904223) >>> 0;
+      return h / 4294967296;
+    };
+  }
+
+  function runSlide(data) {
+    VhfScenes.setTimeZone(data.settings && data.settings.timezone);
+    var id = slideParam;
+    if (id === "next") {
+      var next = VhfScenes.upcomingEvents(data, 1, 0, { excludeTitleContains: eventPoolExcludes(data.playlist) })[0];
+      id = next ? next.id : null;
+    }
+
+    var node = null;
+    if (id) {
+      var random = Math.random;
+      Math.random = seededRandom(id);
+      try {
+        node = VhfScenes.render({ id: "slide", type: "event", content: { eventId: id } }, data);
+      } catch (err) {
+        console.warn("[VHF] slide " + id + " could not be built", err);
+      } finally {
+        Math.random = random;
+      }
+    }
+    if (!node) {
+      log("slide " + slideParam + ": no such upcoming event");
+      postToEmbedder("missing", slideParam);
+      return;
+    }
+
+    // Long enough that the slow photo drift plays out rather than stopping
+    // short; nothing replaces the slide when it ends.
+    node.style.setProperty("--vhf-scene-duration", "30s");
+    warmImages(node, MAX_PRELOAD_MS).then(function () {
+      showLayer(node);
+      log("showing slide " + id);
+      postToEmbedder("ready", id);
+    });
+  }
+
   function start() {
     loadContent()
-      .then(runLoop)
+      .then(slideParam ? runSlide : runLoop)
       .catch(function (err) {
         VhfDiagnostics.error(err, "content load");
         log("failed to load content: " + err.message);
+        // An embedded slide hides itself instead of showing an error card.
+        if (slideParam) {
+          postToEmbedder("missing", slideParam);
+          return;
+        }
         showLayer(
           VhfScenes.renderError(
             { id: "content-load", type: "n/a" },

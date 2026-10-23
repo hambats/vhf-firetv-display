@@ -1072,6 +1072,7 @@ var VhfScenes = (function () {
 
   return {
     render: render,
+    upcomingEvents: upcomingEvents,
     reveal: reveal,
     renderError: renderError,
     renderBlank: renderBlank,

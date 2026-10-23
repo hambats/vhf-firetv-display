@@ -36,7 +36,14 @@
      * still runs, just without offline resilience — so it is recorded for the
      * diagnostics overlay rather than thrown.
      */
-    if ("serviceWorker" in navigator) {
+    /*
+     * Not for a `?slide=` embed (engine.js): a visitor to the website's events
+     * page has no use for the television's offline cache, and should not be
+     * left holding one.
+     */
+    if (/[?&]slide=/.test(location.search)) {
+      VhfDiagnostics.set("sw", "skipped (slide embed)");
+    } else if ("serviceWorker" in navigator) {
       window.addEventListener("load", function () {
         navigator.serviceWorker.register("sw.js").then(
           function (reg) {

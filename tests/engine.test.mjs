@@ -123,7 +123,7 @@ const PLAYLIST_ITEMS = [
   { id: "c", type: "test", enabled: true, duration: 5 }
 ];
 
-function makeContext(clock, tracking) {
+function makeContext(clock, tracking, search) {
   const layers = [makeLayer(tracking), makeLayer(tracking)];
 
   const VhfContentSource = {
@@ -141,6 +141,11 @@ function makeContext(clock, tracking) {
   const VhfScenes = {
     render(item) {
       tracking.rendered.push(item.id);
+      if (item.type === "event") {
+        // Same contract as the real renderEvent: an unknown id throws.
+        if (item.content.eventId === "gone") throw new Error("event scene missing event data");
+        return makeSceneNode("event:" + item.content.eventId);
+      }
       if (item.id === "throws") throw new Error("scene render exploded on purpose");
       return makeSceneNode(item.id);
     },
@@ -149,6 +154,9 @@ function makeContext(clock, tracking) {
     },
     renderBlank() {
       return makeSceneNode("blank");
+    },
+    upcomingEvents() {
+      return [{ id: "next-event-2026-11-01" }];
     },
     setTimeZone() {},
     markImageFailed() {}
@@ -175,7 +183,7 @@ function makeContext(clock, tracking) {
         return layers;
       }
     },
-    location: { reload() {} },
+    location: { search: search || "", reload() {} },
     fetch() {
       // Version poll: report a stable version so it never queues a reload
       // mid-test. Its own timer chain isn't what this test is exercising.
@@ -190,16 +198,22 @@ function makeContext(clock, tracking) {
     VhfDiagnostics
   };
   sandbox.window = sandbox; // engine.js calls window.setTimeout / window.VhfQuietHours etc.
+  // Stands in for the website page that frames a `?slide=` embed.
+  sandbox.window.parent = {
+    postMessage(msg) {
+      tracking.posted.push(msg);
+    }
+  };
 
   vm.createContext(sandbox);
   return { sandbox, layers };
 }
 
-async function bootEngine() {
+async function bootEngine(search) {
   const source = await fs.readFile(ENGINE_PATH, "utf8");
   const clock = makeClock();
-  const tracking = { rendered: [], logs: [], diagErrors: [], shown: [] };
-  const { sandbox, layers } = makeContext(clock, tracking);
+  const tracking = { rendered: [], logs: [], diagErrors: [], shown: [], posted: [] };
+  const { sandbox, layers } = makeContext(clock, tracking, search);
 
   vm.runInContext(source, sandbox);
 
@@ -265,4 +279,32 @@ test("a throwing scene is skipped and the loop advances to the next one", async 
     "rotation wraps and keeps re-attempting the throwing scene each lap"
   );
   assert.equal(clock.size(), 4);
+});
+
+/*
+ * `?slide=<event-id>` is the website's embed of one event slide. It must show
+ * that one slide and then do nothing at all: no loop, no poll, no watchdog,
+ * no reload, since it lives inside someone else's page.
+ */
+test("?slide= shows the one event and arms no timers", async () => {
+  const { clock, tracking } = await bootEngine("?slide=beekeeping-101-2026-10-24");
+
+  assert.deepEqual(tracking.shown, ["event:beekeeping-101-2026-10-24"]);
+  assert.equal(clock.size(), 0, "no loop, version poll, watchdog or reload timers in slide mode");
+  assert.deepEqual(JSON.parse(JSON.stringify(tracking.posted)), [{ source: "vhf-tv-slide", status: "ready", id: "beekeeping-101-2026-10-24" }]);
+});
+
+test("?slide=next shows the next upcoming event", async () => {
+  const { tracking } = await bootEngine("?slide=next");
+
+  assert.deepEqual(tracking.shown, ["event:next-event-2026-11-01"]);
+  assert.equal(tracking.posted[0].status, "ready");
+});
+
+test("?slide= for an unknown event posts missing and shows nothing", async () => {
+  const { clock, tracking } = await bootEngine("?slide=gone");
+
+  assert.deepEqual(tracking.shown, [], "no error card inside the website's frame");
+  assert.equal(clock.size(), 0);
+  assert.deepEqual(JSON.parse(JSON.stringify(tracking.posted)), [{ source: "vhf-tv-slide", status: "missing", id: "gone" }]);
 });
