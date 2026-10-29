@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "Google Drive shared folder (build-side only; see sources/drive)",
-  "generatedAt": "2026-10-28T18:34:15.204Z",
+  "generatedAt": "2026-10-29T18:43:45.771Z",
   "sets": {
     "gen-pop-additions": {
       "section": "farm",
@@ -126,6 +126,13 @@
           "expires": "2026-11-12T15:01:44.774Z"
         }
       ]
+    },
+    "program-herb-squad": {
+      "section": "classes",
+      "folder": "Herb Squad",
+      "dir": "program-herb-squad",
+      "photos": [],
+      "keyword": "herb squad"
     },
     "program-quail-hunt": {
       "section": "classes",
