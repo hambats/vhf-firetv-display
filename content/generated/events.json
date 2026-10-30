@@ -2,7 +2,7 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-10-29T18:43:50.695Z",
+  "generatedAt": "2026-10-30T18:19:34.313Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
     {
@@ -159,12 +159,17 @@
       "programId": "program-friendsgiving"
     },
     {
-      "id": "holiday-candle-making-with-peaks-and-petals-2026-12-05",
-      "title": "Holiday Candle Making with Peaks and Petals",
+      "id": "quilts-of-valor-presentation-2026-12-05",
+      "title": "Quilts of Valor Presentation",
       "start": "2026-12-05T15:00:00.000Z",
-      "end": "2026-12-05T17:00:00.000Z",
-      "description": "Come learn how to make your own organic soy candles with Peaks and Petals Candle Making. You’ll get to select your jar, your choice of holiday scent and florals for the top. You will be guided through each step of the process & no prior experience is required.",
-      "programId": "program-beekeeping"
+      "end": "2026-12-05T16:00:00.000Z"
+    },
+    {
+      "id": "fruit-liquor-making-class-with-patrina-2026-12-05",
+      "title": "Fruit Liquor making class with Patrina",
+      "start": "2026-12-05T18:00:00.000Z",
+      "end": "2026-12-05T20:00:00.000Z",
+      "description": "Fruit liqueur making class Students will learn to make liqueurs from fresh fruits and other ingredients. We will be making white peach liqueur, blackberry liqueur, coffee liqueur and Irish cream liquor. These make great gifts or keep for yourself!"
     },
     {
       "id": "hendersonville-women-s-club-meeting-2026-12-08",
@@ -173,6 +178,37 @@
       "end": "2026-12-08T17:00:00.000Z",
       "description": "Empower, Engage, Enrich. A century of empowering women and enriching Henderson County through philanthropic and community service.",
       "programId": "program-hendersonville-womans-club"
+    },
+    {
+      "id": "herbal-holiday-gift-making-part-2-with-rebecca-2026-12-09",
+      "title": "Herbal Holiday Gift Making Part 2 with Rebecca",
+      "start": "2026-12-09T17:00:00.000Z",
+      "end": "2026-12-09T20:00:00.000Z",
+      "description": "The holidays are the perfect time to share your love of herbs with your friends and family! Gifts you prepare yourself are often more meaningful than anything you can buy at the store.",
+      "programId": "program-herb-squad"
+    },
+    {
+      "id": "wreath-making-with-maddie-2026-12-10",
+      "title": "Wreath Making with Maddie",
+      "start": "2026-12-10T21:00:00.000Z",
+      "end": "2026-12-10T23:00:00.000Z",
+      "description": "We'll spread holiday cheer at the farm by making wreaths and holiday decor using natural products. Participants will learn the basics of wreath building and then supplement their wreaths with dried florals and textural elements grown in the VHF gardens.",
+      "programId": "program-wreath-making"
+    },
+    {
+      "id": "massage-with-lisa-2026-12-16",
+      "title": "Massage with Lisa",
+      "start": "2026-12-16T15:00:00.000Z",
+      "end": "2026-12-16T20:00:00.000Z",
+      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands. Sessions can be 15 or 30 minutes, it uses a specialized ergonomic chair to provide targeted acupressure and Swedish massage techniques."
+    },
+    {
+      "id": "soap-pouring-with-grace-2026-12-18",
+      "title": "Soap Pouring with Grace",
+      "start": "2026-12-18T17:00:00.000Z",
+      "end": "2026-12-18T20:00:00.000Z",
+      "description": "A soap pour workshop (commonly called a melt-and-pour soap making class) is a fun, hands-on, and beginner-friendly crafting class where participants learn to design and create custom soap bars using a pre-made soap base.",
+      "programId": "program-soap-making"
     }
   ]
 }
