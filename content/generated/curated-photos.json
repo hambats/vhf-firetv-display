@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-10-30T18:19:33.845Z",
+  "generatedAt": "2026-10-30T20:17:50.586Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -155,6 +155,12 @@
         "src": "content/artwork/curated/in-uniform/491503397_18494813875062494_1984777543171559801_n.jpg",
         "width": 1440,
         "height": 1800
+      },
+      {
+        "id": "in-uniform/navy-dress-whites-portrait.jpg",
+        "src": "content/artwork/curated/in-uniform/navy-dress-whites-portrait.jpg",
+        "width": 795,
+        "height": 1048
       }
     ],
     "memorial-wall": [
