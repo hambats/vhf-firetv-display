@@ -100,6 +100,11 @@ not a code style tool.
   `content-source.js` → `engine.js`, then the Service Worker registers.
   - `js/engine.js` — the playlist scheduler: crossfades, preloads one dwell ahead, quiet-hours /
     black-screen logic, a stall watchdog, a 6-hour periodic reload, and content-version polling.
+    `?slide=<event-id>` (or `?slide=next`) skips all of that and holds one event slide still.
+    The website's events page (`D:\VHF Website\content\events-full.html`) frames it, so
+    **event ids are a public contract**: changing the id rule in `sources/calendar/index.mjs`
+    breaks the website's matching. The slide uses a fixed photo for each event (seeded from the id),
+    skips the Service Worker, and reports `ready`/`missing` to the embedding page by postMessage.
   - `js/scenes.js` — pure render functions, one per scene type (photo, photo-pool, event,
     information, announcement...); tracks and skips images that fail to load. Written in ES5
     because it is also bundled unmodified into the `app/` WebView shell.
