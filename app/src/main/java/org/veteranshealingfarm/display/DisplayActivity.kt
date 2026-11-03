@@ -157,6 +157,9 @@ class DisplayActivity : AppCompatActivity() {
 
         loadDisplay()
         handler.postDelayed(watchdog, WATCHDOG_INTERVAL_MS)
+
+        // Optional and off by default; see MeshBridgeService and docs/MESH_BRIDGE.md.
+        MeshConfig.startIfEnabled(this)
     }
 
     private fun loadDisplay() {
