@@ -136,11 +136,15 @@ not a code style tool.
 - **`admin/`** — `server.mjs`, a small dependency-free Node HTTP server bound to `127.0.0.1:8787`
   only, no auth. Reads/writes `content/*.json` through the same `validateContentDir` the build uses,
   so a rejected write restores the previous file rather than producing a broken deploy.
-- **`app/`** — Kotlin/Android WebView shell. Two source files only: `DisplayActivity.kt`
-  (fullscreen WebView, screen-on, immersive chrome, remote/back-key lockout) and `BootReceiver.kt`
-  (relaunch on `BOOT_COMPLETED`). `app/src/main/assets/web/` is a **bundled offline copy** of
-  `web/` used as a fallback — it does not update itself and can drift from the live site; treat the
-  root `web/` as the one to edit.
+- **`app/`** — Kotlin/Android WebView shell. The display is `DisplayActivity.kt` (fullscreen
+  WebView, screen-on, immersive chrome, remote/back-key lockout, retry with an offline card, and
+  in-place WebView rebuild after a renderer crash — never by bringing itself forward) and
+  `BootReceiver.kt` (relaunch on `BOOT_COMPLETED`). The optional Meshtastic bridge
+  (`Mesh*.kt`, [docs/MESH_BRIDGE.md](docs/MESH_BRIDGE.md)) runs in its own `:mesh` process so it
+  can never take the display down; its pure logic is in `MeshLogic.kt`, with JVM tests under
+  `app/src/test/` (`./gradlew testReleaseUnitTest`). The shell's only offline fallback is
+  `app/src/main/assets/offline.html`; the old copy of `web/` under `app/src/main/assets/web/` is
+  never loaded. Always edit the root `web/`.
 - **`tests/`** — `node --test`, no external test framework. Each `*.test.mjs` file has a
   `Run with: node --test tests/<file>.test.mjs` header comment. `helpers/build-fixture.mjs` builds
   a throwaway fixture tree so build/publish tests can corrupt content without touching the real
@@ -168,7 +172,7 @@ Ordered by risk — what keeps an unattended page alive — not by feature layer
 including ship gates, in [docs/BUILD_TREE.md](docs/BUILD_TREE.md).
 
 0. **On the screen** — *done (Sept 18–19).* The `app/` WebView shell is the answer: fullscreen,
-   no chrome, screen never sleeps, points at GitHub Pages. v1.1.0 is installed on the television.
+   no chrome, screen never sleeps, points at GitHub Pages. v1.2.1 (renderer-crash recovery, isolated mesh bridge) is the current build.
    `docs/DISPLAY_SETUP.md` covers sideloading and the television's own sleep/screensaver settings.
 1. **Survives being left alone** — Service Worker (app shell + JSON + photos), self-hosted fonts,
    version polling so content actually refreshes, error/stall watchdog, diagnostics overlay,

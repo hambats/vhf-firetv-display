@@ -15,8 +15,8 @@ android {
         // docs/ARCHITECTURE.md "Unconfirmed device" for the compatibility approach.
         minSdk = 21
         targetSdk = 28
-        versionCode = 4
-        versionName = "1.2.0"
+        versionCode = 5
+        versionName = "1.2.1"
     }
 
     buildTypes {
@@ -50,4 +50,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.webkit:webkit:1.10.0")
+
+    // JVM unit tests for the pure mesh-bridge logic (app/src/test, MeshLogic.kt).
+    testImplementation("junit:junit:4.13.2")
 }
