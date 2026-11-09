@@ -133,9 +133,9 @@ not a code style tool.
   so a rejected write restores the previous file rather than producing a broken deploy.
 - **`app/`** — Kotlin/Android WebView shell. Two source files only: `DisplayActivity.kt`
   (fullscreen WebView, screen-on, immersive chrome, remote/back-key lockout) and `BootReceiver.kt`
-  (relaunch on `BOOT_COMPLETED`). `app/src/main/assets/web/` is a **bundled offline copy** of
-  `web/` used as a fallback — it does not update itself and can drift from the live site; treat the
-  root `web/` as the one to edit.
+  (relaunch on `BOOT_COMPLETED`). The shell's only offline fallback is
+  `app/src/main/assets/offline.html`; the old copy of `web/` under `app/src/main/assets/web/` is
+  never loaded (dead weight, see BUILD_TREE §6). Always edit the root `web/`.
 - **`tests/`** — `node --test`, no external test framework. Each `*.test.mjs` file has a
   `Run with: node --test tests/<file>.test.mjs` header comment. `helpers/build-fixture.mjs` builds
   a throwaway fixture tree so build/publish tests can corrupt content without touching the real

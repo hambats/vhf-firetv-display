@@ -10,7 +10,8 @@
  * crossfade reveals an empty frame while a 2500px gallery photo downloads,
  * and a photo whose URL has died shows as a blank rectangle for its full
  * dwell, every time it comes around. A scene whose content images all failed
- * is skipped instead of shown, and its URLs are struck from the rotation.
+ * is skipped instead of shown, and its URLs are struck from the rotation
+ * for a while (scenes.js markImageFailed).
  */
 (function () {
   "use strict";
@@ -59,7 +60,12 @@
    * its own so nobody has to remember to turn it back off.
    */
   var wakeUntil = 0;
+  // The loop's armed dwell/recheck timer. Null while a tick is running
+  // (building or warming the next scene), so "parked" is exactly
+  // pendingTimeout !== null — and only a parked loop is safe to nudge: a tick
+  // in flight schedules itself, and nudging it starts a second loop.
   var pendingTimeout = null;
+  var quietShowing = false; // the black quiet-hours frame is what is on screen
   var advanceRef = null; // set once runLoop is underway
 
   function closedWeekdays(settings) {
@@ -104,11 +110,18 @@
   window.VhfQuietHours = {
     wake: function () {
       wakeUntil = Date.now() + WAKE_DURATION_MS;
+      /*
+       * Only a loop parked on the black frame needs a nudge. Mid-tick — the
+       * screen is still black while the first scene warms, which is exactly
+       * when someone presses BACK a second time — the tick re-checks quiet
+       * hours itself; nudging it then started a second loop nothing ever
+       * cancelled. And on an open day there is nothing to wake: BACK must
+       * not skip the scene someone is looking at.
+       */
+      if (pendingTimeout === null || !quietShowing) return;
       log("woken from quiet hours for " + Math.round(WAKE_DURATION_MS / 60000) + " min");
-      if (pendingTimeout !== null) {
-        window.clearTimeout(pendingTimeout);
-        pendingTimeout = null;
-      }
+      window.clearTimeout(pendingTimeout);
+      pendingTimeout = null;
       if (advanceRef) advanceRef();
     }
   };
@@ -117,9 +130,10 @@
    * Skips the current scene's remaining dwell and shows the next one right
    * away — a curation tool, not a viewer feature: reviewing new content
    * against every scene means sitting through 8-14s dwell times per scene
-   * otherwise. Same mechanism as VhfQuietHours.wake() (clear the pending
-   * timer, call the same advance() the loop itself uses), so it can never
-   * double-advance or desync the loop's own scheduling.
+   * otherwise. Same mechanism as VhfQuietHours.wake() (clear the parked
+   * timer, call the same advance() the loop itself uses), and the same rule:
+   * mid-tick it does nothing, because the loop is already on its way to the
+   * next scene and a second advance() would be a second loop.
    *
    * Gated to ?diag=1 for both the exposed function and the key binding —
    * this has no business being reachable on the unattended television.
@@ -127,10 +141,9 @@
   window.VhfEngine = {
     advanceNow: function () {
       if (!VhfDiagnostics.visible) return;
-      if (pendingTimeout !== null) {
-        window.clearTimeout(pendingTimeout);
-        pendingTimeout = null;
-      }
+      if (pendingTimeout === null) return;
+      window.clearTimeout(pendingTimeout);
+      pendingTimeout = null;
       if (advanceRef) advanceRef();
     }
   };
@@ -439,6 +452,10 @@
     }
 
     function advance() {
+      // The timer that got us here has fired (or wake/advanceNow cleared
+      // it): not parked again until scheduleNext arms the next one.
+      pendingTimeout = null;
+
       // Exactly one scheduling per tick, whichever path gets there first.
       // The loop staying armed is the property this whole function exists
       // to protect: a display that stops advancing is the failure an
@@ -459,10 +476,12 @@
       if (isQuietHours(data.settings)) {
         upcoming = null;
         showLayer(VhfScenes.renderBlank());
+        quietShowing = true;
         log("quiet hours: showing black scene");
         scheduleNext(QUIET_RECHECK_MS);
         return;
       }
+      quietShowing = false;
 
       var ready;
       try {
@@ -618,7 +637,16 @@
 
   // The comma-separated ids in `?slide=` that can actually be shown, in
   // order, without repeats. "next" stands for the next upcoming event.
+  //
+  // An event that has already finished counts as missing, same as an unknown
+  // id: events.json keeps a past event until the next calendar sync, and a
+  // stale link should hide the frame rather than advertise something over.
+  // "Upcoming" is scenes.js's own rule (upcomingEvents), not a second copy.
   function slideIds(data) {
+    var live = {};
+    var upcoming = VhfScenes.upcomingEvents(data, Infinity, 0);
+    for (var u = 0; u < upcoming.length; u++) live[upcoming[u].id] = true;
+
     var ids = [];
     var parts = slideParam.split(",");
     for (var i = 0; i < parts.length; i++) {
@@ -627,7 +655,8 @@
         var next = VhfScenes.upcomingEvents(data, 1, 0, { excludeTitleContains: eventPoolExcludes(data.playlist) })[0];
         id = next ? next.id : "";
       }
-      if (id && ids.indexOf(id) === -1 && buildSlide(data, id)) ids.push(id);
+      if (!id || !Object.prototype.hasOwnProperty.call(live, id)) continue;
+      if (ids.indexOf(id) === -1 && buildSlide(data, id)) ids.push(id);
     }
     return ids;
   }
@@ -675,6 +704,12 @@
   }
 
   function start() {
+    // A website visitor has no use for the television's offline copy of the
+    // content (index.html skips the Service Worker for the same reason), and
+    // a browser blocking third-party storage would refuse it anyway.
+    if (slideParam && typeof VhfContentSource.setCacheEnabled === "function") {
+      VhfContentSource.setCacheEnabled(false);
+    }
     loadContent()
       .then(slideParam ? runSlide : runLoop)
       .catch(function (err) {

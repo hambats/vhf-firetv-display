@@ -123,14 +123,32 @@ const PLAYLIST_ITEMS = [
   { id: "c", type: "test", enabled: true, duration: 5 }
 ];
 
+/* Events for the `?slide=` tests. Ends are relative to now, so "upcoming"
+   and "finished" hold whatever day the suite runs; the dates in the ids are
+   just ids. */
+const DAY_MS = 24 * 60 * 60 * 1000;
+function slideEvents() {
+  const at = (days) => new Date(Date.now() + days * DAY_MS).toISOString();
+  return [
+    { id: "next-event-2026-11-01", end: at(1) },
+    { id: "beekeeping-101-2026-10-24", end: at(3) },
+    { id: "a-2026-11-01", end: at(5) },
+    { id: "b-2026-11-02", end: at(6) },
+    { id: "finished-2026-01-01", end: at(-2) }
+  ];
+}
+
 function makeContext(clock, tracking, search) {
   const layers = [makeLayer(tracking), makeLayer(tracking)];
 
   const VhfContentSource = {
+    setCacheEnabled(on) {
+      tracking.cacheEnabled.push(on);
+    },
     fetchJson(pathname) {
       if (/playlist\.json/.test(pathname)) return Promise.resolve({ playlist: PLAYLIST_ITEMS });
       if (/settings\.json/.test(pathname)) return Promise.resolve({});
-      if (/events\.json/.test(pathname)) return Promise.resolve({ version: 1, events: [] });
+      if (/events\.json/.test(pathname)) return Promise.resolve({ version: 1, events: slideEvents() });
       if (/announcements\.json/.test(pathname)) return Promise.resolve({ version: 1, announcements: [] });
       if (/gallery\.json/.test(pathname)) return Promise.resolve({ version: 1, photos: [] });
       if (/curated-photos\.json/.test(pathname)) return Promise.resolve({ version: 1, sets: {} });
@@ -155,8 +173,10 @@ function makeContext(clock, tracking, search) {
     renderBlank() {
       return makeSceneNode("blank");
     },
-    upcomingEvents() {
-      return [{ id: "next-event-2026-11-01" }];
+    // Same rule as the real upcomingEvents: finished events drop out.
+    upcomingEvents(data, limit) {
+      const now = Date.now();
+      return data.events.events.filter((e) => new Date(e.end).getTime() >= now).slice(0, limit || 5);
     },
     setEmbedded() {},
     setTimeZone() {},
@@ -213,7 +233,7 @@ function makeContext(clock, tracking, search) {
 async function bootEngine(search) {
   const source = await fs.readFile(ENGINE_PATH, "utf8");
   const clock = makeClock();
-  const tracking = { rendered: [], logs: [], diagErrors: [], shown: [], posted: [] };
+  const tracking = { rendered: [], logs: [], diagErrors: [], shown: [], posted: [], cacheEnabled: [] };
   const { sandbox, layers } = makeContext(clock, tracking, search);
 
   vm.runInContext(source, sandbox);
@@ -295,6 +315,25 @@ test("?slide= shows the one event and arms no timers", async () => {
   assert.deepEqual(JSON.parse(JSON.stringify(tracking.posted)), [
     { source: "vhf-tv-slide", status: "ready", id: "beekeeping-101-2026-10-24" }
   ]);
+  assert.deepEqual(tracking.cacheEnabled, [false], "a website visitor is not left holding the TV's content cache");
+});
+
+test("the television's own loop keeps its content cache", async () => {
+  const { tracking } = await bootEngine();
+  assert.deepEqual(tracking.cacheEnabled, []);
+});
+
+test("?slide= for an event that has already finished posts missing", async () => {
+  // events.json keeps a past event until the next calendar sync; a stale
+  // link hides the frame rather than advertising something already over.
+  const { tracking } = await bootEngine("?slide=finished-2026-01-01");
+  assert.deepEqual(tracking.shown, []);
+  assert.deepEqual(JSON.parse(JSON.stringify(tracking.posted)), [
+    { source: "vhf-tv-slide", status: "missing", id: "finished-2026-01-01" }
+  ]);
+
+  const mixed = await bootEngine("?slide=finished-2026-01-01,a-2026-11-01");
+  assert.deepEqual(mixed.tracking.shown, ["event:a-2026-11-01"], "a finished id is dropped like an unknown one");
 });
 
 test("?slide=next shows the next upcoming event", async () => {
@@ -327,4 +366,78 @@ test("?slide=a,b cycles through the known events and drops unknown ones", async 
   assert.deepEqual(tracking.shown, ["event:a-2026-11-01", "event:b-2026-11-02", "event:a-2026-11-01"], "wraps round");
   assert.equal(clock.size(), 1);
   assert.deepEqual(tracking.posted.map((m) => m.id), ["a-2026-11-01", "b-2026-11-02", "a-2026-11-01"]);
+});
+
+/*
+ * ---- scenes.js: a failed photo sits out a retry window, not the page's life ----
+ *
+ * Here rather than in a file of its own only to keep this change inside the
+ * files it was scoped to; it loads the real scenes.js, not engine.js.
+ *
+ * engine.js reports every image that fails to load to markImageFailed, and
+ * "failed" includes the network being down. When that struck a URL until the
+ * 6-hour reload, an hour-long outage left most of the gallery out of rotation
+ * long after the network came back.
+ */
+function fakeElement(tag) {
+  return {
+    tagName: tag,
+    className: "",
+    textContent: "",
+    children: [],
+    attributes: {},
+    complete: false,
+    style: { setProperty() {} },
+    setAttribute(k, v) {
+      this.attributes[k] = v;
+    },
+    getAttribute(k) {
+      return this.attributes[k];
+    },
+    appendChild(child) {
+      this.children.push(child);
+      return child;
+    },
+    insertBefore(child) {
+      this.children.unshift(child);
+      return child;
+    },
+    addEventListener() {},
+    querySelector() {
+      return null;
+    }
+  };
+}
+
+async function loadScenes() {
+  const source = await fs.readFile(path.join(ROOT, "web", "js", "scenes.js"), "utf8");
+  const clock = { now: Date.parse("2026-11-08T15:00:00Z") };
+  const sandbox = {
+    __clock: clock,
+    console: { log() {}, warn() {}, error() {} },
+    document: { createElement: fakeElement }
+  };
+  sandbox.window = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(source + "\nDate.now = function () { return __clock.now; };", sandbox);
+  return { scenes: sandbox.VhfScenes, clock };
+}
+
+test("a photo that failed to load comes back into rotation after the retry window", async () => {
+  const { scenes, clock } = await loadScenes();
+  const src = "https://images.example.test/photo-1.jpg?format=2500w";
+  const data = { gallery: { photos: [{ id: "photo-1", src }] }, curated: {} };
+  const item = { id: "pool", type: "photo-pool", content: {} };
+  const photoSrc = (scene) => scene.children.find((c) => c.attributes["data-vhf-role"] === "content").src;
+
+  assert.equal(photoSrc(scenes.render(item, data)), src);
+
+  scenes.markImageFailed(src); // say, the network dropped while it loaded
+  assert.throws(() => scenes.render(item, data), /no usable photos/, "a just-failed photo is not drawn again straight away");
+
+  clock.now += 29 * 60 * 1000;
+  assert.throws(() => scenes.render(item, data), /no usable photos/);
+
+  clock.now += 2 * 60 * 1000;
+  assert.equal(photoSrc(scenes.render(item, data)), src, "retried once the window has passed");
 });

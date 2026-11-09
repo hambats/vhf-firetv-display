@@ -35,15 +35,30 @@ test("an unreachable device is a fault, and stops there", () => {
 });
 
 /*
- * The real incident this encodes: after a sleep/wake cycle the television came
- * back on the Fire TV launcher with our app alive behind it. A heartbeat posted
- * by the page would have said everything was fine while the display showed
- * Amazon's home row.
+ * The television is shared: after hours it is the residents' own TV. The
+ * launcher or Netflix in front is legitimate use, so it is recorded (the
+ * sleep/wake incident, where the launcher came back in front of a healthy app,
+ * stays visible in the history) but never raised as a fault.
  */
-test("the launcher in front is a fault even though the app is running", () => {
-  const v = evaluate({ ...HEALTHY, foreground: "com.amazon.tv.launcher/.ui.HomeActivity_vNext" });
-  assert.equal(v.status, "fault");
-  assert.ok(v.findings.some((f) => f.code === "wrong-app"));
+test("another app in front is recorded, never a fault", () => {
+  for (const foreground of [
+    "com.amazon.tv.launcher/.ui.HomeActivity_vNext",
+    "com.netflix.ninja/.MainActivity"
+  ]) {
+    for (const closedDay of [false, true]) {
+      const v = evaluate({ ...HEALTHY, foreground, closedDay, screenshotBytes: undefined });
+      assert.equal(v.status, "warn", `${foreground} closedDay=${closedDay}`);
+      assert.ok(v.findings.some((f) => f.code === "other-app"));
+      assert.ok(v.findings.every((f) => f.severity !== "fault"));
+    }
+  }
+});
+
+test("a screenshot that was not taken is not read as a blank screen", () => {
+  // probe() only photographs our own app, so the screen of a resident's TV
+  // never reaches a public CI artifact. Not measured must not mean "blank".
+  const v = evaluate({ ...HEALTHY, screenshotBytes: undefined });
+  assert.equal(v.status, "ok");
 });
 
 test("a blank screen is a fault on an open day", () => {

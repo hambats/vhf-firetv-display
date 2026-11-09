@@ -69,6 +69,18 @@ const GALLERY_PAGES = [
 ];
 
 const CONCURRENCY = 16;
+
+/*
+ * The smallest pool this adapter will write. Mirrors GALLERY_FLOOR in
+ * scripts/lint-content.mjs (not exported from there, so the value is repeated
+ * here -- keep the two equal). Lint only *warns* below it; here it is a hard
+ * stop, because the CI sync publishes whatever this writes. A pool this small
+ * is not a quiet gallery, it is a broken scrape: a Squarespace template change
+ * that no longer matches IMAGE_URL_RE, or a CDN refusing the size checks.
+ * Capped at maxPhotos so a deliberately small pool setting is still writable.
+ */
+const GALLERY_FLOOR = 20;
+
 const IMAGE_URL_RE = /src="(https:\/\/images\.squarespace-cdn\.com\/[^"]+)"/g;
 
 // Defaults — overridden by content/settings.json's "gallery" object if
@@ -272,6 +284,14 @@ async function main() {
 
   const allUrls = new Map(); // url -> sourcePage
 
+  /*
+   * One unreadable page is a failed sync, not a smaller gallery. Skipping it
+   * used to write a pool built from the remaining pages -- or, with all three
+   * down, an empty one -- and the CI sync published that as a real change,
+   * emptying every photo scene on the wall. So: read every page or write
+   * nothing, leaving the last good gallery.json in place.
+   */
+  const pageFailures = [];
   for (const page of GALLERY_PAGES) {
     console.log(`[gallery] fetching ${page}`);
     let urls;
@@ -279,11 +299,16 @@ async function main() {
       urls = await extractImageUrls(page);
     } catch (err) {
       console.error(`[gallery] failed to read ${page}: ${err.message}`);
+      pageFailures.push(page);
       continue;
     }
     for (const url of urls) {
       if (!allUrls.has(url)) allUrls.set(url, page);
     }
+  }
+  if (pageFailures.length > 0) {
+    fail(`${pageFailures.length} of ${GALLERY_PAGES.length} gallery page(s) could not be read -- gallery.json left as it was`);
+    return;
   }
 
   console.log(`[gallery] found ${allUrls.size} candidate images, checking dimensions (concurrency ${CONCURRENCY})...`);
@@ -407,6 +432,12 @@ async function main() {
 
   console.log(`[gallery] kept ${kept.length} of ${photos.length} qualifying photos (>= ${settings.minDimension}px on the long side, capped at ${settings.maxPhotos}, recency-weighted)`);
 
+  const floor = Math.min(GALLERY_FLOOR, settings.maxPhotos);
+  if (kept.length < floor) {
+    fail(`only ${kept.length} usable photo(s), below the floor of ${floor} -- gallery.json left as it was`);
+    return;
+  }
+
   const output = {
     version: 1,
     source: "vhf-gallery-scrape",
@@ -417,6 +448,16 @@ async function main() {
   await fs.mkdir(path.dirname(OUTPUT_PATH), { recursive: true });
   await fs.writeFile(OUTPUT_PATH, JSON.stringify(output, null, 2) + "\n");
   console.log(`[gallery] wrote ${path.relative(ROOT, OUTPUT_PATH)}`);
+}
+
+/*
+ * A refusal to write is a failure, not a quiet no-op: a non-zero exit fails the
+ * CI sync step, which skips the publish and turns the run red.
+ */
+function fail(message) {
+  console.error(`[gallery] FAILED: ${message}`);
+  if (process.env.GITHUB_ACTIONS) console.log(`::error title=Gallery sync failed::${message}`);
+  process.exitCode = 1;
 }
 
 main().catch((err) => {

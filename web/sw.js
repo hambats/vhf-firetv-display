@@ -66,6 +66,15 @@ var MAX_DRIVE_IMAGES = 200;
  */
 var MAX_IMAGES = 60;
 
+/*
+ * How long a navigation waits on the network before settling for the cached
+ * shell. A reload on a connection that is up but going nowhere (Wi-Fi fine,
+ * upstream dead) otherwise waits out the network stack's own timeouts, which
+ * run to minutes, with the old page frozen mid-loop. Same budget as
+ * content-source.js, which bounds the content reads that follow.
+ */
+var NETWORK_TIMEOUT_MS = 4000;
+
 function isContentJson(url) {
   return url.pathname.indexOf("/content/") !== -1 && /\.json$/.test(url.pathname);
 }
@@ -157,6 +166,69 @@ function cacheImage(request, response) {
   });
 }
 
+function cachedShell() {
+  return caches.open(SHELL_CACHE).then(function (cache) {
+    return cache.match("index.html").then(function (cached) {
+      return cached || cache.match("./");
+    });
+  });
+}
+
+/*
+ * Network first for navigations, with two ways out to the cached shell:
+ *
+ *   - an error status. A host's 404 or 503 page is still a page, so it used
+ *     to be shown as one, on a television nobody will press reload on. The
+ *     cached shell boots instead and runs on cached content.
+ *   - no answer within NETWORK_TIMEOUT_MS, if there is a shell to fall back
+ *     to. Without one, keep waiting: giving up sooner than the network does
+ *     helps nothing when there is nothing else to show.
+ *
+ * A redirect passes through untouched. Navigations fetch with redirect:
+ * "manual", so it arrives as an opaqueredirect with ok false, and serving the
+ * shell at the pre-redirect URL would resolve its relative paths wrongly.
+ */
+function navigate(request) {
+  return new Promise(function (resolve, reject) {
+    var done = false;
+    function settle(fn, value) {
+      if (done) return;
+      done = true;
+      fn(value);
+    }
+
+    var timer = setTimeout(function () {
+      cachedShell().then(function (shell) {
+        if (shell) settle(resolve, shell);
+      }, function () {});
+    }, NETWORK_TIMEOUT_MS);
+
+    fetch(request).then(
+      function (response) {
+        clearTimeout(timer);
+        if (response.ok || response.type === "opaqueredirect") {
+          settle(resolve, response);
+          return null;
+        }
+        return cachedShell().then(function (shell) {
+          settle(resolve, shell || response);
+        }, function () {
+          settle(resolve, response);
+        });
+      },
+      function (err) {
+        clearTimeout(timer);
+        return cachedShell().then(function (shell) {
+          if (shell) settle(resolve, shell);
+          else settle(reject, err);
+        }, function () {
+          settle(reject, err);
+        });
+      }
+    );
+  });
+}
+
 /* Cache-first with a background refresh: the display paints from cache
    immediately (which is the whole point on a restart), and the next start gets
    whatever was republished since. */
@@ -201,15 +273,7 @@ self.addEventListener("fetch", function (event) {
    * read. This is the single most important branch in the file.
    */
   if (request.mode === "navigate") {
-    event.respondWith(
-      fetch(request).catch(function () {
-        return caches.open(SHELL_CACHE).then(function (cache) {
-          return cache.match("index.html").then(function (cached) {
-            return cached || cache.match("./");
-          });
-        });
-      })
-    );
+    event.respondWith(navigate(request));
     return;
   }
 

@@ -37,7 +37,7 @@ this project already use.
 | `custom`         | `src`                          | full 16:9 artwork, no overlay |
 | `event`          | `eventId` OR `title`+`start`   | looked up from `content/generated/events.json` by id, or inline |
 | `event-pool`     | —                               | picks one upcoming event (full detail, same layout as `event`) each time it comes up in rotation, cycling through all of them before repeating — put a few of these in the playlist instead of one big list so each event gets its own screen |
-| `events`         | —                               | `limit` optional (default 5), `offset` optional (default 0), `eyebrow` optional; renders a list of the next N upcoming from `events.json` starting after `offset` — kept for admin/manual use, the playlist itself now prefers `event-pool` |
+| `events`         | —                               | `limit` optional (default 8), `offset` optional (default 0), `eyebrow` optional; renders a list of the next N upcoming from `events.json` starting after `offset` — kept for admin/manual use, the playlist itself now prefers `event-pool` |
 
 ## `content/settings.json`
 
@@ -188,7 +188,7 @@ scrape, not just the next one.
 - The file is valid JSON.
 - `version` is present and a number, on every file.
 - Every array field documented above is present (even if empty) and is an array.
-- Every item in `playlist` has `id`, `type` (one of the six known types), `duration`
+- Every item in `playlist` has `id`, `type` (one of the eight known types: `SCENE_TYPES` in `scripts/validate-content.mjs`), `duration`
   (positive number), `enabled` (boolean), and `content` (object).
 - Every event/announcement/gallery photo has a unique `id` within its file.
 - Any field documented above as an ISO date is parseable by `Date.parse`.

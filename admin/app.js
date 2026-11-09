@@ -274,16 +274,24 @@
   function collectAnnouncementsFromDom() {
     var cards = document.querySelectorAll("#announcements-list .card");
     var items = [];
-    cards.forEach(function (card) {
-      var a = {
+    cards.forEach(function (card, i) {
+      // Start from the entry this card was rendered from, so fields the form
+      // does not show (showRegistration, registrationNote, ...) survive a save.
+      // Building a fresh object here silently stripped the registration QR off
+      // any announcement saved through this tab. Cards are rendered in array
+      // order and every add/delete re-renders, so index i is that entry.
+      var original = (announcementsDoc && announcementsDoc.announcements[i]) || {};
+      var a = Object.assign({}, original, {
         id: card.querySelector('[data-f="id"]').value,
         title: card.querySelector('[data-f="title"]').value,
         body: card.querySelector('[data-f="body"]').value
-      };
+      });
       var activation = card.querySelector('[data-f="activation"]').value.trim();
       var expiration = card.querySelector('[data-f="expiration"]').value.trim();
       if (activation) a.activation = activation;
+      else delete a.activation;
       if (expiration) a.expiration = expiration;
+      else delete a.expiration;
       items.push(a);
     });
     return items;

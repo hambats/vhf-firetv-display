@@ -108,9 +108,10 @@ export function evaluate(facts) {
     const detail = facts.adbDetail ? ` — ${facts.adbDetail}` : "";
     if (facts.adbState === "unauthorized" || /unauthorized/i.test(facts.adbDetail || "")) {
       // Android authorises adb per *client key*, and a CI runner mints a new
-      // one every run. The television answers, then refuses the handshake and
-      // puts an "Allow USB debugging?" prompt on screen that nobody is there to
-      // accept. This is not a dead display and must not be reported as one.
+      // one every run unless the ADB_KEY secret supplies a fixed one (see
+      // display-monitor.yml). The television answers, then refuses the
+      // handshake and puts an "Allow USB debugging?" prompt on screen that
+      // nobody is there to accept. Not a dead display; must not read as one.
       fault("adb-unauthorized", `${DEVICE} refused this client's adb key${detail}`);
     } else {
       fault("unreachable", `no adb connection to ${DEVICE}${detail}`);
@@ -124,7 +125,12 @@ export function evaluate(facts) {
   }
 
   if (facts.foreground && facts.foreground.indexOf(OUR_PACKAGE) === -1) {
-    fault("wrong-app", `foreground is ${facts.foreground}, not ${OUR_PACKAGE}`);
+    // The television is shared: after hours it is the residents' own TV, and
+    // Netflix or the Fire TV home screen in front is legitimate use, not a
+    // failure. Recorded so a pattern is visible, never raised as a fault --
+    // a monitor that pages someone every evening for normal use is one
+    // nobody believes, and nothing here may push the display back in front.
+    warn("other-app", `foreground is ${facts.foreground}, not ${OUR_PACKAGE} (shared TV; not a fault)`);
   } else if (!facts.foreground) {
     warn("foreground-unknown", "could not read the foreground activity");
   }
@@ -187,9 +193,20 @@ async function probe(screenshotPath, closedDay) {
     shell("uptime")
   ]);
 
-  let screenshotBytes = 0;
+  const foreground = (focus.out.match(/u0 ([^\s}]+)/) || [])[1] || null;
+
+  /*
+   * Only photograph our own app. The screenshot is uploaded as a CI artifact
+   * on a public repository, and when anything else is in front the screen is
+   * a resident's TV -- their Netflix, their home row. The blank check only
+   * means anything for our app anyway. Not measured is left undefined so
+   * evaluate() skips the blank rule rather than reading it as "0 bytes".
+   */
+  const ours = !!foreground && foreground.indexOf(OUR_PACKAGE) !== -1;
+  let screenshotBytes;
   const remote = "/data/local/tmp/vhf-monitor.png";
-  const cap = await shell(`screencap -p ${remote}`);
+  const cap = ours ? await shell(`screencap -p ${remote}`) : { ok: false };
+  if (ours) screenshotBytes = 0;
   if (cap.ok) {
     const pull = await adb(["-s", DEVICE, "pull", remote, screenshotPath], { timeoutMs: 60000 });
     if (pull.ok) {
@@ -207,7 +224,7 @@ async function probe(screenshotPath, closedDay) {
     closedDay,
     // dumpsys prints the activity inside a Window{...} record, so stop at the
     // closing brace rather than taking the rest of the token with it.
-    foreground: (focus.out.match(/u0 ([^\s}]+)/) || [])[1] || null,
+    foreground,
     screenOn: /state=ON/.test(power.out) ? true : /state=OFF/.test(power.out) ? false : null,
     crashes: Number(logcat.out.trim()) || 0,
     memFreeKb,
@@ -233,9 +250,11 @@ async function main() {
 
   console.log(`[monitor] ${verdict.status.toUpperCase()}  ${closedDay ? "(closed day)" : ""}`);
   console.log(`[monitor] foreground : ${facts.foreground || "-"}`);
-  console.log(`[monitor] screen     : ${facts.screenOn === null ? "-" : facts.screenOn ? "ON" : "OFF"}`);
+  // `== null` on purpose: an unreachable device has no screenOn at all, and
+  // printing "OFF" for a screen nobody looked at sent readers the wrong way.
+  console.log(`[monitor] screen     : ${facts.screenOn == null ? "-" : facts.screenOn ? "ON" : "OFF"}`);
   console.log(`[monitor] uptime     : ${facts.uptime || "-"}`);
-  console.log(`[monitor] screenshot : ${facts.screenshotBytes || 0} bytes`);
+  console.log(`[monitor] screenshot : ${typeof facts.screenshotBytes === "number" ? facts.screenshotBytes + " bytes" : "not taken"}`);
   for (const f of verdict.findings) console.log(`[monitor]   ${f.severity}: ${f.code} — ${f.detail}`);
   if (verdict.findings.length === 0) console.log("[monitor]   nothing to report");
 

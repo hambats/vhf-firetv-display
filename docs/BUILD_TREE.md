@@ -235,6 +235,17 @@ this file.
    It cannot tell "television dead" from "network dead" — for this purpose both need someone to walk
    over, so the distinction is academic.
 
+   **Nov 8 update — it has never run.** All 261 scheduled runs from Sept 21 to Nov 8 recorded
+   `unreachable` and every one was green. `TS_AUTHKEY` *is* set, but it holds an API access token
+   (`tskey-api-…`), which Tailscale refuses for node login. CI never joined the tailnet. The
+   workflow now rejects that key type outright and fails whenever CI is not on the tailnet, since
+   observe mode is meant to cover the display's faults, not the monitor's. Two more things were
+   wrong behind the key and are now fixed: it took and uploaded a screenshot whatever was in front
+   (public repo, residents' TV after hours), and it treated another app in front as a fault. Still
+   needed from a human: a real `tskey-auth-…` key and a one-time approval of the `ADB_KEY` adb key
+   on the television ([REMOTE_ACCESS.md](REMOTE_ACCESS.md) has the steps). Real cadence was about 5
+   runs a day, not 96; the cron moved off the quarter-hour, which GitHub itself recommends.
+
 2. **Publish-loop verification — investigated, blocked, bigger than it looks.** `publish.mjs` ends
    by confirming GitHub Pages serves the new version, then says the television "picks this up on
    its next content poll" — which it never checks. The obvious fix was to have the page log its
