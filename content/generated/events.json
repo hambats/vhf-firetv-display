@@ -2,25 +2,9 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-11-10T20:05:53.756Z",
+  "generatedAt": "2026-11-11T19:55:19.904Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
-    {
-      "id": "pottery-create-your-ornaments-2-part-series-with-sophia-2026-11-11",
-      "title": "Pottery Create Your Ornaments 2 part series with Sophia",
-      "start": "2026-11-11T18:00:00.000Z",
-      "end": "2026-11-11T20:00:00.000Z",
-      "description": "Nov 4th - Create Your Ornaments Part 1 of 2 We’ll start by working with clay to create your ornaments. No pottery experience is necessary! We’ll use cookie-cutter-style techniques, making it as easy and fun as cutting out sugar cookies.",
-      "programId": "program-pottery"
-    },
-    {
-      "id": "woodworking-2-part-workshop-with-chris-from-forest-project-w-2026-11-11",
-      "title": "Woodworking 2 part workshop with Chris from Forest Project Woodworking",
-      "start": "2026-11-11T18:00:00.000Z",
-      "end": "2026-11-11T21:00:00.000Z",
-      "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing.",
-      "programId": "program-woodworking"
-    },
     {
       "id": "oyster-mushroom-cultivation-workshop-2026-11-13",
       "title": "Oyster Mushroom Cultivation Workshop",
