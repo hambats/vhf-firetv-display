@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-11-11T19:55:19.385Z",
+  "generatedAt": "2026-11-12T20:32:34.412Z",
   "sets": {
     "gen-pop-additions": [
       {
@@ -840,22 +840,6 @@
         "src": "content/artwork/curated/volunteer-groups/kids-boardwalk-trail.jpg",
         "width": 2500,
         "height": 3333
-      }
-    ],
-    "drive-flyers": [
-      {
-        "id": "drive/1Vq320T1N4ugVJJ6JwFEMzLSjoX0kwTri",
-        "src": "content/artwork/drive/flyers/1Vq320T1N4ugVJJ6JwFEMzLSjoX0kwTri.jpg",
-        "width": 1920,
-        "height": 1920,
-        "expires": "2026-11-12T15:01:42.084Z"
-      },
-      {
-        "id": "drive/12WBmbLRAbipQiBRU_KMKkivnb0v0T4GM",
-        "src": "content/artwork/drive/flyers/12WBmbLRAbipQiBRU_KMKkivnb0v0T4GM.jpg",
-        "width": 1920,
-        "height": 1920,
-        "expires": "2026-11-12T15:01:44.774Z"
       }
     ]
   }

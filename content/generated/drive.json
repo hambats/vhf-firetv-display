@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "Google Drive shared folder (build-side only; see sources/drive)",
-  "generatedAt": "2026-11-11T19:55:16.356Z",
+  "generatedAt": "2026-11-12T20:32:30.446Z",
   "sets": {
     "gen-pop-additions": {
       "section": "farm",
@@ -104,28 +104,7 @@
       "section": "flyers",
       "folder": "Flyers",
       "dir": "flyers",
-      "photos": [
-        {
-          "driveId": "1Vq320T1N4ugVJJ6JwFEMzLSjoX0kwTri",
-          "name": "VHF Slide 1.jpg",
-          "modifiedTime": "2026-10-13T14:54:21.591Z",
-          "dir": "flyers",
-          "src": "content/artwork/drive/flyers/1Vq320T1N4ugVJJ6JwFEMzLSjoX0kwTri.jpg",
-          "width": 1920,
-          "height": 1920,
-          "expires": "2026-11-12T15:01:42.084Z"
-        },
-        {
-          "driveId": "12WBmbLRAbipQiBRU_KMKkivnb0v0T4GM",
-          "name": "VHF Slide 2.jpg",
-          "modifiedTime": "2026-10-13T14:54:25.111Z",
-          "dir": "flyers",
-          "src": "content/artwork/drive/flyers/12WBmbLRAbipQiBRU_KMKkivnb0v0T4GM.jpg",
-          "width": 1920,
-          "height": 1920,
-          "expires": "2026-11-12T15:01:44.774Z"
-        }
-      ]
+      "photos": []
     },
     "program-herb-squad": {
       "section": "classes",
@@ -360,6 +339,14 @@
     }
   },
   "skipped": [
+    {
+      "path": "Flyers/VHF Slide 2.jpg",
+      "reason": "flyer expired 2026-11-12"
+    },
+    {
+      "path": "Flyers/VHF Slide 1.jpg",
+      "reason": "flyer expired 2026-11-12"
+    },
     {
       "path": "Classes/Fishing/16539.JPG",
       "reason": "too small for the TV (360x480, needs 1000px on the long side)"
