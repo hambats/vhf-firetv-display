@@ -2,42 +2,9 @@
   "version": 3,
   "source": "google-calendar-ics",
   "calendarId": "vhf2023calendar@gmail.com",
-  "generatedAt": "2026-11-14T18:35:42.548Z",
+  "generatedAt": "2026-11-18T20:59:10.391Z",
   "note": "Pulled from the public VHF Google Calendar ICS feed (sources/calendar/index.mjs), windowed to the next 120 days. Entries matching content/events-exclude.json (closures, internal volunteer shifts, cancelled/private items) are dropped; everything else is included regardless of whether it has a registration link.",
   "events": [
-    {
-      "id": "appalachian-dog-training-puppy-socialization-2026-11-18",
-      "title": "Appalachian Dog Training - Puppy socialization",
-      "start": "2026-11-18T15:00:00.000Z",
-      "end": "2026-11-18T18:00:00.000Z",
-      "description": "Come get some puppy love!! This is a few hours of drop in puppy time to help teach them socialization. Feel free to come get some puppy snuggles!",
-      "programId": "program-dog-training"
-    },
-    {
-      "id": "chair-massage-with-lisa-2026-11-18",
-      "title": "Chair Massage with Lisa",
-      "start": "2026-11-18T15:00:00.000Z",
-      "end": "2026-11-18T19:30:00.000Z",
-      "description": "A chair massage is a short, session focused on relieving tension in the neck, back, shoulders, arms, and hands. Sessions can be 15 or 30 minutes, it uses a specialized ergonomic chair to provide targeted acupressure and Swedish massage techniques.",
-      "programId": "program-chair-massage"
-    },
-    {
-      "id": "beeswax-candles-with-jessica-2026-11-18",
-      "title": "Beeswax Candles with Jessica",
-      "start": "2026-11-18T17:00:00.000Z",
-      "end": "2026-11-18T21:00:00.000Z",
-      "description": "A beeswax candle making workshop is a hands-on crafting class where participants learn to create eco-friendly, natural candles using pure beeswax from local hives",
-      "programId": "program-beekeeping"
-    },
-    {
-      "id": "woodworking-2-park-workshop-with-chris-from-forest-project-w-2026-11-18",
-      "title": "Woodworking 2 park workshop with Chris from Forest Project Woodworking",
-      "start": "2026-11-18T18:00:00.000Z",
-      "end": "2026-11-18T21:00:00.000Z",
-      "location": "forest Project Woodworking",
-      "description": "This is a 2 part workshop Join master furniture maker Chris to make your own woodworking project. Designed for adult beginners, these workshops introduce shop safety, wood selection, project build, sanding, and finishing.",
-      "programId": "program-woodworking"
-    },
     {
       "id": "wreath-making-with-maddie-2026-11-19",
       "title": "Wreath Making with Maddie",
