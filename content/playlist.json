@@ -21,6 +21,17 @@
       "content": {}
     },
     {
+      "id": "coming-home-sculpture",
+      "type": "information",
+      "duration": 14,
+      "enabled": true,
+      "content": {
+        "eyebrow": "Coming to the Farm",
+        "title": "Coming Home",
+        "body": "Barbie The Welder is welding a 15-foot bronze and steel barn swallow as a gift to our veterans. In Navy tradition, the swallow means a sailor has come safely home."
+      }
+    },
+    {
       "id": "announcements",
       "type": "announcement",
       "duration": 13,
@@ -175,6 +186,20 @@
       "content": {}
     },
     {
+      "id": "coming-home-artist",
+      "type": "information",
+      "duration": 14,
+      "enabled": true,
+      "content": {
+        "eyebrow": "A Gift from Barbie The Welder",
+        "title": "A Year of Her Craft",
+        "body": "American sculptor Barbie The Welder is giving a year of her time to weld a 15-foot bronze and steel sculpture for our veterans. It will stand here at the farm.",
+        "washSources": [
+          "coming-home-artist"
+        ]
+      }
+    },
+    {
       "id": "program-herb-squad",
       "type": "information",
       "duration": 13,
@@ -285,6 +310,21 @@
       "content": {}
     },
     {
+      "id": "coming-home-impact",
+      "type": "information",
+      "duration": 14,
+      "enabled": true,
+      "content": {
+        "family": "impact",
+        "eyebrow": "Coming Home",
+        "title": "15 Feet of Bronze & Steel",
+        "body": "A barn swallow flying in front of the rising sun, welded by Barbie The Welder as a gift to the farm. The final design was unveiled in clay on Veterans Day.",
+        "washSources": [
+          "coming-home-clay"
+        ]
+      }
+    },
+    {
       "id": "resource-fair",
       "type": "information",
       "duration": 13,
@@ -346,6 +386,21 @@
       "duration": 9,
       "enabled": true,
       "content": {}
+    },
+    {
+      "id": "coming-home-unfold",
+      "type": "information",
+      "duration": 14,
+      "enabled": true,
+      "content": {
+        "eyebrow": "A Sculpture for Our Veterans",
+        "title": "Safe Return Home",
+        "titleEffect": "unfold",
+        "body": "Sailors earned a swallow tattoo after 5,000 miles at sea. Barbie The Welder is turning that symbol into a 15-foot sculpture for the farm, titled Coming Home.",
+        "washSources": [
+          "coming-home-sculpture"
+        ]
+      }
     },
     {
       "id": "free-programs",

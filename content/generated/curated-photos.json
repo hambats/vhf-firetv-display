@@ -1,8 +1,52 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-11-19T21:04:46.125Z",
+  "generatedAt": "2026-11-19T23:46:49.756Z",
   "sets": {
+    "coming-home-artist": [
+      {
+        "id": "coming-home-artist/barbie-welding.jpg",
+        "src": "content/artwork/curated/coming-home-artist/barbie-welding.jpg",
+        "width": 1992,
+        "height": 1170,
+        "focus": "center 45%"
+      }
+    ],
+    "coming-home-clay": [
+      {
+        "id": "coming-home-clay/clay-model.jpg",
+        "src": "content/artwork/curated/coming-home-clay/clay-model.jpg",
+        "width": 1280,
+        "height": 720,
+        "focus": "70% center"
+      }
+    ],
+    "coming-home-sculpture": [
+      {
+        "id": "coming-home-sculpture/barbie-welding.jpg",
+        "src": "content/artwork/curated/coming-home-sculpture/barbie-welding.jpg",
+        "width": 1992,
+        "height": 1170,
+        "focus": "center 45%"
+      },
+      {
+        "id": "coming-home-sculpture/clay-model.jpg",
+        "src": "content/artwork/curated/coming-home-sculpture/clay-model.jpg",
+        "width": 1280,
+        "height": 720,
+        "focus": "70% center"
+      },
+      {
+        "id": "coming-home-sculpture/farm-visit.jpg",
+        "src": "content/artwork/curated/coming-home-sculpture/farm-visit.jpg",
+        "width": 1477,
+        "height": 2029,
+        "focus": [
+          "center 72%",
+          "center 40%"
+        ]
+      }
+    ],
     "gen-pop-additions": [
       {
         "id": "gen-pop-additions/481342530_660857999943454_792166771420538192_n.jpg",
