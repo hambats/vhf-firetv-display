@@ -439,20 +439,33 @@ var VhfScenes = (function () {
     // instead of the shared line-by-line rise (see unfoldTitle).
     if (content.titleEffect === "unfold") className += " scene--title-unfold";
     var scene = el("div", className);
-    // Information slides for a specific program (id "program-agritherapy"
+    // Story-family information slides for a specific program (id "program-agritherapy"
     // etc., matching a content/artwork/curated/ folder 1:1) get that
     // program's own photos as the wash instead of a random farm photo.
     // content.washSources overrides this for a slide that names several
     // programs in its own text rather than being about just one.
-    // Shape-chosen layout applies to the story family only. The impact and
-    // crisis families have their own grounds and anchors (D2.1, D5.3) and are
-    // deliberately left alone.
-    appendWash(scene, data, content.washSources || item.id, { shapeLayout: !content.family });
-    scene.appendChild(el("div", "scene__fade"));
+    // Shape-chosen layout applies to the story family only.
+    //
+    // The impact and crisis families get no photo at all: no wash, no fade,
+    // nothing fetched. A ghosted face behind "You Are Not Alone" or behind an
+    // impact figure is the wrong picture of a stranger at the wrong moment,
+    // and a 16% photo under a veil only muddied the ground the text colours
+    // were measured against (D2.2, D5.3).
+    var photoFree = content.family === "impact" || content.family === "crisis";
+    if (!photoFree) {
+      appendWash(scene, data, content.washSources || item.id, { shapeLayout: !content.family });
+      scene.appendChild(el("div", "scene__fade"));
+    }
     var body = el("div", "scene__content");
     body.appendChild(el("p", "scene__eyebrow", content.eyebrow || "Veterans Healing Farm"));
     body.appendChild(el("h1", "scene__title", content.title || "Welcome"));
     if (content.body) body.appendChild(el("p", "scene__body", content.body));
+    // content.callout: the one actionable line on a crisis slide ("Dial 988,
+    // then press 1"), set on its own line as the largest thing after the
+    // title instead of buried mid-sentence in the body.
+    if (content.family === "crisis" && content.callout) {
+      body.appendChild(el("p", "scene__callout", content.callout));
+    }
     scene.appendChild(body);
     // The Welcome scene gets the full lockup instead of the small corner
     // mark — it's the slide with the most room and the highest chance of

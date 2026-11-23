@@ -78,6 +78,19 @@ test("an unparseable time-overrides file fails validation; a missing one does no
   assert.deepEqual(await errorsAfter(t, "events-time-overrides.json", null), []);
 });
 
+test("information family and callout are validated", async (t) => {
+  const info = (d, id) => d.playlist.find((i) => i.id === id);
+  const errors = await errorsAfter(t, "playlist.json", (d) => {
+    info(d, "memorial-wall").content.family = "memorial";
+    info(d, "our-mission").content.callout = "Dial 988, then press 1";
+    info(d, "crisis-line").content.callout = "  ";
+  });
+  const text = errors.join("\n");
+  assert.match(text, /"memorial-wall": "content.family" must be one of impact, crisis/);
+  assert.match(text, /"our-mission": "content.callout" is only shown on a "crisis" family slide/);
+  assert.match(text, /"crisis-line": "content.callout" must be a non-empty string/);
+});
+
 test("parse errors name nested files with forward slashes on every OS", async (t) => {
   const dir = await makeFixture();
   t.after(() => cleanup(dir));

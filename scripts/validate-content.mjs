@@ -107,6 +107,26 @@ function validatePlaylist(doc, errors) {
     }
     if (!isPlainObject(item.content)) {
       errors.push(`${tag}: "content" must be an object`);
+    } else if (item.type === "information") {
+      validateInformationContent(item.content, tag, errors);
+    }
+  }
+}
+
+// Information-slide families with their own ground (web/css/theme.css). Both
+// render with no photo at all; anything else is the default story treatment.
+const INFORMATION_FAMILIES = ["impact", "crisis"];
+
+function validateInformationContent(c, tag, errors) {
+  if (c.family !== undefined && !INFORMATION_FAMILIES.includes(c.family)) {
+    errors.push(`${tag}: "content.family" must be one of ${INFORMATION_FAMILIES.join(", ")} if present (got ${JSON.stringify(c.family)})`);
+  }
+  if (c.callout !== undefined) {
+    if (typeof c.callout !== "string" || c.callout.trim().length === 0) {
+      errors.push(`${tag}: "content.callout" must be a non-empty string`);
+    } else if (c.family !== "crisis") {
+      // Only the crisis family draws it; elsewhere it would silently vanish.
+      errors.push(`${tag}: "content.callout" is only shown on a "crisis" family slide`);
     }
   }
 }

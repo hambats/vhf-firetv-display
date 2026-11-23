@@ -30,7 +30,7 @@ this project already use.
 
 | type            | required fields                | notes |
 |------------------|--------------------------------|-------|
-| `information`    | `title`                        | `eyebrow`, `body` optional |
+| `information`    | `title`                        | `eyebrow`, `body` optional; `family` optional, `"impact"` (charcoal on olive) or `"crisis"` (cream on charcoal), and either family renders with no photo at all; `callout` optional on a `"crisis"` slide only, a short line set on its own at large size (e.g. `"Dial 988, then press 1"`) |
 | `announcement`   | `announcementId` OR `title`    | looked up from `content/announcements/announcements.json` by id, or inline |
 | `photo`          | `src`                          | `fit` (`cover`\|`contain`, default `cover`), `focus` (CSS `object-position`, default `center 35%`) |
 | `photo-pool`     | —                               | picks a random photo from `content/generated/gallery.json` (or a curated set, via `content.source`) each time it comes up in rotation; `fit: "contain"` shows each image whole on a blurred fill instead of cropping it (used by the Drive flyer slots, `source: "drive-flyers"` — see [DRIVE_FEED.md](DRIVE_FEED.md)); a photo entry there may carry an `expires` ISO instant after which it is no longer shown, its own `focus` (object-position override), `zoom` (<1 eases a too-tight cover crop, e.g. `0.9`), or `pan` (`{ x, y }` CSS translate override for the Ken Burns drift direction — default drifts up-left; positive `y` drifts down, e.g. `{ y: "2.5%" }`, toward a subject sitting low in frame) |

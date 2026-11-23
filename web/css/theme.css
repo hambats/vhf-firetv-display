@@ -33,7 +33,9 @@
   --vhf-bg-events: var(--vhf-navy);
   --vhf-text-on-events: var(--vhf-cream);
   --vhf-bg-impact: var(--vhf-olive);
-  --vhf-text-on-impact: var(--vhf-navy);
+  /* Charcoal, not navy: navy on olive measured 2.62:1, below even the 3:1
+     large-text bar. Charcoal on olive is 5.12:1 (tests/contrast.test.mjs). */
+  --vhf-text-on-impact: var(--vhf-charcoal);
   /* The crisis-line slide gets its own calm, high-contrast treatment rather
      than sharing the terracotta announcement ground — see D5.3. */
   --vhf-bg-crisis: var(--vhf-charcoal);
@@ -74,6 +76,7 @@
   --vhf-size-title-announcement: 76px;
   --vhf-size-subtitle: 40px;
   --vhf-size-body: 32px;
+  --vhf-size-callout: 72px;
   --vhf-size-caption: 26px;
   --vhf-size-brand: 24px;
   --vhf-size-events-date: 30px;

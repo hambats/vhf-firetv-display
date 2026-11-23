@@ -211,6 +211,7 @@ html, body {
 .scene__subtitle { animation: vhf-settle 900ms var(--vhf-ease-out) 820ms both; }
 .scene__subtitle + .scene__subtitle { animation-delay: 900ms; }
 .scene__body { animation: vhf-settle 900ms var(--vhf-ease-out) 960ms both; }
+.scene__callout { animation: vhf-settle 900ms var(--vhf-ease-out) 1080ms both; }
 .scene__caption { animation: vhf-settle 900ms var(--vhf-ease-out) 1080ms both; }
 .schedule,
 .events-list { animation: vhf-settle 1000ms var(--vhf-ease-out) 960ms both; }
@@ -231,6 +232,7 @@ html, body {
   .scene__eyebrow::before,
   .scene__subtitle,
   .scene__body,
+  .scene__callout,
   .scene__caption,
   .schedule,
   .events-list {
@@ -323,12 +325,12 @@ html, body {
   );
 }
 
-/* Events/impact families sit on a dark ground, so their fade needs to be a
+/* Events families sit on a dark ground, so their fade needs to be a
    dark-to-transparent veil instead of white-to-transparent (D2.1 grounds by
-   family). */
+   family). The impact and crisis families draw no wash and no fade at all
+   (renderInformation). */
 .scene--event .scene__fade,
-.scene--events .scene__fade,
-.scene--impact .scene__fade {
+.scene--events .scene__fade {
   background: linear-gradient(
     to top,
     rgba(0, 0, 0, 0.55) 0%,
@@ -643,7 +645,8 @@ html, body {
 }
 
 .scene--impact .scene__title,
-.scene--impact .scene__body {
+.scene--impact .scene__body,
+.scene--impact .scene__eyebrow {
   color: var(--vhf-text-on-impact);
 }
 
@@ -658,10 +661,6 @@ html, body {
 .scene--crisis {
   background-color: var(--vhf-bg-crisis);
   color: var(--vhf-text-on-crisis);
-}
-
-.scene--crisis .scene__fade {
-  background: none;
 }
 
 .scene--crisis .scene__content {
@@ -683,8 +682,21 @@ html, body {
   margin-right: auto;
 }
 
+/* Cream, not terracotta: terracotta on charcoal measured 3.45:1 at 28px. */
 .scene--crisis .scene__eyebrow {
-  color: var(--vhf-terracotta);
+  color: var(--vhf-text-on-crisis);
+}
+
+/* The dial instruction on its own line, the largest thing on the slide after
+   the title: readable across a room. Same cream as the rest, no red, no
+   motion beyond the shared entrance settle. */
+.scene--crisis .scene__callout {
+  font-family: var(--vhf-font-display);
+  font-size: var(--vhf-size-callout);
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--vhf-text-on-crisis);
+  margin-top: 40px;
 }
 
 /* ---- Events (plural) list scene ---- */

@@ -490,7 +490,8 @@
         "family": "crisis",
         "eyebrow": "If You Need Support",
         "title": "You Are Not Alone",
-        "body": "If you or a Veteran you know is in crisis, call the Veterans Crisis Line: 988, then press 1."
+        "body": "If you or a Veteran you know is in crisis, call the Veterans Crisis Line.",
+        "callout": "Dial 988, then press 1"
       }
     },
     {
