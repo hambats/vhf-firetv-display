@@ -112,6 +112,38 @@ The last one is worth noting: the Fire TV **does** relaunch the display after a 
 `docs/BUILD_TREE.md` §5 records this as "better, not solved" because Fire OS makes no guarantee,
 and that caveat stands — but it has now been observed working twice on this device.
 
+## The CI monitor's credentials
+
+`.github/workflows/display-monitor.yml` reaches the television the same way, from GitHub
+Actions. It needs two things, and both have tripped it before:
+
+1. **`TS_AUTHKEY` must be an auth key, `tskey-auth-…`**: Tailscale admin console → Settings →
+   Keys → *Generate auth key*, reusable and ephemeral. An API access token (`tskey-api-…`) looks
+   just as valid and is refused at login ("key cannot be used for node auth"). That mistake kept
+   the monitor dark from Sept 21 to Nov 8 behind 261 green runs. The workflow now rejects a
+   `tskey-api-` value outright and fails the run whenever CI does not actually join the tailnet.
+2. **A fixed adb key, `ADB_KEY`** (optional but needed in practice). Android approves adb per
+   client key; without a fixed one every CI run is a new client, the television shows "Allow USB
+   debugging?" on its screen, and the check reports `adb-unauthorized`. Once, on the PC:
+
+   ```bash
+   adb keygen vhf-ci-adbkey
+   ```
+
+   Put the contents of `vhf-ci-adbkey` in the `ADB_KEY` repo secret (and `vhf-ci-adbkey.pub` in
+   `ADB_KEY_PUB`). Then connect once with that key while someone is at the television, and tick
+   **Always allow from this computer** on the prompt:
+
+   ```bash
+   ADB_VENDOR_KEYS=vhf-ci-adbkey adb connect 100.69.183.1:5555
+   ```
+
+   Keep `vhf-ci-adbkey` out of the repo; it is a credential for the television.
+
+The monitor only photographs the screen when the display app is in front (artifacts on this
+public repo would otherwise show a resident's TV), and another app in front is recorded, never a
+fault. See `scripts/check-display.mjs`.
+
 ## If it stops working
 
 | Symptom | Likely cause |

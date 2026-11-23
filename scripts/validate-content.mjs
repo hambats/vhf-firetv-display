@@ -29,6 +29,22 @@ function isIsoDate(v) {
   return typeof v === "string" && !isNaN(Date.parse(v));
 }
 
+/*
+ * A full date-time with an explicit zone: "...Z" or "...-05:00". Anything less
+ * is read by Date.parse in whatever zone the reader is in -- a date-only
+ * string as UTC midnight (the evening before, in North Carolina), an
+ * offset-less one as the television's own local time. Both are wrong by hours
+ * on the screen with nothing to show for it, so hand-typed times must say
+ * which zone they mean.
+ */
+const ZONED_DATE_TIME_RE = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})$/;
+
+function isZonedDateTime(v) {
+  return typeof v === "string" && ZONED_DATE_TIME_RE.test(v) && !isNaN(Date.parse(v));
+}
+
+const ZONED_HINT = 'a full date-time with a UTC offset or Z, e.g. "2026-11-08T23:59:59-05:00"';
+
 function isValidUrl(v) {
   if (typeof v !== "string") return false;
   try {
@@ -184,11 +200,11 @@ function validateAnnouncements(doc, errors) {
   for (const a of doc.announcements) {
     const tag = `${label} announcement "${a.id ?? "?"}"`;
     if (typeof a.title !== "string" || a.title.length === 0) errors.push(`${tag}: "title" is required`);
-    if (a.activation !== undefined && !isIsoDate(a.activation)) {
-      errors.push(`${tag}: "activation" must be a parseable ISO date`);
+    if (a.activation !== undefined && !isZonedDateTime(a.activation)) {
+      errors.push(`${tag}: "activation" must be ${ZONED_HINT} (got ${JSON.stringify(a.activation)})`);
     }
-    if (a.expiration !== undefined && !isIsoDate(a.expiration)) {
-      errors.push(`${tag}: "expiration" must be a parseable ISO date`);
+    if (a.expiration !== undefined && !isZonedDateTime(a.expiration)) {
+      errors.push(`${tag}: "expiration" must be ${ZONED_HINT} (got ${JSON.stringify(a.expiration)})`);
     }
   }
 }
@@ -257,6 +273,43 @@ function validateEventsExclude(doc, errors) {
   }
 }
 
+/*
+ * content/events-time-overrides.json: hand-typed corrections that
+ * sources/calendar copies verbatim into events.json, so the display parses
+ * these exact strings. Shape is what loadTimeOverrides/applyTimeOverride read:
+ * { overrides: { <event id>: { start?, end?, note? } } }.
+ */
+const EVENT_ID_RE = /-\d{4}-\d{2}-\d{2}(?:-\d+)?$/;
+
+function validateTimeOverrides(doc, errors) {
+  const label = "content/events-time-overrides.json";
+  if (doc.version !== undefined && typeof doc.version !== "number") errors.push(`${label}: "version" must be a number`);
+  if (!isPlainObject(doc.overrides)) {
+    errors.push(`${label}: "overrides" must be an object keyed by event id`);
+    return;
+  }
+  for (const [id, o] of Object.entries(doc.overrides)) {
+    const tag = `${label} override "${id}"`;
+    if (!EVENT_ID_RE.test(id)) {
+      errors.push(`${tag}: key must be an event id as the calendar sync generates it (ending in -YYYY-MM-DD)`);
+    }
+    if (!isPlainObject(o)) {
+      errors.push(`${tag}: must be an object with "start" and/or "end"`);
+      continue;
+    }
+    if (o.start === undefined && o.end === undefined) errors.push(`${tag}: needs "start" and/or "end"`);
+    if (o.start !== undefined && !isZonedDateTime(o.start)) errors.push(`${tag}: "start" must be ${ZONED_HINT}`);
+    // null is meaningful to the loader: it clears the calendar's end time.
+    if (o.end !== undefined && o.end !== null && !isZonedDateTime(o.end)) errors.push(`${tag}: "end" must be ${ZONED_HINT} or null`);
+    if (isZonedDateTime(o.start) && isZonedDateTime(o.end) && Date.parse(o.end) < Date.parse(o.start)) {
+      errors.push(`${tag}: "end" is before "start"`);
+    }
+    if (o.note !== undefined && typeof o.note !== "string") errors.push(`${tag}: "note" must be a string`);
+  }
+}
+
+// `optional`: a missing file is fine (the reader treats it as empty); a
+// present one must still parse and validate.
 const KNOWN_FILES = [
   { relPath: "playlist.json", validate: validatePlaylist },
   { relPath: "settings.json", validate: validateSettings },
@@ -265,7 +318,8 @@ const KNOWN_FILES = [
   { relPath: path.join("generated", "gallery.json"), validate: validateGallery },
   { relPath: path.join("generated", "curated-photos.json"), validate: validateCuratedPhotos },
   { relPath: "gallery-exclude.json", validate: validateGalleryExclude },
-  { relPath: "events-exclude.json", validate: validateEventsExclude }
+  { relPath: "events-exclude.json", validate: validateEventsExclude },
+  { relPath: "events-time-overrides.json", validate: validateTimeOverrides, optional: true }
 ];
 
 // Name -> relative path, reused by admin/server.mjs so it edits exactly the
@@ -282,13 +336,16 @@ export const CONTENT_FILES = {
 
 export async function validateContentDir(contentDir) {
   const errors = [];
-  for (const { relPath, validate } of KNOWN_FILES) {
+  for (const { relPath, validate, optional } of KNOWN_FILES) {
     const filePath = path.join(contentDir, relPath);
     let doc;
     try {
       doc = await readJson(filePath);
     } catch (err) {
-      errors.push(`content/${relPath}: ${err.message}`);
+      if (optional && err.code === "ENOENT") continue;
+      // Forward slashes whatever the OS, to match every other message here --
+      // admin/server.mjs picks out a file's errors by this prefix.
+      errors.push(`content/${relPath.split(path.sep).join("/")}: ${err.message}`);
       continue;
     }
     validate(doc, errors);

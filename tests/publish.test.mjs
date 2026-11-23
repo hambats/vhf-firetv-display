@@ -11,8 +11,18 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import path from "node:path";
+import os from "node:os";
 import { promises as fs } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { PUBLISHED_CONTENT } from "../scripts/build-site.mjs";
+import {
+  spawnPlan,
+  parsePorcelainZ,
+  classifyEntries,
+  commitArgs,
+  isNewBuild,
+  parseAheadBehind
+} from "../scripts/publish.mjs";
 import { ROOT, runBuild, makeFixture, exists, cleanup } from "./helpers/build-fixture.mjs";
 
 test("a successful build publishes every file the engine fetches", async (t) => {
@@ -83,4 +93,119 @@ test("invalid content fails the build and leaves dist/ untouched", async (t) => 
 
   const after = await fs.readFile(path.join(dir, "dist", "content", "playlist.json"), "utf8");
   assert.equal(after, good, "the previously published playlist must survive a failed build");
+});
+
+/*
+ * scripts/publish.mjs's git handling. These run real git against a throwaway
+ * repository: the bugs they pin down were all in the space between what the
+ * script handed git and what git actually received.
+ */
+
+const NASTY_MESSAGE = 'Rename "Q&A" slide to 100%PATH% done';
+
+test("git is spawned without a shell, so a commit message arrives verbatim", () => {
+  const win = spawnPlan("git", ["commit", "-m", NASTY_MESSAGE], "win32");
+  assert.equal(win.shell, false);
+  assert.deepEqual(win.args, ["commit", "-m", NASTY_MESSAGE]);
+
+  // npm is a .cmd shim on Windows and still needs one; it never carries user text.
+  const npm = spawnPlan("npm", ["test"], "win32");
+  assert.equal(npm.shell, true);
+  assert.equal(spawnPlan("npm", ["test"], "linux").shell, false);
+});
+
+test("porcelain -z parsing keeps unusual names, renames and untracked folders intact", () => {
+  const out = [
+    " M content/artwork/curated/program-x/Maddie’s pie.jpg",
+    "R  content/new name.json",
+    "content/old name.json",
+    "?? content/artwork/drive/program-new/",
+    "?? content/artwork/candidates/x.png",
+    ""
+  ].join("\0");
+  const entries = parsePorcelainZ(out);
+  assert.deepEqual(entries.map((e) => e.path), [
+    "content/artwork/curated/program-x/Maddie’s pie.jpg",
+    "content/new name.json",
+    "content/artwork/drive/program-new",
+    "content/artwork/candidates/x.png"
+  ]);
+  assert.equal(entries[1].from, "content/old name.json");
+
+  const { staging, heldBack, renamedFrom } = classifyEntries(entries);
+  assert.deepEqual(heldBack, ["content/artwork/candidates/x.png"]);
+  assert.ok(staging.includes("content/artwork/drive/program-new"));
+  assert.deepEqual(renamedFrom, ["content/old name.json"]);
+});
+
+test("ahead/behind counts are read from rev-list", () => {
+  assert.deepEqual(parseAheadBehind("2\t5\n"), { ahead: 2, behind: 5 });
+  assert.deepEqual(parseAheadBehind("0\t0"), { ahead: 0, behind: 0 });
+});
+
+test("a publish commit holds exactly the publish, whatever else is staged", async (t) => {
+  const dir = await fs.mkdtemp(path.join(os.tmpdir(), "vhf-git-"));
+  t.after(() => cleanup(dir));
+  const g = (...args) => execFileSync("git", ["--literal-pathspecs", ...args], { cwd: dir, encoding: "utf8" });
+  const write = async (rel, body) => {
+    await fs.mkdir(path.dirname(path.join(dir, rel)), { recursive: true });
+    await fs.writeFile(path.join(dir, rel), body);
+  };
+
+  g("init", "-q");
+  g("config", "user.name", "test");
+  g("config", "user.email", "test@example.com");
+  g("config", "core.autocrlf", "false");
+  await write("content/artwork/curated/program-x/Maddie’s pie.jpg", "a");
+  await write("content/artwork/curated/program-x/flyer[1].jpg", "a");
+  await write("content/old.json", "{\"old\": true}");
+  await write("content/gone.json", "{\"gone\": true}");
+  await write("app/Main.kt", "a");
+  g("add", "-A");
+  g("commit", "-q", "-m", "init");
+
+  await write("content/artwork/curated/program-x/Maddie’s pie.jpg", "b");
+  await write("content/artwork/curated/program-x/flyer[1].jpg", "b");
+  await write("content/artwork/drive/program-new/1abc.jpg", "new");
+  await write("content/artwork/candidates/draft.png", "not for publishing");
+  await fs.rm(path.join(dir, "content", "gone.json"));
+  g("mv", "content/old.json", "content/renamed.json");
+  await write("app/Main.kt", "unrelated work in progress");
+  g("add", "app/Main.kt");
+
+  const entries = parsePorcelainZ(g("status", "--porcelain", "-z", "--", "content", "web"));
+  const { staging, heldBack, renamedFrom } = classifyEntries(entries);
+  // git reports a wholly untracked folder as the folder itself.
+  assert.deepEqual(heldBack, ["content/artwork/candidates"]);
+
+  g("add", "--", ...staging);
+  g(...commitArgs(NASTY_MESSAGE, staging.concat(renamedFrom)));
+
+  assert.equal(g("log", "-1", "--format=%s").trim(), NASTY_MESSAGE);
+  const committed = g("-c", "core.quotePath=false", "show", "--name-status", "--format=", "HEAD").trim().split("\n").sort();
+  assert.deepEqual(committed, [
+    "A\tcontent/artwork/drive/program-new/1abc.jpg",
+    "D\tcontent/gone.json",
+    "M\tcontent/artwork/curated/program-x/Maddie’s pie.jpg",
+    "M\tcontent/artwork/curated/program-x/flyer[1].jpg",
+    "R100\tcontent/old.json\tcontent/renamed.json"
+  ]);
+  // The unrelated staged change is still staged, and still uncommitted.
+  assert.match(g("status", "--porcelain", "--", "app"), /^M  app\/Main\.kt/);
+});
+
+test("a publish is only verified by a build made after the push", () => {
+  const pushStartedAt = Date.parse("2026-11-08T18:00:00Z");
+  const old = { version: Date.parse("2026-11-07T17:55:00Z") };
+  const fresh = { version: pushStartedAt + 45_000 };
+
+  // The bug: with the pre-push read failed, the old manifest passed.
+  assert.equal(isNewBuild(old, { before: null, pushStartedAt }), false);
+  assert.equal(isNewBuild(old, { before: old, pushStartedAt }), false);
+  assert.equal(isNewBuild(fresh, { before: old, pushStartedAt }), true);
+  assert.equal(isNewBuild(fresh, { before: null, pushStartedAt }), true);
+  assert.equal(isNewBuild(null, { before: old, pushStartedAt }), false);
+  // A manifest that names its commit is matched exactly.
+  assert.equal(isNewBuild({ ...fresh, commit: "abc1234" }, { pushStartedAt, commit: "abc1234def" }), true);
+  assert.equal(isNewBuild({ ...fresh, commit: "fff0000" }, { pushStartedAt, commit: "abc1234def" }), false);
 });

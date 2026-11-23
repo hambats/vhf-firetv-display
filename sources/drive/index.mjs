@@ -196,6 +196,7 @@ export function planFromTree(tree, now = new Date()) {
       modifiedTime: file.modifiedTime,
       thumbnailLink: file.thumbnailLink
     };
+    if (file.md5Checksum) entry.md5Checksum = file.md5Checksum;
     const caption = captionFrom(file.description);
     if (caption) entry.caption = caption;
     if (kind === "flyers") {
@@ -247,6 +248,20 @@ export function planFromTree(tree, now = new Date()) {
 
   for (const set of Object.values(sets)) {
     set.files.sort((a, b) => a.name.localeCompare(b.name) || a.driveId.localeCompare(b.driveId));
+    // The same photo uploaded twice is two Drive files with one checksum; it
+    // would otherwise show at double weight. After the sort, so which copy
+    // stays does not depend on Drive's listing order.
+    const firstByMd5 = new Map();
+    set.files = set.files.filter((f) => {
+      if (!f.md5Checksum) return true;
+      const first = firstByMd5.get(f.md5Checksum);
+      if (!first) {
+        firstByMd5.set(f.md5Checksum, f.name);
+        return true;
+      }
+      skipped.push({ path: `${set.folder}/${f.name}`, reason: `duplicate of ${first} (same file uploaded twice)` });
+      return false;
+    });
   }
   return { sets, skipped };
 }
@@ -291,7 +306,7 @@ async function listChildren(folderId, key) {
   do {
     const params = new URLSearchParams({
       q: `'${folderId}' in parents and trashed = false`,
-      fields: "nextPageToken,files(id,name,mimeType,createdTime,modifiedTime,description,thumbnailLink,imageMediaMetadata(width,height))",
+      fields: "nextPageToken,files(id,name,mimeType,createdTime,modifiedTime,description,thumbnailLink,md5Checksum,imageMediaMetadata(width,height))",
       pageSize: "1000",
       supportsAllDrives: "true",
       includeItemsFromAllDrives: "true",

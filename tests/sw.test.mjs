@@ -38,7 +38,10 @@ class FakeCache {
     this.putFailsWith = null;
   }
   async match(request) {
-    return this.entries.get(keyOf(request)) || undefined;
+    /* A real Cache hands back a fresh Response each time; the stored one is
+       never read, so the same entry can be served twice. */
+    const entry = this.entries.get(keyOf(request));
+    return entry ? entry.clone() : undefined;
   }
   async put(request, response) {
     if (this.putFailsWith) throw this.putFailsWith;
@@ -76,10 +79,13 @@ function makeCaches(fetchImpl) {
 
 /* ---- loading sw.js ---- */
 
-async function loadSw(swSource, fetchImpl) {
+/* Real timers unless a test passes its own (a fake clock it fires by hand). */
+async function loadSw(swSource, fetchImpl, timers = { setTimeout, clearTimeout }) {
   const listeners = {};
   const caches = makeCaches(fetchImpl);
   const context = {
+    setTimeout: timers.setTimeout,
+    clearTimeout: timers.clearTimeout,
     self: {
       addEventListener(type, fn) {
         (listeners[type] = listeners[type] || []).push(fn);
@@ -220,6 +226,110 @@ test("a navigation with the network gone is served the cached shell", async () =
   assert.ok(response, "the worker must answer a navigation it can serve from cache");
   assert.equal(response.status, 200);
   assert.match(await response.text(), /id="stage"/);
+});
+
+function navigation(url = ORIGIN + "/") {
+  const request = new Request(url);
+  Object.defineProperty(request, "mode", { value: "navigate" });
+  return request;
+}
+
+const SHELL_HTML = "<!DOCTYPE html><div id=\"stage\"></div>";
+
+test("a navigation answered with an error status is served the cached shell", async () => {
+  const source = await stampedSw();
+  /* A host's 503 page is a page: shown as one, it sits on a television nobody
+     will press reload on. */
+  const network = { status: 200 };
+  const fetchImpl = () =>
+    Promise.resolve(new Response(network.status === 200 ? SHELL_HTML : "Service Unavailable", { status: network.status }));
+  const { listeners } = await loadSw(source, fetchImpl);
+  await fireLifecycle(listeners, "install");
+
+  for (const status of [404, 503]) {
+    network.status = status;
+    const response = await fireFetch(listeners, navigation());
+    assert.equal(response.status, 200, `a ${status} must not replace the display`);
+    assert.match(await response.text(), /id="stage"/);
+  }
+});
+
+test("with no cached shell, an error status is passed through rather than swallowed", async () => {
+  const source = await stampedSw();
+  const { listeners } = await loadSw(source, serving("Not Found", { status: 404 }));
+  const response = await fireFetch(listeners, navigation());
+  assert.equal(response.status, 404);
+});
+
+test("a redirect is passed through, not replaced by the shell", async () => {
+  const source = await stampedSw();
+  /* Navigations fetch with redirect: "manual"; the shell served at the
+     pre-redirect URL would resolve its relative paths wrongly. */
+  const redirect = { ok: false, status: 0, type: "opaqueredirect" };
+  const fetchImpl = (req) =>
+    req.mode === "navigate" ? Promise.resolve(redirect) : Promise.resolve(new Response(SHELL_HTML, { status: 200 }));
+  const { listeners } = await loadSw(source, fetchImpl);
+  await fireLifecycle(listeners, "install");
+  assert.equal(await fireFetch(listeners, navigation(ORIGIN + "/vhf")), redirect);
+});
+
+/* A fake clock: setTimeout records, the test fires. */
+function makeClock() {
+  let next = 1;
+  const timers = new Map();
+  return {
+    setTimeout(fn, ms) {
+      const id = next++;
+      timers.set(id, { fn, ms });
+      return id;
+    },
+    clearTimeout(id) {
+      timers.delete(id);
+    },
+    fireAll(ms) {
+      for (const [id, t] of [...timers]) {
+        if (t.ms === ms) {
+          timers.delete(id);
+          t.fn();
+        }
+      }
+    }
+  };
+}
+
+async function settles(promise, ticks = 50) {
+  let done = false;
+  promise.then(() => (done = true), () => (done = true));
+  for (let i = 0; i < ticks; i++) await new Promise((r) => setImmediate(r));
+  return done;
+}
+
+test("a navigation the network never answers gets the cached shell after the timeout", async () => {
+  const source = await stampedSw();
+  /* Wi-Fi up, upstream dead: the request neither answers nor fails until the
+     network stack's own timeouts, which run to minutes. */
+  const network = { hang: false };
+  const fetchImpl = () =>
+    network.hang ? new Promise(() => {}) : Promise.resolve(new Response(SHELL_HTML, { status: 200 }));
+  const clock = makeClock();
+  const { listeners, context } = await loadSw(source, fetchImpl, clock);
+  await fireLifecycle(listeners, "install");
+  network.hang = true;
+
+  const responded = fireFetch(listeners, navigation());
+  assert.equal(await settles(responded), false, "must not give up on the network before the timeout");
+  clock.fireAll(context.NETWORK_TIMEOUT_MS);
+  assert.equal(await settles(responded), true, "the cached shell must answer once the timeout passes");
+  assert.match(await (await responded).text(), /id="stage"/);
+});
+
+test("with no cached shell, a slow navigation keeps waiting instead of failing early", async () => {
+  const source = await stampedSw();
+  const clock = makeClock();
+  const { listeners, context } = await loadSw(source, () => new Promise(() => {}), clock);
+  const responded = fireFetch(listeners, navigation());
+  clock.fireAll(context.NETWORK_TIMEOUT_MS);
+  assert.equal(await settles(responded), false, "nothing cached to show, so the network is still the best hope");
 });
 
 test("content JSON is left to content-source.js, and version.json is never cached", async () => {

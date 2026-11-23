@@ -140,17 +140,23 @@ async function loadCalendarSettings() {
 // excludeIds is keyed by generated id (same keys as events-time-overrides.json)
 // with the reason as the value, so the note travels with the entry. Like a time
 // override, an entry for a date that has passed is a no-op and can be deleted.
+//
+// A missing file means "nothing excluded". A file that exists but will not
+// parse is an error, not an empty list: swallowing it put every closure,
+// private event and hidden 5K straight back into events.json.
 async function loadExcludeList() {
+  let raw;
   try {
-    const raw = await fs.readFile(EXCLUDE_PATH, "utf8");
-    const doc = JSON.parse(raw);
-    return {
-      terms: Array.isArray(doc.excludeTitleContains) ? doc.excludeTitleContains : [],
-      ids: doc.excludeIds && typeof doc.excludeIds === "object" ? doc.excludeIds : {}
-    };
-  } catch {
-    return { terms: [], ids: {} };
+    raw = await fs.readFile(EXCLUDE_PATH, "utf8");
+  } catch (err) {
+    if (err.code === "ENOENT") return { terms: [], ids: {} };
+    throw err;
   }
+  const doc = JSON.parse(raw);
+  return {
+    terms: Array.isArray(doc.excludeTitleContains) ? doc.excludeTitleContains : [],
+    ids: doc.excludeIds && typeof doc.excludeIds === "object" ? doc.excludeIds : {}
+  };
 }
 
 // Hand-maintained corrections for events whose source calendar entry has a
@@ -158,14 +164,19 @@ async function loadExcludeList() {
 // Keyed by the same id the sync generates, so a fix survives every re-sync
 // until the underlying Google Calendar entry itself gets corrected — at
 // which point the override becomes a no-op and should be deleted.
+//
+// Missing file: no overrides. Unparseable file: throw, so the sync fails loudly
+// instead of quietly publishing every corrected event at its wrong time.
 async function loadTimeOverrides() {
+  let raw;
   try {
-    const raw = await fs.readFile(TIME_OVERRIDES_PATH, "utf8");
-    const doc = JSON.parse(raw);
-    return doc.overrides && typeof doc.overrides === "object" ? doc.overrides : {};
-  } catch {
-    return {};
+    raw = await fs.readFile(TIME_OVERRIDES_PATH, "utf8");
+  } catch (err) {
+    if (err.code === "ENOENT") return {};
+    throw err;
   }
+  const doc = JSON.parse(raw);
+  return doc.overrides && typeof doc.overrides === "object" ? doc.overrides : {};
 }
 
 function applyTimeOverride(event, overrides) {
@@ -390,17 +401,25 @@ function cleanLocation(loc) {
 }
 
 // Expands a single VEVENT (master or non-recurring) into concrete
-// occurrences within [windowStart, windowEnd]. Handles EXDATE and
+// occurrences that overlap [windowStart, windowEnd]. Handles EXDATE and
 // RECURRENCE-ID overrides (node-ical exposes the latter as `.recurrences`,
 // keyed by the ISO date string of the original occurrence).
-function expandEvent(evt, windowStart, windowEnd) {
+//
+// "Overlap", not "starts inside": an occurrence stays while its END is still
+// ahead of windowStart. The display keeps an event on screen until it ends
+// (upcomingEvents in web/js/scenes.js), but this used to drop it the moment it
+// started -- so a sync landing mid-afternoon pulled that day's events off the
+// wall while they were happening. Ids are unaffected: they come from the start,
+// which has not moved.
+export function expandEvent(evt, windowStart, windowEnd) {
   if (evt.status === "CANCELLED") return [];
 
   const durationMs = evt.end && evt.start ? evt.end.getTime() - evt.start.getTime() : 0;
   const occurrences = [];
+  const stillRunning = (start, end) => (end || start) >= windowStart;
 
   if (!evt.rrule) {
-    if (evt.start >= windowStart && evt.start <= windowEnd) {
+    if (stillRunning(evt.start, evt.end) && evt.start <= windowEnd) {
       occurrences.push({ start: evt.start, end: evt.end, source: evt });
     }
     return occurrences;
@@ -411,7 +430,9 @@ function expandEvent(evt, windowStart, windowEnd) {
   );
   const recurrenceOverrides = evt.recurrences || {};
 
-  const dates = evt.rrule.between(windowStart, windowEnd, true);
+  // Reach back one duration so an occurrence that began before windowStart
+  // but has not finished is still found.
+  const dates = evt.rrule.between(new Date(windowStart.getTime() - durationMs), windowEnd, true);
   for (const start of dates) {
     if (exdateKeys.has(start.toDateString())) continue;
 
@@ -424,6 +445,8 @@ function expandEvent(evt, windowStart, windowEnd) {
     }
     if (override) {
       if (override.status === "CANCELLED") continue;
+      // A moved occurrence carries its own times; it may already be over.
+      if (!stillRunning(override.start, override.end)) continue;
       occurrences.push({ start: override.start, end: override.end, source: override });
     } else {
       occurrences.push({ start, end: new Date(start.getTime() + durationMs), source: evt });
@@ -532,7 +555,15 @@ async function main() {
   console.log(`[calendar] wrote ${events.length} upcoming events (excluded ${excludedCount} by title or id) -> ${path.relative(ROOT, OUTPUT_PATH)}`);
 }
 
-main().catch((err) => {
-  console.error("[calendar] failed:", err);
-  process.exitCode = 1;
-});
+/*
+ * Runs on import, because scripts/sync-sources.mjs runs this adapter by
+ * importing it. VHF_NO_AUTORUN=1 is for tests that only want the exported
+ * helpers -- importing without it fetches the live calendar and rewrites
+ * content/generated/events.json.
+ */
+if (process.env.VHF_NO_AUTORUN !== "1") {
+  main().catch((err) => {
+    console.error("[calendar] failed:", err);
+    process.exitCode = 1;
+  });
+}

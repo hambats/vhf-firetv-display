@@ -35,15 +35,30 @@ var VhfScenes = (function () {
     return node;
   }
 
-  // URLs that definitively failed to load during this run: a 404, a
-  // gallery object deleted after gallery.json was published, a CDN that
-  // refused the request. The engine reports them here so a dead photo is
-  // drawn once and then never again — without this, one dead URL in the
-  // pool costs a skipped scene every time the bag comes back around to it.
-  var failedSrc = {};
+  // URLs that failed to load: a 404, a gallery object deleted after
+  // gallery.json was published, a CDN that refused the request. The engine
+  // reports them here so a dead photo is not drawn again — without this, one
+  // dead URL in the pool costs a skipped scene every time the bag comes back
+  // around to it.
+  //
+  // Struck for FAILED_IMAGE_RETRY_MS, not for good: "failed" also covers the
+  // network being down, and the Service Worker holds only a fraction of the
+  // gallery. Without expiry an hour-long outage struck most of the pool until
+  // the 6-hour reload, long after the network was back. A URL that really is
+  // dead just fails again and is skipped again, once per window.
+  var FAILED_IMAGE_RETRY_MS = 30 * 60 * 1000;
+  var failedUntil = {};
 
   function markImageFailed(src) {
-    if (src) failedSrc[src] = true;
+    if (src) failedUntil[src] = Date.now() + FAILED_IMAGE_RETRY_MS;
+  }
+
+  function recentlyFailed(src) {
+    var until = failedUntil[src];
+    if (!until) return false;
+    if (Date.now() < until) return true;
+    delete failedUntil[src];
+    return false;
   }
 
   // photo.expires is set on Drive flyers (sources/drive): a flyer for a past
@@ -56,7 +71,7 @@ var VhfScenes = (function () {
   }
 
   function isUsablePhoto(photo) {
-    return !!(photo && photo.src && !failedSrc[photo.src] && !isExpired(photo));
+    return !!(photo && photo.src && !recentlyFailed(photo.src) && !isExpired(photo));
   }
 
   function usablePhotos(photos) {
@@ -376,8 +391,8 @@ var VhfScenes = (function () {
   var photoPoolShuffledByKey = {};
 
   function drawPhotos(key, photos, count) {
-    // Refill from the live pool minus anything known dead, so a failed URL
-    // leaves the rotation permanently instead of returning every cycle.
+    // Refill from the live pool minus anything that recently failed, so a
+    // failed URL sits out its retry window instead of returning every cycle.
     var pool = usablePhotos(photos);
     var drawn = [];
     // The bag can still hold entries that died after it was filled, and a
