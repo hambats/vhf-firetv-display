@@ -22,7 +22,7 @@ import org.veteranshealingfarm.display.MeshConfigEdits.KEY_PIN
  *
  *   adb shell am broadcast -a org.veteranshealingfarm.display.MESH_CONFIG \
  *       -n org.veteranshealingfarm.display/.MeshConfigReceiver \
- *       --ez enabled true --es node AA:BB:CC:DD:EE:FF --es pin 123456
+ *       --ez enabled true --es node AA:BB:CC:DD:EE:FF --es pin <pairing PIN>
  *
  * The file is written by the ":mesh" process (MeshConfigReceiver, auto-pick) and read by both
  * processes, so it is opened with MODE_MULTI_PROCESS: each read re-checks the file on disk

@@ -135,7 +135,7 @@ Actions. It needs two things, and both have tripped it before:
    **Always allow from this computer** on the prompt:
 
    ```bash
-   ADB_VENDOR_KEYS=vhf-ci-adbkey adb connect 100.69.183.1:5555
+   ADB_VENDOR_KEYS=vhf-ci-adbkey adb connect <tv tailnet address>:5555
    ```
 
    Keep `vhf-ci-adbkey` out of the repo; it is a credential for the television.

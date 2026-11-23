@@ -29,7 +29,7 @@ meshtastic --port COMx --seturl "<your mesh channel URL>"
 ```
 
 ```bash
-meshtastic --port COMx --set lora.region US --set device.role CLIENT --set bluetooth.enabled true --set bluetooth.mode FIXED_PIN --set bluetooth.fixed_pin 123456
+meshtastic --port COMx --set lora.region US --set device.role CLIENT --set bluetooth.enabled true --set bluetooth.mode FIXED_PIN --set bluetooth.fixed_pin <pairing PIN>
 ```
 
 ```bash
@@ -70,7 +70,7 @@ Fire OS location is off.
 Name the node explicitly (preferred — the address from the scan above):
 
 ```bash
-adb shell am broadcast -a org.veteranshealingfarm.display.MESH_CONFIG -n org.veteranshealingfarm.display/.MeshConfigReceiver --ez enabled true --es node F1:23:45:67:89:AB --es pin 123456
+adb shell am broadcast -a org.veteranshealingfarm.display.MESH_CONFIG -n org.veteranshealingfarm.display/.MeshConfigReceiver --ez enabled true --es node F1:23:45:67:89:AB --es pin "<pairing PIN>"
 ```
 
 Or auto-pick: with no node set, the bridge takes the strongest node **whose advertised name
@@ -78,7 +78,7 @@ contains `VHF`** (case-insensitive) and remembers it. A louder node with any oth
 neighbour's, a passer-by's — is never taken. Change the match with `--es match <text>`:
 
 ```bash
-adb shell am broadcast -a org.veteranshealingfarm.display.MESH_CONFIG -n org.veteranshealingfarm.display/.MeshConfigReceiver --ez enabled true --es pin 123456
+adb shell am broadcast -a org.veteranshealingfarm.display.MESH_CONFIG -n org.veteranshealingfarm.display/.MeshConfigReceiver --ez enabled true --es pin "<pairing PIN>"
 ```
 
 If nothing matching is heard it keeps looking with a backoff (5 s up to 60 s between 10 s scans),
@@ -121,7 +121,7 @@ for example only the development PC:
 
 ```json
 "grants": [
-  { "src": ["100.84.23.92"], "dst": ["100.69.183.1"], "ip": ["tcp:4403"] }
+  { "src": ["<dev PC tailnet address>"], "dst": ["<tv tailnet address>"], "ip": ["tcp:4403"] }
 ]
 ```
 
@@ -132,7 +132,7 @@ its own grant then too.
 
 | Symptom | Fix |
 |---|---|
-| PIN prompt on the TV screen | Auto-PIN was refused; enter `123456` with the remote once. |
+| PIN prompt on the TV screen | Auto-PIN was refused; enter the pairing PIN with the remote once. |
 | `not a Meshtastic node (service missing)` | Old firmware or wrong address; reflash or rescan. |
 | `FromNum subscription failed (status=5)` or `(status=15)`, repeating | Wrong PIN, or a **stale bond**: a reflashed or factory-reset node forgets its pairing but the TV does not. Unpair the node on the TV (Settings → Controllers & Bluetooth Devices → the node → Unpair), then let the bridge reconnect. |
 | Connects and drops repeatedly | Another device (phone) holds the node, or it's too far away. |
