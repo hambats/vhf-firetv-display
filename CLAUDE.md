@@ -100,6 +100,11 @@ not a code style tool.
   `content-source.js` → `engine.js`, then the Service Worker registers.
   - `js/engine.js` — the playlist scheduler: crossfades, preloads one dwell ahead, quiet-hours /
     black-screen logic, a stall watchdog, a 6-hour periodic reload, and content-version polling.
+    `?slide=<event-id>` (or `?slide=next`) skips all of that and holds one event slide still.
+    The website's events page (`D:\VHF Website\content\events-full.html`) frames it, so
+    **event ids are a public contract**: changing the id rule in `sources/calendar/index.mjs`
+    breaks the website's matching. The slide uses a fixed photo for each event (seeded from the id),
+    skips the Service Worker, and reports `ready`/`missing` to the embedding page by postMessage.
   - `js/scenes.js` — pure render functions, one per scene type (photo, photo-pool, event,
     information, announcement...); tracks and skips images that fail to load. Written in ES5
     because it is also bundled unmodified into the `app/` WebView shell.
@@ -131,9 +136,13 @@ not a code style tool.
 - **`admin/`** — `server.mjs`, a small dependency-free Node HTTP server bound to `127.0.0.1:8787`
   only, no auth. Reads/writes `content/*.json` through the same `validateContentDir` the build uses,
   so a rejected write restores the previous file rather than producing a broken deploy.
-- **`app/`** — Kotlin/Android WebView shell. Two source files only: `DisplayActivity.kt`
-  (fullscreen WebView, screen-on, immersive chrome, remote/back-key lockout) and `BootReceiver.kt`
-  (relaunch on `BOOT_COMPLETED`). The shell's only offline fallback is
+- **`app/`** — Kotlin/Android WebView shell. The display is `DisplayActivity.kt` (fullscreen
+  WebView, screen-on, immersive chrome, remote/back-key lockout, retry with an offline card, and
+  in-place WebView rebuild after a renderer crash — never by bringing itself forward) and
+  `BootReceiver.kt` (relaunch on `BOOT_COMPLETED`). The optional Meshtastic bridge
+  (`Mesh*.kt`, [docs/MESH_BRIDGE.md](docs/MESH_BRIDGE.md)) runs in its own `:mesh` process so it
+  can never take the display down; its pure logic is in `MeshLogic.kt`, with JVM tests under
+  `app/src/test/` (`./gradlew testReleaseUnitTest`). The shell's only offline fallback is
   `app/src/main/assets/offline.html`; the old copy of `web/` under `app/src/main/assets/web/` is
   never loaded (dead weight, see BUILD_TREE §6). Always edit the root `web/`.
 - **`tests/`** — `node --test`, no external test framework. Each `*.test.mjs` file has a
@@ -163,7 +172,7 @@ Ordered by risk — what keeps an unattended page alive — not by feature layer
 including ship gates, in [docs/BUILD_TREE.md](docs/BUILD_TREE.md).
 
 0. **On the screen** — *done (Sept 18–19).* The `app/` WebView shell is the answer: fullscreen,
-   no chrome, screen never sleeps, points at GitHub Pages. v1.1.0 is installed on the television.
+   no chrome, screen never sleeps, points at GitHub Pages. v1.2.1 (renderer-crash recovery, isolated mesh bridge) is the current build.
    `docs/DISPLAY_SETUP.md` covers sideloading and the television's own sleep/screensaver settings.
 1. **Survives being left alone** — Service Worker (app shell + JSON + photos), self-hosted fonts,
    version polling so content actually refreshes, error/stall watchdog, diagnostics overlay,
