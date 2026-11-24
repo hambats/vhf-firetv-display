@@ -1,4 +1,4 @@
-package org.veteranshealingfarm.display
+package org.veteranshealingfarm.meshbridge
 
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -53,8 +53,8 @@ import java.util.concurrent.RejectedExecutionException
  *   - FromRadio is read only for an attached client that has sent something; with nobody
  *     attached, packets stay queued on the node for the next client.
  *
- * Kept apart from the display on purpose: it runs in its own ":mesh" process
- * (AndroidManifest.xml), so even a crash here cannot take the WebView down. Inside that
+ * Kept apart from the display on purpose: since display 1.3.0 it is its own APK, and it still
+ * runs in a ":mesh" process (AndroidManifest.xml). Inside that
  * process every bridge thread reports uncaught exceptions to [onBridgeCrashed], which tears
  * the bridge down and starts a fresh one after a growing delay. Logs under the tag VhfMesh
  * (`adb logcat -s VhfMesh`).
@@ -117,7 +117,12 @@ class MeshBridgeService : Service() {
                 @Suppress("DEPRECATION")
                 val device = intent.getParcelableExtra<BluetoothDevice>(BluetoothDevice.EXTRA_DEVICE) ?: return
                 if (!device.address.equals(MeshConfig.nodeAddress(context), ignoreCase = true)) return
-                if (device.setPin(MeshConfig.pin(context).toByteArray())) {
+                val pin = MeshConfig.pin(context)
+                if (pin == null) {
+                    Log.w(TAG, "pairing requested but no PIN is configured (--es pin); pair once by hand")
+                    return
+                }
+                if (device.setPin(pin.toByteArray())) {
                     Log.i(TAG, "answered pairing request with configured PIN")
                     abortBroadcast()
                 }
@@ -588,7 +593,7 @@ class MeshBridgeService : Service() {
             Notification.Builder(this)
         }
         return builder
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(android.R.drawable.stat_sys_data_bluetooth)
             .setContentTitle("VHF mesh bridge")
             .setOngoing(true)
             .build()

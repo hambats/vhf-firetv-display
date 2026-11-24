@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "vhf-firetv-display"
 include(":app")
+include(":mesh")

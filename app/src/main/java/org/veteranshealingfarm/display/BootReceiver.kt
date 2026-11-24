@@ -19,8 +19,6 @@ class BootReceiver : BroadcastReceiver() {
             action != "android.intent.action.QUICKBOOT_POWERON"
         ) return
 
-        MeshConfig.startIfEnabled(context)
-
         context.startActivity(
             Intent(context, DisplayActivity::class.java)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
