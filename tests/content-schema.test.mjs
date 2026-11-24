@@ -98,3 +98,44 @@ test("parse errors name nested files with forward slashes on every OS", async (t
   const errors = await validateContentDir(path.join(dir, "content"));
   assert.ok(errors.some((e) => e.startsWith("content/announcements/announcements.json:")), String(errors));
 });
+
+test("heartbeat: off by default, https only, and needs opening hours", async (t) => {
+  const settingsErrors = (mutate) => errorsAfter(t, "settings.json", mutate);
+
+  assert.deepEqual(await settingsErrors((d) => { delete d.heartbeat; }), []);
+  assert.deepEqual(await settingsErrors((d) => { d.heartbeat = { url: "" }; }), []);
+
+  const noHours = await settingsErrors((d) => {
+    d.heartbeat = { url: "https://hc-ping.com/0000" };
+    delete d.hours.open;
+  });
+  assert.ok(noHours.some((e) => /"heartbeat.url" needs "hours.open"/.test(e)), String(noHours));
+
+  for (const url of ["http://hc-ping.com/0000", "hc-ping.com/0000", "javascript:alert(1)", 42]) {
+    const errors = await settingsErrors((d) => {
+      d.heartbeat = { url };
+      d.hours.open = { from: "10:00", to: "16:00" };
+    });
+    assert.ok(errors.some((e) => /"heartbeat.url" must be/.test(e)), `${url}: ${errors}`);
+  }
+
+  const ok = await settingsErrors((d) => {
+    d.heartbeat = { url: "https://hc-ping.com/0000", intervalMinutes: 10 };
+    d.hours.open = { from: "10:00", to: "16:00" };
+  });
+  assert.deepEqual(ok, []);
+
+  for (const intervalMinutes of [0, 45, "10"]) {
+    const errors = await settingsErrors((d) => { d.heartbeat = { url: "", intervalMinutes }; });
+    assert.ok(errors.some((e) => /"heartbeat.intervalMinutes"/.test(e)), `${intervalMinutes}: ${errors}`);
+  }
+});
+
+test("hours.open must be a from < to pair of 24-hour times", async (t) => {
+  for (const open of [{ from: "4pm", to: "17:00" }, { from: "16:00", to: "10:00" }, { from: "10:00" }, "10-16", { from: "10:00", to: "24:30" }]) {
+    const errors = await errorsAfter(t, "settings.json", (d) => { d.hours.open = open; });
+    assert.ok(errors.some((e) => /"hours.open/.test(e)), `${JSON.stringify(open)}: ${errors}`);
+  }
+  const ok = await errorsAfter(t, "settings.json", (d) => { d.hours.open = { from: "09:30", to: "24:00" }; });
+  assert.deepEqual(ok, []);
+});

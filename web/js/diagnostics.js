@@ -90,7 +90,8 @@ var VhfDiagnostics = (function () {
       line("sw", fields.sw || "?"),
       line("cache", count("cacheHit") + "h/" + count("cacheMiss") + "m"),
       line("img", count("imageFailed") + " failed"),
-      line("err", String(errorCount))
+      line("err", String(errorCount)),
+      line("hb", fields.heartbeat || "?")
     ];
     if (fields.scene) parts.push(fields.scene);
     if (fields.photoId) parts.push("photo " + fields.photoId);

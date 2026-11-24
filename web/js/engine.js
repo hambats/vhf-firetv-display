@@ -79,6 +79,20 @@
     return new Date().getDay();
   }
 
+  // Minutes since local midnight at the venue, on the same clock as
+  // currentWeekday: settings.timezone through Intl, or the device's own time
+  // when Intl cannot do time zones. en-GB because its default is a 00-23
+  // hour, where en-US with hour12:false can say "24" at midnight.
+  function currentMinutes(tz) {
+    if (tz && window.VhfCompat && VhfCompat.intlTimeZone) {
+      var h = parseInt(new Intl.DateTimeFormat("en-GB", { timeZone: tz, hour: "2-digit", hour12: false }).format(new Date()), 10);
+      var m = parseInt(new Intl.DateTimeFormat("en-GB", { timeZone: tz, minute: "2-digit" }).format(new Date()), 10);
+      if (!isNaN(h) && !isNaN(m)) return (h % 24) * 60 + m;
+    }
+    var now = new Date();
+    return now.getHours() * 60 + now.getMinutes();
+  }
+
   /*
    * `?awake=1` keeps the playlist running on a closed day.
    *
@@ -95,6 +109,10 @@
 
   function isQuietHours(settings) {
     if (previewAwake) return false;
+    return isClosedDay(settings);
+  }
+
+  function isClosedDay(settings) {
     var closed = closedWeekdays(settings);
     if (closed.length === 0) return false;
     var today = currentWeekday(settings && settings.timezone);
@@ -327,17 +345,145 @@
    * outright takes this timer with it — that case belongs to the native shell's
    * own watchdog (app/, BUILD_TREE §5), which is why both layers exist.
    */
+  // "The loop is advancing": a scene changed within three of the current
+  // dwells (and never less than a minute). The watchdog reloads past it; the
+  // heartbeat stays silent past it.
+  function isAdvancing(state) {
+    return Date.now() - state.lastAdvance < Math.max(state.currentSceneMs * 3, 60000);
+  }
+
   function startWatchdog(state) {
     window.setInterval(function () {
-      var expected = Math.max(state.currentSceneMs * 3, 60000);
+      if (isAdvancing(state)) return;
       var idle = Date.now() - state.lastAdvance;
-      if (idle < expected) return;
       VhfDiagnostics.error(
         new Error("no scene change in " + Math.round(idle / 1000) + "s"),
         "watchdog"
       );
       location.reload();
     }, WATCHDOG_INTERVAL_MS);
+  }
+
+  /*
+   * ---- Heartbeat: "I am on screen and working" ----
+   *
+   * A dead-man's switch (docs/HEARTBEAT.md). Every heartbeat.intervalMinutes
+   * the page pings settings.heartbeat.url, and an outside service alerts when
+   * the pings stop during opening hours. Silence is the signal, so the page
+   * pings only when it is genuinely doing its job, and all of these hold:
+   *
+   *   - it is the television: no query string (the shell's URL never has one,
+   *     so ?slide= embeds, ?awake=1 links and ?diag=1 previews never ping) and
+   *     an Android WebView / Fire TV user agent, so someone opening the public
+   *     site in an ordinary browser cannot mask a dead wall;
+   *   - document.visibilityState is "visible": behind Netflix or the launcher
+   *     the TV is the residents' own, and nothing is expected of it;
+   *   - the scene loop is advancing (isAdvancing, the watchdog's own rule);
+   *   - today is an open day and the venue clock is inside hours.open, on the
+   *     same clock and closed-day rule the loop itself uses.
+   *
+   * No url, or no hours.open, means no pings at all. The ping is a
+   * fire-and-forget POST (text/plain, no-cors, no credentials, no-store)
+   * whose small body says what is on screen and what the engine supports;
+   * nothing in it is personal. Its outcome is never read, and nothing it does
+   * can throw into, delay, or stop the scene loop. The Service Worker leaves
+   * cross-origin non-image requests alone, so it never touches the cache.
+   */
+  var HEARTBEAT_DEFAULT_MINUTES = 10;
+
+  function heartbeatConfig(settings) {
+    var hb = settings && settings.heartbeat;
+    if (!hb || typeof hb.url !== "string" || !/^https:\/\/\S+$/.test(hb.url)) return null;
+    var minutes = typeof hb.intervalMinutes === "number" && hb.intervalMinutes > 0
+      ? hb.intervalMinutes
+      : HEARTBEAT_DEFAULT_MINUTES;
+    return { url: hb.url, ms: minutes * 60 * 1000 };
+  }
+
+  function isTelevision() {
+    if (location.search) return false;
+    var ua = (typeof navigator !== "undefined" && navigator && navigator.userAgent) || "";
+    return /; wv\)|\bAFT/.test(ua);
+  }
+
+  function hhmm(text) {
+    var m = /^(\d{2}):(\d{2})$/.exec(text || "");
+    return m ? parseInt(m[1], 10) * 60 + parseInt(m[2], 10) : null;
+  }
+
+  function isWithinOpeningHours(settings) {
+    var open = settings && settings.hours && settings.hours.open;
+    var from = hhmm(open && open.from);
+    var to = hhmm(open && open.to);
+    if (from === null || to === null) return false;
+    var now = currentMinutes(settings.timezone);
+    return now >= from && now < to;
+  }
+
+  // Why this tick does not ping, or null when it should.
+  function heartbeatBlocker(settings, state) {
+    if (document.visibilityState !== "visible") return "hidden";
+    if (isClosedDay(settings)) return "closed day";
+    if (!isWithinOpeningHours(settings)) return "outside hours";
+    if (!isAdvancing(state)) return "not advancing";
+    return null;
+  }
+
+  function heartbeatBody(data, state) {
+    var events = "?";
+    try {
+      events = VhfScenes.upcomingEvents(data, Infinity, 0).length;
+    } catch (err) { /* reported as "?" */ }
+    var lines = [
+      "content=" + (VhfDiagnostics.get("contentVersion") || "?") +
+        " up=" + Math.round((Date.now() - VhfDiagnostics.startedAt) / 60000) + "m" +
+        " err=" + VhfDiagnostics.errors() +
+        " img=" + VhfDiagnostics.count("imageFailed") +
+        " events=" + events +
+        " scene=" + (state.sceneId || "?")
+    ];
+    if (window.VhfCompat && typeof VhfCompat.summary === "function") {
+      lines.push("probe " + VhfCompat.summary());
+    }
+    return lines.join("\n").slice(0, 1000);
+  }
+
+  function startHeartbeat(data, state) {
+    var config = heartbeatConfig(data.settings);
+    if (!config) {
+      VhfDiagnostics.set("heartbeat", "off");
+      return;
+    }
+    if (!isTelevision()) {
+      VhfDiagnostics.set("heartbeat", "off (not the television)");
+      return;
+    }
+    VhfDiagnostics.set("heartbeat", "armed");
+
+    window.setInterval(function () {
+      try {
+        var at = new Date().toISOString().slice(11, 16);
+        var blocker = heartbeatBlocker(data.settings, state);
+        if (blocker) {
+          VhfDiagnostics.set("heartbeat", "quiet " + at + " (" + blocker + ")");
+          return;
+        }
+        if (typeof fetch !== "function") return;
+        var sent = fetch(config.url, {
+          method: "POST",
+          mode: "no-cors",
+          credentials: "omit",
+          cache: "no-store",
+          headers: { "Content-Type": "text/plain" },
+          body: heartbeatBody(data, state)
+        });
+        if (sent && typeof sent.then === "function") sent.then(null, function () {});
+        VhfDiagnostics.set("heartbeat", "sent " + at);
+      } catch (err) {
+        // A ping is never worth an error: the next interval simply tries again.
+        VhfDiagnostics.set("heartbeat", "failed (" + (err && err.message) + ")");
+      }
+    }, config.ms);
   }
 
   var currentLayerIndex = 0;
@@ -389,6 +535,7 @@
     // Shared with the watchdog, which reads it from outside the loop.
     var state = { lastAdvance: Date.now(), currentSceneMs: DEFAULT_DURATION_SECONDS * 1000 };
     startWatchdog(state);
+    startHeartbeat(data, state);
 
     function nextItem() {
       var item = items[index % items.length];
@@ -510,6 +657,7 @@
           if (scene.node) {
             showLayer(scene.node);
             log("showing " + scene.item.id + " (" + scene.item.type + ")");
+            state.sceneId = scene.item.id;
             // Surfaced only through ?diag=1 — lets a photo/graphic that's
             // poorly cropped or composed on the wall be pointed straight
             // back at its source file/folder instead of guessed at.

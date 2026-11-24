@@ -56,9 +56,25 @@ this project already use.
   "calendar": {                 // optional; read by sources/calendar/index.mjs
     "calendarId": "...@gmail.com", // optional, default "vhf2023calendar@gmail.com"
     "windowDays": 120             // optional, positive number, default 120
+  },
+  "hours": {                      // optional
+    "closedWeekdays": [0, 1],     // optional, 0=Sunday..6=Saturday; the display shows a lit
+                                  //   black screen all day on these days
+    "open": { "from": "10:00", "to": "16:00" } // optional, 24-hour venue time (settings.timezone),
+                                  //   from < to, "24:00" allowed as an end; read ONLY by the
+                                  //   heartbeat, it does not change what the display shows
+  },
+  "heartbeat": {                  // optional; see docs/HEARTBEAT.md
+    "url": "",                    // "" or absent = off, no requests at all; otherwise an https://
+                                  //   ping URL (it is published: a ping URL, never a secret)
+    "intervalMinutes": 10         // optional, 1-30, default 10
   }
 }
 ```
+
+**`heartbeat.url` requires `hours.open`.** The display pings only on an open day, inside
+`hours.open`, while it is visible and its scenes are advancing, so without opening hours it would
+never ping and the check would alert every day. The validator rejects that combination.
 
 **`timezone` is required, not defaulted.** `events.json` stores UTC, and the display formats every
 event time through this zone rather than the television's own clock setting. A wrong or reset TV

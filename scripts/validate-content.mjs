@@ -131,6 +131,65 @@ function validateInformationContent(c, tag, errors) {
   }
 }
 
+const HHMM_RE = /^([01]\d|2[0-4]):([0-5]\d)$/;
+
+function hhmmMinutes(v) {
+  const m = typeof v === "string" ? HHMM_RE.exec(v) : null;
+  if (!m) return null;
+  const minutes = Number(m[1]) * 60 + Number(m[2]);
+  return minutes <= 24 * 60 ? minutes : null;
+}
+
+/*
+ * hours.open is the venue's daily opening window, read only by the heartbeat
+ * (engine.js): pings are expected inside it on open days, and silence outside
+ * it is correct. The heartbeat URL is published inside settings.json, so it
+ * must be https and nothing else; an empty string means "off".
+ */
+function validateHoursAndHeartbeat(doc, label, errors) {
+  let hasOpenHours = false;
+  if (doc.hours !== undefined) {
+    if (!isPlainObject(doc.hours)) {
+      errors.push(`${label}: "hours" must be an object if present`);
+    } else if (doc.hours.open !== undefined) {
+      const open = doc.hours.open;
+      const from = isPlainObject(open) ? hhmmMinutes(open.from) : null;
+      const to = isPlainObject(open) ? hhmmMinutes(open.to) : null;
+      if (from === null || to === null) {
+        errors.push(`${label}: "hours.open" must be { "from": "HH:MM", "to": "HH:MM" } (24-hour venue time)`);
+      } else if (from >= to) {
+        errors.push(`${label}: "hours.open.from" must be earlier than "hours.open.to"`);
+      } else {
+        hasOpenHours = true;
+      }
+    }
+  }
+  if (doc.heartbeat === undefined) return;
+  if (!isPlainObject(doc.heartbeat)) {
+    errors.push(`${label}: "heartbeat" must be an object if present`);
+    return;
+  }
+  const hb = doc.heartbeat;
+  if (hb.url !== undefined && typeof hb.url !== "string") {
+    errors.push(`${label}: "heartbeat.url" must be a string ("" turns the heartbeat off)`);
+  } else if (hb.url) {
+    let ok = false;
+    try {
+      ok = new URL(hb.url).protocol === "https:" && !/\s/.test(hb.url);
+    } catch {
+      ok = false;
+    }
+    if (!ok) errors.push(`${label}: "heartbeat.url" must be an https:// URL`);
+    if (!hasOpenHours) {
+      errors.push(`${label}: "heartbeat.url" needs "hours.open", or the heartbeat never knows when to ping`);
+    }
+  }
+  if (hb.intervalMinutes !== undefined &&
+      (typeof hb.intervalMinutes !== "number" || hb.intervalMinutes < 1 || hb.intervalMinutes > 30)) {
+    errors.push(`${label}: "heartbeat.intervalMinutes" must be a number from 1 to 30`);
+  }
+}
+
 function validateSettings(doc, errors) {
   const label = "content/settings.json";
   if (typeof doc.version !== "number") errors.push(`${label}: "version" must be a number`);
@@ -166,6 +225,7 @@ function validateSettings(doc, errors) {
       }
     }
   }
+  validateHoursAndHeartbeat(doc, label, errors);
   if (doc.calendar !== undefined) {
     if (!isPlainObject(doc.calendar)) {
       errors.push(`${label}: "calendar" must be an object if present`);
