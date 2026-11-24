@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "content/artwork/curated (hand-curated) + content/artwork/drive (Google Drive feed); build-side only",
-  "generatedAt": "2026-11-21T19:52:35.319Z",
+  "generatedAt": "2026-11-24T00:28:32.167Z",
   "sets": {
     "coming-home-artist": [
       {
@@ -462,12 +462,6 @@
       {
         "id": "drive/1oq_gf151OjemsN05DCw1Ghq6Lif4To-A",
         "src": "content/artwork/drive/program-fishing/1oq_gf151OjemsN05DCw1Ghq6Lif4To-A.jpg",
-        "width": 1421,
-        "height": 1920
-      },
-      {
-        "id": "drive/1P1ZCxVnmMKlidylSHgbcSKj7gaxMnkVq",
-        "src": "content/artwork/drive/program-fishing/1P1ZCxVnmMKlidylSHgbcSKj7gaxMnkVq.jpg",
         "width": 1421,
         "height": 1920
       }

@@ -1,7 +1,7 @@
 {
   "version": 1,
   "source": "Google Drive shared folder (build-side only; see sources/drive)",
-  "generatedAt": "2026-11-21T19:52:31.684Z",
+  "generatedAt": "2026-11-24T00:28:27.781Z",
   "sets": {
     "gen-pop-additions": {
       "section": "farm",
@@ -239,15 +239,6 @@
           "src": "content/artwork/drive/program-fishing/1oq_gf151OjemsN05DCw1Ghq6Lif4To-A.jpg",
           "width": 1421,
           "height": 1920
-        },
-        {
-          "driveId": "1P1ZCxVnmMKlidylSHgbcSKj7gaxMnkVq",
-          "name": "IMG_4909.JPG",
-          "modifiedTime": "2026-08-25T16:02:28.000Z",
-          "dir": "program-fishing",
-          "src": "content/artwork/drive/program-fishing/1P1ZCxVnmMKlidylSHgbcSKj7gaxMnkVq.jpg",
-          "width": 1421,
-          "height": 1920
         }
       ],
       "keyword": "fishing"
@@ -358,6 +349,10 @@
     {
       "path": "Classes/Fishing/16551.JPG",
       "reason": "too small for the TV (360x480, needs 1000px on the long side)"
+    },
+    {
+      "path": "Fishing/IMG_4909.JPG",
+      "reason": "duplicate of IMG_4909.JPG (same file uploaded twice)"
     }
   ]
 }
