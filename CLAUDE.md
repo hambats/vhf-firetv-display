@@ -54,8 +54,9 @@ it independently. The television must NOT depend on the developer's PC remaining
   anything the television loads.
 - **The native Fire TV app (`app/`) is active again (Sept 2026).** It is a thin Kotlin WebView
   appliance shell that loads the published site fullscreen: it keeps the screen awake, hides all
-  system chrome, blocks the remote from navigating away, retries after a network outage, and
-  relaunches on boot where Fire OS permits. It owns *only* what a web page cannot do for itself —
+  system chrome, retries after a network outage, and starts at boot only when the TV is already
+  on. It never brings itself forward, never lights the panel and never swallows volume or power
+  keys (the TV is shared with residents). It owns *only* what a web page cannot do for itself —
   the scene engine, caching and content refresh stay in `web/`. Content changes never require a
   rebuild — only a change of publish endpoint does. Install steps:
   [docs/DISPLAY_SETUP.md](docs/DISPLAY_SETUP.md).
@@ -147,14 +148,15 @@ not a code style tool.
   **Known-broken:** the Playlist tab lacks the `event-pool` type, so every playlist save is
   rejected and rolled back, and the deploy button is still labelled "Netlify". Use the skills.
 - **`app/`** — Kotlin/Android WebView shell. The display is `DisplayActivity.kt` (fullscreen
-  WebView, screen-on, immersive chrome, remote/back-key lockout, retry with an offline card, and
-  in-place WebView rebuild after a renderer crash — never by bringing itself forward) and
-  `BootReceiver.kt` (relaunch on `BOOT_COMPLETED`). The optional Meshtastic bridge
-  (`Mesh*.kt`, [docs/MESH_BRIDGE.md](docs/MESH_BRIDGE.md)) runs in its own `:mesh` process so it
-  can never take the display down; its pure logic is in `MeshLogic.kt`, with JVM tests under
-  `app/src/test/` (`./gradlew testReleaseUnitTest`). The shell's only offline fallback is
-  `app/src/main/assets/offline.html`; the old copy of `web/` under `app/src/main/assets/web/` is
-  never loaded (dead weight, see BUILD_TREE §6). Always edit the root `web/`.
+  WebView, keep-screen-on, immersive chrome, retry with an offline card, and in-place WebView
+  rebuild after a renderer crash — never by bringing itself forward), `BootReceiver.kt` (starts
+  the display on `BOOT_COMPLETED` only if the TV is on) and `ShellPolicy.kt` (the pure key and
+  boot decisions: short BACK does nothing, held BACK steps the display aside, every other key
+  goes to the system). The shell's only offline fallback is `app/src/main/assets/offline.html`.
+  Always edit the root `web/`.
+- **`mesh/`** — the optional Meshtastic bridge as its own APK (`org.veteranshealingfarm.meshbridge`,
+  [docs/MESH_BRIDGE.md](docs/MESH_BRIDGE.md)), with no dependency on `app/`; pure logic in
+  `MeshLogic.kt`. JVM tests: `./gradlew :app:testReleaseUnitTest :mesh:testReleaseUnitTest`.
 - **`tests/`** — `node --test`, no external test framework. Each `*.test.mjs` file has a
   `Run with: node --test tests/<file>.test.mjs` header comment. `helpers/build-fixture.mjs` builds
   a throwaway fixture tree so build/publish tests can corrupt content without touching the real
@@ -182,7 +184,7 @@ Ordered by risk — what keeps an unattended page alive — not by feature layer
 including ship gates, in [docs/BUILD_TREE.md](docs/BUILD_TREE.md).
 
 0. **On the screen** — *done (Sept 18–19).* The `app/` WebView shell is the answer: fullscreen,
-   no chrome, screen never sleeps, points at GitHub Pages. v1.2.1 (renderer-crash recovery, isolated mesh bridge) is the current build.
+   no chrome, screen never sleeps, points at GitHub Pages. v1.2.1 is what the television runs (Nov 2026); v1.3.0 (shared-TV key and boot behaviour, mesh bridge moved to `mesh/`) is built but not yet installed. Liveness is the page's own heartbeat ([docs/HEARTBEAT.md](docs/HEARTBEAT.md)), off until a ping URL is set.
    `docs/DISPLAY_SETUP.md` covers sideloading and the television's own sleep/screensaver settings.
 1. **Survives being left alone** — Service Worker (app shell + photos; content JSON via
    `content-source.js`), self-hosted fonts,
