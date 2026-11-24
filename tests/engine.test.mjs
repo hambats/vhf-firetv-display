@@ -218,7 +218,7 @@ function makeContext(clock, tracking, search) {
     VhfScenes,
     VhfDiagnostics
   };
-  sandbox.window = sandbox; // engine.js calls window.setTimeout / window.VhfQuietHours etc.
+  sandbox.window = sandbox; // engine.js calls window.setTimeout etc.
   // Stands in for the website page that frames a `?slide=` embed.
   sandbox.window.parent = {
     postMessage(msg) {

@@ -1,20 +1,22 @@
 /*
- * The remote's BACK key (app/.../DisplayActivity.kt onKeyUp) calls
- * VhfQuietHours.wake() on every press, on any day. Two things must hold:
+ * Closed days, and the remote's BACK key.
  *
- *   1. It never starts a second loop. While the woken scene is still warming
- *      the screen is still black — exactly when someone presses BACK again —
- *      and a second advance() then ran its own timer chain that nothing ever
- *      cancelled: scenes changing twice per dwell until the next reload.
- *   2. On an open day it does nothing. BACK must not skip the scene someone
- *      is looking at.
+ * The closed-day "wake on BACK" is gone (proposal F5): knowing the display is
+ * alive is the heartbeat's job, not staff pressing buttons. But the installed
+ * 1.2.1 shell (app/.../DisplayActivity.kt onKeyUp) still evaluates
  *
- * Same technique as tests/engine.test.mjs: the real engine.js in a vm
- * context, a fake clock the test fires by hand. Here each scene carries one
- * content image that never loads, so warming waits on its budget timer and
- * the test controls exactly when a tick is "in flight".
+ *     window.VhfQuietHours && window.VhfQuietHours.wake();
  *
- * Run with: node --test tests/engine-wake.test.mjs
+ * on every BACK press, on any day, and the web side ships before any new APK.
+ * So these tests pin that the shell's exact expression is a harmless no-op:
+ * it does not throw, does not light a closed day, and does not skip or
+ * double the scene loop on an open one. Closed days stay a lit black screen.
+ *
+ * The real engine.js in a vm context, a fake clock the test fires by hand.
+ * Each scene carries one content image that never loads, so warming waits on
+ * its budget timer and the test controls exactly when a tick is "in flight".
+ *
+ * Run with: node --test tests/engine-quiet.test.mjs
  */
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -134,45 +136,38 @@ async function boot({ closedToday, diag = false, items }) {
   return { sandbox, clock, shown };
 }
 
-// One BACK press: a separate task on the device (evaluateJavascript), so
-// promise callbacks run between presses.
+// The exact expression the installed 1.2.1 shell evaluates on a BACK press
+// (DisplayActivity.kt onKeyUp). Each press is its own task on the device.
+const SHELL_BACK_JS = "window.VhfQuietHours && window.VhfQuietHours.wake();";
+
 async function press(sandbox) {
-  sandbox.VhfQuietHours.wake();
+  vm.runInContext(SHELL_BACK_JS, sandbox);
   await flush();
 }
 
-test("two BACK presses while the woken scene warms leave exactly one loop", async () => {
+test("there is no VhfQuietHours to wake", async () => {
+  const { sandbox } = await boot({ closedToday: true });
+  assert.equal(sandbox.VhfQuietHours, undefined);
+});
+
+test("a closed day stays black through BACK presses, on one recheck timer", async () => {
   const { sandbox, clock, shown } = await boot({ closedToday: true });
   assert.deepEqual(shown, ["blank"]);
   assert.equal(clock.pending(QUIET_RECHECK_MS).length, 1);
 
-  await press(sandbox); // wakes: the first scene starts warming, screen still black
-  await press(sandbox); // "did it work?" — pressed again before anything shows
-
+  await press(sandbox);
+  await press(sandbox);
   clock.fireAll(FIRST_PAINT_BUDGET_MS);
   await flush();
-  clock.fireAll(PRELOAD_BUDGET_MS);
+  assert.deepEqual(shown, ["blank"], "BACK no longer lights a closed day");
+  assert.equal(clock.pending(QUIET_RECHECK_MS).length, 1);
+  assert.equal(clock.pending(DWELL_MS).length, 0);
+
+  // The recheck keeps the frame black, still on exactly one timer.
+  clock.fireAll(QUIET_RECHECK_MS);
   await flush();
-
-  assert.deepEqual(shown, ["blank", "a"]);
-  assert.equal(clock.pending(DWELL_MS).length, 1, "exactly one armed scene timer, not one per press");
-  assert.equal(clock.pending(QUIET_RECHECK_MS).length, 0);
-
-  // A further press once awake changes nothing either.
-  const armed = clock.pending(DWELL_MS)[0];
-  await press(sandbox);
-  assert.deepEqual(clock.pending(DWELL_MS), [armed]);
-  assert.deepEqual(shown, ["blank", "a"]);
-
-  // And the loop keeps one pace from here on.
-  for (let lap = 0; lap < 3; lap++) {
-    clock.fireAll(DWELL_MS);
-    await flush();
-    clock.fireAll(PRELOAD_BUDGET_MS);
-    await flush();
-    assert.equal(clock.pending(DWELL_MS).length, 1);
-  }
-  assert.deepEqual(shown, ["blank", "a", "b", "c", "a"]);
+  assert.deepEqual(shown, ["blank", "blank"]);
+  assert.equal(clock.pending(QUIET_RECHECK_MS).length, 1);
 });
 
 test("BACK on an open day does not skip the scene on screen", async () => {
@@ -191,9 +186,9 @@ test("BACK on an open day does not skip the scene on screen", async () => {
   assert.deepEqual(clock.pending(DWELL_MS), armed, "the same dwell timer is still the one armed");
 });
 
-test("a BACK press right after a skipped scene leaves exactly one loop", async () => {
+test("a BACK press mid-tick leaves exactly one loop", async () => {
   // The window right after a throttled scene is skipped: the replacement is
-  // still warming and no dwell timer is armed. Every loop has a few.
+  // still warming and no dwell timer is armed.
   const { sandbox, clock, shown } = await boot({ closedToday: false, items: ["a", "throttled", "c"] });
   clock.fireAll(FIRST_PAINT_BUDGET_MS);
   await flush();

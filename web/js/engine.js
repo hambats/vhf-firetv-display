@@ -38,13 +38,8 @@
   // The stall detector's own tick. It is deliberately not tied to the scene
   // loop: its whole job is to notice that the scene loop has stopped.
   var WATCHDOG_INTERVAL_MS = 30 * 1000;
-  // How long the display stays showing normal content after a remote wake
-  // during quiet hours, before falling back to black again. Long enough for
-  // someone to actually look at the screen, short enough that a stray
-  // button press doesn't light up the building overnight.
-  var WAKE_DURATION_MS = 10 * 60 * 1000;
-  // How often quiet hours are re-checked (day rollover, wake expiring)
-  // while the display is black.
+  // How often quiet hours are re-checked (day rollover) while the display is
+  // black.
   var QUIET_RECHECK_MS = 60 * 1000;
   var layers = document.querySelectorAll(".stage__layer");
 
@@ -54,18 +49,21 @@
    * The farm is closed some days (settings.json: hours.closedWeekdays,
    * 0=Sunday..6=Saturday), and there is no reason to keep a television lit
    * in an empty building. On a closed day the loop shows a black frame
-   * instead of the playlist. The remote's BACK key (app/DisplayActivity.kt)
-   * calls VhfQuietHours.wake() so on-site staff can still check the display
-   * is alive without waiting for the next open day; the override expires on
-   * its own so nobody has to remember to turn it back off.
+   * instead of the playlist (a lit black screen: the shell keeps the panel
+   * on and never switches it on or off itself).
+   *
+   * There is deliberately no way to wake it from the remote. Knowing the
+   * display is alive is the heartbeat's job (docs/HEARTBEAT.md), not staff
+   * pressing buttons. The installed 1.2.1 shell still evaluates
+   * `window.VhfQuietHours && window.VhfQuietHours.wake();` on every BACK
+   * press; with VhfQuietHours gone that guarded expression is a no-op, which
+   * tests/engine-quiet.test.mjs pins.
    */
-  var wakeUntil = 0;
   // The loop's armed dwell/recheck timer. Null while a tick is running
   // (building or warming the next scene), so "parked" is exactly
   // pendingTimeout !== null — and only a parked loop is safe to nudge: a tick
   // in flight schedules itself, and nudging it starts a second loop.
   var pendingTimeout = null;
-  var quietShowing = false; // the black quiet-hours frame is what is on screen
   var advanceRef = null; // set once runLoop is underway
 
   function closedWeekdays(settings) {
@@ -97,7 +95,6 @@
 
   function isQuietHours(settings) {
     if (previewAwake) return false;
-    if (Date.now() < wakeUntil) return false;
     var closed = closedWeekdays(settings);
     if (closed.length === 0) return false;
     var today = currentWeekday(settings && settings.timezone);
@@ -107,32 +104,12 @@
     return false;
   }
 
-  window.VhfQuietHours = {
-    wake: function () {
-      wakeUntil = Date.now() + WAKE_DURATION_MS;
-      /*
-       * Only a loop parked on the black frame needs a nudge. Mid-tick — the
-       * screen is still black while the first scene warms, which is exactly
-       * when someone presses BACK a second time — the tick re-checks quiet
-       * hours itself; nudging it then started a second loop nothing ever
-       * cancelled. And on an open day there is nothing to wake: BACK must
-       * not skip the scene someone is looking at.
-       */
-      if (pendingTimeout === null || !quietShowing) return;
-      log("woken from quiet hours for " + Math.round(WAKE_DURATION_MS / 60000) + " min");
-      window.clearTimeout(pendingTimeout);
-      pendingTimeout = null;
-      if (advanceRef) advanceRef();
-    }
-  };
-
   /*
    * Skips the current scene's remaining dwell and shows the next one right
    * away — a curation tool, not a viewer feature: reviewing new content
    * against every scene means sitting through 8-14s dwell times per scene
-   * otherwise. Same mechanism as VhfQuietHours.wake() (clear the parked
-   * timer, call the same advance() the loop itself uses), and the same rule:
-   * mid-tick it does nothing, because the loop is already on its way to the
+   * otherwise. It clears the parked timer and calls the same advance() the
+   * loop itself uses, and only on a parked loop: mid-tick it does nothing, because the loop is already on its way to the
    * next scene and a second advance() would be a second loop.
    *
    * Gated to ?diag=1 for both the exposed function and the key binding —
@@ -452,7 +429,7 @@
     }
 
     function advance() {
-      // The timer that got us here has fired (or wake/advanceNow cleared
+      // The timer that got us here has fired (or advanceNow cleared
       // it): not parked again until scheduleNext arms the next one.
       pendingTimeout = null;
 
@@ -476,13 +453,10 @@
       if (isQuietHours(data.settings)) {
         upcoming = null;
         showLayer(VhfScenes.renderBlank());
-        quietShowing = true;
         log("quiet hours: showing black scene");
         scheduleNext(QUIET_RECHECK_MS);
         return;
       }
-      quietShowing = false;
-
       var ready;
       try {
         ready = upcoming || prepare(nextItem(), firstPaint ? FIRST_PAINT_MAX_PRELOAD_MS : MAX_PRELOAD_MS);
