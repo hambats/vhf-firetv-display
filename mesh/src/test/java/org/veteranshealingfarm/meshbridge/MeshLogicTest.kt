@@ -1,11 +1,11 @@
-package org.veteranshealingfarm.display
+package org.veteranshealingfarm.meshbridge
 
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.veteranshealingfarm.display.MeshConfigEdits.Edit
+import org.veteranshealingfarm.meshbridge.MeshConfigEdits.Edit
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.InetAddress

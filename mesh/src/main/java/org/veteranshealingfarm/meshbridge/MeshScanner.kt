@@ -1,4 +1,4 @@
-package org.veteranshealingfarm.display
+package org.veteranshealingfarm.meshbridge
 
 import android.Manifest
 import android.annotation.SuppressLint
@@ -13,7 +13,6 @@ import android.content.pm.PackageManager
 import android.os.Handler
 import android.os.ParcelUuid
 import android.util.Log
-import androidx.core.content.ContextCompat
 import java.util.UUID
 
 /**
@@ -46,7 +45,7 @@ object MeshScanner {
         match: String?,
         done: (List<MeshNode>) -> Unit
     ): Handle? {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) !=
+        if (context.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) !=
             PackageManager.PERMISSION_GRANTED
         ) {
             Log.w(

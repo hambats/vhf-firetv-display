@@ -1,4 +1,4 @@
-package org.veteranshealingfarm.display
+package org.veteranshealingfarm.meshbridge
 
 import java.io.IOException
 import java.io.InputStream
@@ -121,7 +121,7 @@ object MeshConfigEdits {
      * @param enabled the `enabled` extra, or null when absent
      * @param node the `node` extra, or null when absent; blank (`--es node ''`) forgets it
      * @param forget the `forget` extra; true forgets the node unless a non-blank node is given
-     * @param pin the `pin` extra; blank restores the default
+     * @param pin the `pin` extra; blank clears it (there is no default PIN)
      * @param match the `match` extra; blank restores the default
      */
     fun from(enabled: Boolean?, node: String?, forget: Boolean, pin: String?, match: String?): List<Edit> {

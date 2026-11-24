@@ -1,4 +1,4 @@
-package org.veteranshealingfarm.display
+package org.veteranshealingfarm.meshbridge
 
 import android.content.BroadcastReceiver
 import android.content.Context
@@ -8,31 +8,33 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import org.veteranshealingfarm.display.MeshConfigEdits.Edit
-import org.veteranshealingfarm.display.MeshConfigEdits.KEY_ENABLED
-import org.veteranshealingfarm.display.MeshConfigEdits.KEY_MATCH
-import org.veteranshealingfarm.display.MeshConfigEdits.KEY_NODE
-import org.veteranshealingfarm.display.MeshConfigEdits.KEY_PIN
+import org.veteranshealingfarm.meshbridge.MeshConfigEdits.Edit
+import org.veteranshealingfarm.meshbridge.MeshConfigEdits.KEY_ENABLED
+import org.veteranshealingfarm.meshbridge.MeshConfigEdits.KEY_MATCH
+import org.veteranshealingfarm.meshbridge.MeshConfigEdits.KEY_NODE
+import org.veteranshealingfarm.meshbridge.MeshConfigEdits.KEY_PIN
 
 /**
  * Settings for the optional mesh bridge (MeshBridgeService). Off unless switched on.
  *
- * There is no on-screen UI for this — the television has no keyboard and nothing on the
- * display is interactive. It is set once over ADB (see docs/MESH_BRIDGE.md):
+ * There is no on-screen UI for this — the television has no keyboard, and this app has no
+ * activity at all. It is set once over ADB (see docs/MESH_BRIDGE.md):
  *
- *   adb shell am broadcast -a org.veteranshealingfarm.display.MESH_CONFIG \
- *       -n org.veteranshealingfarm.display/.MeshConfigReceiver \
+ *   adb shell am broadcast --include-stopped-packages \
+ *       -a org.veteranshealingfarm.meshbridge.MESH_CONFIG \
+ *       -n org.veteranshealingfarm.meshbridge/.MeshConfigReceiver \
  *       --ez enabled true --es node AA:BB:CC:DD:EE:FF --es pin <pairing PIN>
  *
- * The file is written by the ":mesh" process (MeshConfigReceiver, auto-pick) and read by both
- * processes, so it is opened with MODE_MULTI_PROCESS: each read re-checks the file on disk
- * instead of trusting this process's cached copy. Same file name and keys as v1.2.0, so an
- * upgrade keeps the existing settings.
+ * There is no default pairing PIN: until one is configured the bridge does not answer the
+ * node's pairing prompt (it logs why), so no real PIN ever has to live in source control.
+ *
+ * Opened with MODE_MULTI_PROCESS (each read re-checks the file on disk), as when the bridge
+ * lived inside the display APK (v1.2.x). This is a separate package, so its settings start
+ * empty and must be entered once after it is installed.
  */
 object MeshConfig {
     private const val TAG = "VhfMesh"
     private const val PREFS = "mesh_bridge"
-    private const val DEFAULT_PIN = "123456"
     /** Auto-pick only takes a node whose BLE name contains this (the owner names in MESH_BRIDGE.md). */
     const val DEFAULT_MATCH = "VHF"
 
@@ -42,7 +44,8 @@ object MeshConfig {
 
     fun enabled(context: Context) = prefs(context).getBoolean(KEY_ENABLED, false)
     fun nodeAddress(context: Context): String? = prefs(context).getString(KEY_NODE, null)
-    fun pin(context: Context) = prefs(context).getString(KEY_PIN, DEFAULT_PIN) ?: DEFAULT_PIN
+    /** The node's BLE pairing PIN, or null until one is configured with `--es pin`. */
+    fun pin(context: Context): String? = prefs(context).getString(KEY_PIN, null)?.takeIf { it.isNotBlank() }
     fun nodeMatch(context: Context) = prefs(context).getString(KEY_MATCH, DEFAULT_MATCH) ?: DEFAULT_MATCH
 
     fun setNode(context: Context, address: String) {
@@ -50,9 +53,8 @@ object MeshConfig {
     }
 
     /**
-     * Starts the bridge if it is switched on; otherwise a no-op. Never throws: it is called on
-     * the display's own startup path (DisplayActivity.onCreate, BootReceiver), and a bridge
-     * that cannot start must not take the display with it.
+     * Starts the bridge if it is switched on; otherwise a no-op. Never throws: it is called
+     * from the boot, upgrade and config receivers, which must not crash.
      */
     fun startIfEnabled(context: Context) {
         try {
@@ -64,7 +66,7 @@ object MeshConfig {
                 context.startService(intent)
             }
         } catch (t: Throwable) {
-            Log.w(TAG, "could not start the mesh bridge; the display carries on without it", t)
+            Log.w(TAG, "could not start the mesh bridge", t)
         }
     }
 
@@ -121,21 +123,33 @@ class MeshConfigReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        const val ACTION = "org.veteranshealingfarm.display.MESH_CONFIG"
-        const val ACTION_SCAN = "org.veteranshealingfarm.display.MESH_SCAN"
+        const val ACTION = "org.veteranshealingfarm.meshbridge.MESH_CONFIG"
+        const val ACTION_SCAN = "org.veteranshealingfarm.meshbridge.MESH_SCAN"
         private const val SCAN_MS = 8_000L
     }
 }
 
 /**
  * After `adb install -r` the old process is gone, and nothing else would bring the bridge back
- * until the next boot or the next time someone opens the display. This restarts the bridge
- * only — never the activity: starting DisplayActivity here would turn the screen on in a
- * resident's room. Runs in the ":mesh" process; not exported (the system still delivers it).
+ * until the next boot. This restarts the bridge, a service; this app has no screen to show.
+ * Runs in the ":mesh" process; not exported (the system still delivers it).
  */
 class MeshUpgradeReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != Intent.ACTION_MY_PACKAGE_REPLACED) return
+        MeshConfig.startIfEnabled(context)
+    }
+}
+
+/**
+ * Starts the bridge after the television boots, if it is switched on. Starts a service only,
+ * never an activity, so it can never touch the screen. (Until display 1.3.0 the display app's
+ * BootReceiver did this.) Not exported: BOOT_COMPLETED is a protected broadcast sent by the
+ * system, which reaches non-exported receivers.
+ */
+class MeshBootReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != Intent.ACTION_BOOT_COMPLETED) return
         MeshConfig.startIfEnabled(context)
     }
 }

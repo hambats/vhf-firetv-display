@@ -9,19 +9,7 @@
         android:required="false" />
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
-
-    <!-- Optional mesh bridge (MeshBridgeService). targetSdk 28, so the legacy BT permissions apply. -->
-    <uses-feature
-        android:name="android.hardware.bluetooth_le"
-        android:required="false" />
-    <uses-permission android:name="android.permission.BLUETOOTH" />
-    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <!-- Android 9 returns no BLE scan results without it. Granted once over ADB (MESH_BRIDGE.md). -->
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <application
         android:allowBackup="false"
@@ -47,42 +35,15 @@
             </intent-filter>
         </activity>
 
+        <!-- BOOT_COMPLETED only. It is a protected broadcast that only the system can send, and
+             the system's broadcasts reach non-exported receivers, so no other app on the
+             television can fire this receiver and pull the display to the front. -->
         <receiver
             android:name=".BootReceiver"
             android:enabled="true"
-            android:exported="true">
-            <intent-filter android:priority="1000">
+            android:exported="false">
+            <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
-                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
-            </intent-filter>
-        </receiver>
-
-        <!-- The mesh bridge and everything it owns run in their own ":mesh" process, so
-             nothing in it can take the display (this app's main process) down. -->
-        <service
-            android:name=".MeshBridgeService"
-            android:exported="false"
-            android:process=":mesh" />
-
-        <!-- Set over ADB only: the shell holds DUMP, installable apps cannot. -->
-        <receiver
-            android:name=".MeshConfigReceiver"
-            android:exported="true"
-            android:permission="android.permission.DUMP"
-            android:process=":mesh">
-            <intent-filter>
-                <action android:name="org.veteranshealingfarm.display.MESH_CONFIG" />
-                <action android:name="org.veteranshealingfarm.display.MESH_SCAN" />
-            </intent-filter>
-        </receiver>
-
-        <!-- After `adb install -r`: restarts the mesh bridge (if enabled), never the display. -->
-        <receiver
-            android:name=".MeshUpgradeReceiver"
-            android:exported="false"
-            android:process=":mesh">
-            <intent-filter>
-                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
     </application>
