@@ -62,6 +62,125 @@
   VhfDiagnostics.set("compat", missing.length === 0 ? "ok" : "missing: " + missing.join(","));
   window.VhfCompat = checks;
 
+  /*
+   * ---- The rebuild probe ----
+   *
+   * Nothing above may change because of this section: those are what the
+   * display relies on today. These are what a rebuild *wants* to rely on
+   * (modern syntax, ES modules, newer CSS and image formats), and the rule
+   * is to prove each on the television before using it (proposal F11). The
+   * answer has to be readable without touching the TV, so it goes to the
+   * ?diag=1 overlay and, when the heartbeat is on, into every ping body
+   * (VhfCompat.summary(), read by engine.js).
+   *
+   * Every test runs inside has(): a syntax test is a string handed to the
+   * Function constructor, so an engine that cannot parse it throws a
+   * SyntaxError that is caught here instead of failing this file's parse.
+   */
+  function syntax(source) {
+    return has(function () {
+      return new Function(source)() === true;
+    });
+  }
+
+  function cssSupports(property, value) {
+    return has(function () {
+      return window.CSS && CSS.supports && CSS.supports(property, value);
+    });
+  }
+
+  var userAgent = has(function () { return navigator.userAgent; }) ? String(navigator.userAgent) : "";
+  var chromeMatch = /Chrome\/(\d+)/.exec(userAgent);
+
+  var features = {
+    es2017: syntax("var f = async function () { await 0; }; return typeof f === 'function' && typeof Object.entries === 'function';"),
+    es2020: syntax("var o = {}; return (o?.a ?? 1) === 1 && 1n === BigInt(1) && typeof globalThis === 'object';"),
+    es2022: syntax("class A { #x = 1; static y = 2; get x() { return this.#x; } } return new A().x === 1 && [1].at(-1) === 1;"),
+    dynamicImport: syntax("var f = function () { return import('./x.js'); }; return typeof f === 'function';"),
+    modules: has(function () { return "noModule" in document.createElement("script"); }),
+    structuredClone: has(function () { return typeof structuredClone === "function"; }),
+    fetch: checks.fetch,
+    abortController: has(function () { return typeof AbortController === "function"; }),
+    intersectionObserver: has(function () { return typeof IntersectionObserver === "function"; }),
+    resizeObserver: has(function () { return typeof ResizeObserver === "function"; }),
+    cssVariables: checks.cssVariables,
+    cssClamp: cssSupports("width", "clamp(1px, 2px, 3px)"),
+    textWrapBalance: cssSupports("text-wrap", "balance"),
+    aspectRatio: cssSupports("aspect-ratio", "16 / 9"),
+    containerQueries: cssSupports("container-type", "inline-size"),
+    backdropFilter: cssSupports("backdrop-filter", "blur(2px)") || cssSupports("-webkit-backdrop-filter", "blur(2px)"),
+    serviceWorker: checks.serviceWorker,
+    cacheStorage: checks.cacheStorage,
+    visibilityChange: has(function () {
+      return typeof document.visibilityState === "string" && "onvisibilitychange" in document;
+    }),
+    webp: null, // null until the decode test below settles
+    avif: null
+  };
+
+  function summarize(withUserAgent) {
+    var no = [];
+    var pending = [];
+    var total = 0;
+    var ok = 0;
+    for (var name in features) {
+      if (!Object.prototype.hasOwnProperty.call(features, name)) continue;
+      total += 1;
+      if (features[name] === null) pending.push(name);
+      else if (features[name]) ok += 1;
+      else no.push(name);
+    }
+    var parts = [
+      "chrome=" + (chromeMatch ? chromeMatch[1] : "?"),
+      "ok=" + ok + "/" + total
+    ];
+    if (no.length) parts.push("no=" + no.join(","));
+    if (pending.length) parts.push("pending=" + pending.join(","));
+    if (withUserAgent) parts.push("ua=" + userAgent.slice(0, 200));
+    return parts.join(" ");
+  }
+
+  function publish() {
+    try {
+      VhfDiagnostics.set("probe", summarize(false));
+    } catch (err) { /* the overlay is optional */ }
+  }
+
+  // 1x1 images, generated with Pillow and decode-checked.
+  var IMAGE_SAMPLES = {
+    webp: "data:image/webp;base64,UklGRjoAAABXRUJQVlA4IC4AAADwAQCdASoBAAEAAUAmJaACdLoB+AAEyAAA/q4X/zYEDND6YP/SbPE2eJs+OYAA",
+    avif: "data:image/avif;base64,AAAAIGZ0eXBhdmlmAAAAAGF2aWZtaWYxbWlhZk1BMUIAAADrbWV0YQAAAAAAAAAhaGRscgAAAAAAAAAAcGljdAAAAAAAAAAAAAAAAAAAAAAOcGl0bQAAAAAAAQAAAB5pbG9jAAAAAEQAAAEAAQAAAAEAAAETAAAAJwAAAChpaW5mAAAAAAABAAAAGmluZmUCAAAAAAEAAGF2MDFDb2xvcgAAAABqaXBycAAAAEtpcGNvAAAAFGlzcGUAAAAAAAAAAQAAAAEAAAAQcGl4aQAAAAADCAgIAAAADGF2MUOBAAwAAAAAE2NvbHJuY2x4AAEADQAGgAAAABdpcG1hAAAAAAAAAAEAAQQBAoMEAAAAL21kYXQSAAoIGAAGiAhoNCAyGRTHh4ZlAgggnlAAAABIWtlcu9vRQxmukxg="
+  };
+
+  function probeImage(name) {
+    try {
+      var image = new Image();
+      var settled = false;
+      var settle = function (ok) {
+        if (settled) return;
+        settled = true;
+        features[name] = ok;
+        publish();
+      };
+      image.onload = function () { settle(image.naturalWidth === 1); };
+      image.onerror = function () { settle(false); };
+      window.setTimeout(function () { settle(false); }, 5000);
+      image.src = IMAGE_SAMPLES[name];
+    } catch (err) {
+      features[name] = false;
+    }
+  }
+
+  probeImage("webp");
+  probeImage("avif");
+  publish();
+
+  checks.features = features;
+  checks.userAgent = userAgent;
+  checks.summary = function () {
+    return summarize(true);
+  };
+
   if (missing.length > 0) {
     console.warn(
       "[VHF] this browser is missing capabilities the display relies on: " +

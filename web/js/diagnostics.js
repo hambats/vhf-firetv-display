@@ -95,6 +95,7 @@ var VhfDiagnostics = (function () {
     ];
     if (fields.scene) parts.push(fields.scene);
     if (fields.photoId) parts.push("photo " + fields.photoId);
+    if (fields.probe) parts.push("probe " + fields.probe);
     parts.push("[→/space/n: skip scene]");
     if (lastError) parts.push("! " + lastError.where + ": " + lastError.message);
     el.textContent = parts.join("  ·  ");
