@@ -18,10 +18,11 @@ remains the higher-value piece of work for an unattended display.
 
 | Device | Tailnet address | Node name |
 |---|---|---|
-| The television (Toshiba AFTTI43) | `100.69.183.1` | `vhf-display` |
-| Development PC | `100.84.23.92` | `desktop-m8kebh3` |
+| The television (Toshiba AFTTI43) | `<tv tailnet address>` | `<tv node name>` |
+| Development PC | `<dev PC tailnet address>` | `<dev PC node name>` |
 
-Tailnet: `taild0c74d.ts.net`, account `rwlauterbach@`.
+The real addresses, node names, tailnet name and account are kept out of this public repo, in
+the owner's private notes (`private/curation-notes.md`, git-ignored, backed up to the vault).
 
 The `100.x` address belongs to the device, not the network. It is the same from the farm, from
 home, or if the television moves. The farm's router needs no configuration at all — no port
@@ -31,16 +32,16 @@ coordination server, which introduces them and then steps out of the traffic pat
 ## Using it
 
 ```bash
-adb connect 100.69.183.1:5555
+adb connect <tv tailnet address>:5555
 ```
 
 Everything then behaves exactly as it does on the LAN:
 
 ```bash
-adb -s 100.69.183.1:5555 install -r release/vhf-display-<version>.apk
-adb -s 100.69.183.1:5555 shell dumpsys window | grep mCurrentFocus
-adb -s 100.69.183.1:5555 shell screencap -p /data/local/tmp/t.png
-adb -s 100.69.183.1:5555 pull /data/local/tmp/t.png
+adb -s <tv tailnet address>:5555 install -r release/vhf-display-<version>.apk
+adb -s <tv tailnet address>:5555 shell dumpsys window | grep mCurrentFocus
+adb -s <tv tailnet address>:5555 shell screencap -p /data/local/tmp/t.png
+adb -s <tv tailnet address>:5555 pull /data/local/tmp/t.png
 ```
 
 Two notes from experience: the television drops the ADB connection after a while and needs a
@@ -81,12 +82,12 @@ farm, which defeats the entire point. **Expiry is now disabled**, confirmed agai
 Nothing further is needed. If it ever reappears, it is in the admin console under the machine's
 `⋯` menu → *Disable key expiry*.
 
-The node was also renamed from `nicoles-tv` to `vhf-display`. Doing that required first turning
+The node was also renamed from its original owner-named default to `<tv node name>`. Doing that required first turning
 off **"Auto-generate from OS hostname"** in the rename dialog — left on, the name reverts to the
 device's own hostname, which this television reports as `localhost`. A rename without that step
 appears to succeed and then quietly undoes itself.
 
-Renaming retires `nicoles-tv.taild0c74d.ts.net`. Nothing depends on it; everything here uses the
+Renaming retires the old MagicDNS name. Nothing depends on it; everything here uses the
 address.
 
 ## Verifying it actually works
@@ -96,13 +97,13 @@ nothing about the boot path — during setup that produced a perfectly healthy-l
 while the boot path was still broken.
 
 ```bash
-adb -s 100.69.183.1:5555 reboot
+adb -s <tv tailnet address>:5555 reboot
 ```
 
 Then, from the PC, without touching the television:
 
-- `tailscale status` shows `vhf-display` without `offline` (took about 10 seconds)
-- `adb connect 100.69.183.1:5555` succeeds — drop any LAN connection first, or you will
+- `tailscale status` shows `<tv node name>` without `offline` (took about 10 seconds)
+- `adb connect <tv tailnet address>:5555` succeeds — drop any LAN connection first, or you will
   test the wrong path
 - `adb shell ip -f inet addr show` shows `inet 100.` on `tun0`
 - `dumpsys window | grep mCurrentFocus` shows `DisplayActivity` — this also confirms
@@ -115,7 +116,9 @@ and that caveat stands — but it has now been observed working twice on this de
 ## The CI monitor's credentials
 
 `.github/workflows/display-monitor.yml` reaches the television the same way, from GitHub
-Actions. It needs two things, and both have tripped it before:
+Actions. It reads the address from the `VHF_DEVICE` repo secret (`<tv tailnet address>:5555`),
+as does `scripts/check-display.mjs` from the environment. It also needs two things, and both have
+tripped it before:
 
 1. **`TS_AUTHKEY` must be an auth key, `tskey-auth-…`**: Tailscale admin console → Settings →
    Keys → *Generate auth key*, reusable and ephemeral. An API access token (`tskey-api-…`) looks

@@ -129,5 +129,5 @@ The output APK is at `app/build/outputs/apk/debug/app-debug.apk`.
 
 Installing does **not** require a PC-to-TV cable: the Downloader app from the Fire TV appstore works
 (enable "Apps from Unknown Sources", type a URL, install), and since Sept 19 the television is on
-Tailscale, so `adb -s 100.69.183.1:5555 install -r <apk>` works from anywhere —
-see [docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md).
+Tailscale, so `adb -s <tv tailnet address>:5555 install -r <apk>` works from anywhere —
+see [docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md) (the real address is in the git-ignored `private/curation-notes.md`).

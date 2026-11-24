@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "note": "Hand-maintained time corrections. Most were confirmed against the farm's Regpack registration listing on 2026-09-18 and flagged to Megan (veteranshealingfarm@gmail.com) the same day; the Google Calendar entries carry a stale/wrong start time for those pottery sessions. Each override is a no-op once the source calendar entry is fixed — delete the entry here when that happens rather than leaving a redundant override in place. Per-entry `note` records anything with different provenance.",
+  "note": "Hand-maintained time corrections. Most were confirmed against the farm's Regpack registration listing on 2026-09-18 and flagged to VHF staff the same day; the Google Calendar entries carry a stale/wrong start time for those pottery sessions. Each override is a no-op once the source calendar entry is fixed — delete the entry here when that happens rather than leaving a redundant override in place. Per-entry `note` records anything with different provenance.",
   "overrides": {
     "pottery-with-resident-potter-sophia-2026-10-03": { "start": "2026-10-03T14:00:00.000Z", "end": "2026-10-03T16:00:00.000Z", "note": "Calendar has every session of this 4-week handbuilding series as 10-11 AM; they actually run 10 AM - 12 PM. All four occurrences corrected below." },
     "pottery-with-resident-potter-sophia-2026-10-10": { "start": "2026-10-10T14:00:00.000Z", "end": "2026-10-10T16:00:00.000Z" },

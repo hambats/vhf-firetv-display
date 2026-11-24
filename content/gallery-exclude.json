@@ -1,46 +1,46 @@
 {
   "version": 1,
-  "note": "Hand-maintained. Ids here are dropped from content/generated/gallery.json every time sources/gallery/index.mjs re-runs, even though the adapter re-derives the pool from scratch. Add an id here (and why) after spotting a photo in rotation that needs context an unattended TV can't provide, or that's otherwise not a good fit for the auto-pool.",
+  "note": "Hand-maintained. Ids here are dropped from content/generated/gallery.json every time sources/gallery/index.mjs re-runs. `reason` is a one-word category only (privacy, quality, crop, signage, context): this repo is public, so the full note (what the photo shows, who asked, when) goes in the git-ignored private/curation-notes.md under the same id.",
   "excluded": [
     {
       "id": "20260404-110738",
-      "reason": "Tight candid of a child mid-bite across a cluttered table — an unattended public display is the wrong place for a close-up of a minor, and the framing (packaging, cups, a backpack) does not read as a farm scene. Flagged 2026-09-19."
+      "reason": "privacy"
     },
     {
       "id": "20260304-090420",
-      "reason": "Close-up of the NC Governor's Working Group banner filling the whole frame — another organisation's branding rather than a VHF scene, which on a VHF display reads as someone else's logo. Flagged 2026-09-19."
+      "reason": "signage"
     },
     {
       "id": "20260506-110209",
-      "reason": "Flag retirement ceremony (burning a worn flag) — correct/respectful practice, but reads as alarming out of context with no caption on an unattended public display."
+      "reason": "context"
     },
     {
       "id": "20260210-181436",
-      "reason": "Another flag retirement ceremony photo (different date/occasion) — same concern as 20260506-110209: correct practice, alarming-looking with no caption."
+      "reason": "context"
     },
     {
       "id": "20260207-102252",
-      "reason": "Near-square (2500x2377) full-body group portrait — the display's default 16:9 wash/photo crop (object-position: center 35%) has to crop roughly 40% of the image's height, which cuts heads or feet off this composition. No per-photo crop-focus override exists for the scraped gallery pool, so excluding rather than shipping a bad crop."
+      "reason": "crop"
     },
     {
       "id": "photo-jul-10-2026-2c-2-13-19-pm",
-      "reason": "Shows the farm's WiFi password legible in the background (whiteboard/screen) — security concern, flagged 2026-09-18."
+      "reason": "privacy"
     },
     {
       "id": "photo-jul-10-2026-2c-2-13-16-pm",
-      "reason": "Same burst as photo-jul-10-2026-2c-2-13-19-pm (3 seconds apart) — also shows the farm's WiFi password legible in the background. Security concern, flagged 2026-09-18."
+      "reason": "privacy"
     },
     {
       "id": "20260221-123622",
-      "reason": "Classroom photo (Feb 21) — same whiteboard-WiFi-password pattern as the two Jul 10 exclusions above, different date/session. Security concern, flagged 2026-09-18. This is the third occurrence of the same pattern (staff writing the WiFi password on the classroom whiteboard where it gets photographed) — worth a heads-up to whoever runs workshops there, since more instances likely exist in the untracked ~270 candidate photos the 120-photo sample doesn't cover."
+      "reason": "privacy"
     },
     {
       "id": "20260207-111449",
-      "reason": "Low-quality candid close-up (two people mid-action, awkward crop) — flagged by Robert as not display-worthy, 2026-09-19."
+      "reason": "quality"
     },
     {
       "id": "20250906-112958",
-      "reason": "Privacy request: a woman pictured (laughing beside a man at a lunch table, Sept 6 2025 event) asked that it not be shown. Requested via Robert, 2026-10-21. Permanent — do not remove this line. The photo is still on the website's 2025 gallery page; this only keeps it off the TV."
+      "reason": "privacy (permanent, never remove)"
     }
   ]
 }

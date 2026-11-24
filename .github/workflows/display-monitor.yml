@@ -57,7 +57,9 @@ permissions:
 
 env:
   MONITOR_OBSERVE: "true"
-  VHF_DEVICE: "100.69.183.1:5555"
+  # The television's tailnet address as host:port. Kept out of this public
+  # file: set it as the repo secret VHF_DEVICE (value in the owner's private notes).
+  VHF_DEVICE: ${{ secrets.VHF_DEVICE }}
 
 jobs:
   check:
@@ -84,6 +86,11 @@ jobs:
           TS_OAUTH_CLIENT_ID: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           TS_OAUTH_SECRET: ${{ secrets.TS_OAUTH_SECRET }}
         run: |
+          if [ -z "$VHF_DEVICE" ]; then
+            echo "::warning::No VHF_DEVICE secret (the television's tailnet host:port). Skipping."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           KEY="${TS_AUTHKEY:-$TS_AUTH_KEY}"
           if [ -n "$KEY" ]; then
             # An API access token (tskey-api-...) looks like a credential and
@@ -161,7 +168,7 @@ jobs:
           # To narrow it to adb on the display alone, declare the tag and grant
           # it explicitly, then put `tags: tag:ci` back:
           #   "tagOwners": { "tag:ci": ["autogroup:admin"] }
-          #   grants: { "src": ["tag:ci"], "dst": ["100.69.183.1"], "ip": ["5555"] }
+          #   grants: { "src": ["tag:ci"], "dst": ["<tv tailnet address>"], "ip": ["5555"] }
           version: latest
 
       # Prove whether the tailnet path exists before blaming the television.
@@ -188,14 +195,15 @@ jobs:
         if: steps.creds.outputs.ready == 'true'
         continue-on-error: true
         run: |
+          TV_HOST="${VHF_DEVICE%:*}"
           echo "--- this node ---"
           tailscale status --self --peers=false || true
           echo "--- can it see the display? ---"
           tailscale status | grep -i vhf || echo "display not in peer list"
           echo "--- direct path test ---"
-          tailscale ping --timeout 5s --c 3 100.69.183.1 || echo "tailscale ping failed"
+          tailscale ping --timeout 5s --c 3 "$TV_HOST" || echo "tailscale ping failed"
           echo "--- tcp 5555 ---"
-          timeout 10 bash -c 'cat < /dev/null > /dev/tcp/100.69.183.1/5555' \
+          timeout 10 bash -c "cat < /dev/null > /dev/tcp/$TV_HOST/5555" \
             && echo "port 5555 OPEN" || echo "port 5555 unreachable"
 
       - name: Check the display

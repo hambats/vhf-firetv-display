@@ -20,14 +20,17 @@ likelier one, do it, and name the alternative in your report.
 
 | Target | Remove / suppress | Add / restore |
 |---|---|---|
-| **Calendar event** (one date or a whole series) | `content/events-exclude.json`: add to `excludeIds` (`"<event-id>": "why, who asked, date"`) for one occurrence, or `excludeTitleContains` for every occurrence. Event ids are in `content/generated/events.json`. | Delete the line. Real fix is the Google Calendar itself — tell the user if the entry is wrong there. |
-| **Gallery photo** (the auto-pool from the website) | `content/gallery-exclude.json`: add `{id, reason}` | Delete the entry |
-| **Drive photo / flyer** (Maddie's folder) | Delete it from the Drive folder; it leaves the display on the next sync. Or set the matching scene `"enabled": false` for a temporary pause. Never delete files under `content/artwork/drive/` — that is a mirror. | Add to the Drive folder (ask Maddie, agriculturalmanagervhf@gmail.com) |
+| **Calendar event** (one date or a whole series) | `content/events-exclude.json`: add to `excludeIds` (`"<event-id>": "<one-word category>"`) for one occurrence, or `excludeTitleContains` for every occurrence. Event ids are in `content/generated/events.json`. | Delete the line. Real fix is the Google Calendar itself — tell the user if the entry is wrong there. |
+| **Gallery photo** (the auto-pool from the website) | `content/gallery-exclude.json`: add `{id, reason}` (reason = one-word category) | Delete the entry |
+| **Drive photo / flyer** (Maddie's folder) | Delete it from the Drive folder; it leaves the display on the next sync. Or set the matching scene `"enabled": false` for a temporary pause. Never delete files under `content/artwork/drive/` — that is a mirror. | Add to the Drive folder (ask the farm's Drive-folder owner; contact in the private notes) |
 | **Playlist slide** (mission, program, impact, a pool scene) | `"enabled": false` on its scene in `content/playlist.json` (prefer over deleting — reversible) | `"enabled": true`, or add a scene per `docs/CONTENT_SCHEMA.md` |
 | **Registration QR** for an event | `content/settings.json` → `registration.overrides` (`"hide": true` for no code) | Remove the override |
 | **Curated artwork** | Only `content/artwork/curated/` is published; move to `candidates/` to unpublish | Move into `curated/` and reference it from a scene |
 
-Always leave a **reason** in exclude files (who asked, date, when to delete the line). Past
+This repo is **public**. In the exclude files, the reason is a one-word category only
+(`privacy`, `quality`, `crop`, `signage`, `context`, `on request`). Write the full note (what it
+shows, who asked, date, when to delete the line) in the git-ignored `private/curation-notes.md`
+under the same id. Never put names, emails, or descriptions of people in a tracked file. Past
 exclusions are the only record of why something is missing.
 
 ## 3. Apply, then verify the change took

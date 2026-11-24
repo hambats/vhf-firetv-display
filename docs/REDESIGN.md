@@ -23,7 +23,7 @@ Every number here was read off the television on 2026-09-21 over Tailscale, not 
 | Storage | 11 GB `/data`, 6.6 GB free |
 | Panel | 1920×1080 |
 | Uptime at time of reading | 1 day 19:53 |
-| Access | Tailscale, always-on VPN, `adb connect 100.69.183.1:5555` |
+| Access | Tailscale, always-on VPN, `adb connect <tv tailnet address>:5555` |
 
 ### 1.1 The WebView finding, and why it matters most
 

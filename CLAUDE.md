@@ -60,7 +60,7 @@ it independently. The television must NOT depend on the developer's PC remaining
   rebuild — only a change of publish endpoint does. Install steps:
   [docs/DISPLAY_SETUP.md](docs/DISPLAY_SETUP.md).
 - **The television is reachable from anywhere (Sept 19).** It runs Tailscale with always-on VPN, so
-  `adb connect 100.69.183.1:5555` works off-site — installs, screenshots, logcat. This is *access,
+  `adb connect <tv tailnet address>:5555` works off-site — installs, screenshots, logcat. This is *access,
   not awareness*: nothing yet notices a dead display. See
   [docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md).
 

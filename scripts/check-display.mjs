@@ -2,6 +2,7 @@
 /*
  * Ask the television how it is, from anywhere, over Tailscale.
  *
+ *   VHF_DEVICE=<tv tailnet address>:5555 node scripts/check-display.mjs   # required env
  *   node scripts/check-display.mjs                 # check, exit non-zero on a fault
  *   node scripts/check-display.mjs --observe       # check and report, never fail
  *   node scripts/check-display.mjs --json out.json # also write the report as JSON
@@ -36,7 +37,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, "..");
 
 const ADB = process.env.VHF_ADB || "adb";
-const DEVICE = process.env.VHF_DEVICE || "100.69.183.1:5555";
+// The television's tailnet address (host:port). Required, and deliberately not
+// written here: this repo is public. Locally, set VHF_DEVICE from the private
+// notes (private/curation-notes.md); in CI it comes from the VHF_DEVICE secret.
+const DEVICE = process.env.VHF_DEVICE || "";
 
 /*
  * A 1920x1080 screenshot of a real scene is 1-2 MB of PNG. A screen showing
@@ -235,6 +239,11 @@ async function probe(screenshotPath, closedDay) {
 
 async function main() {
   const argv = process.argv.slice(2);
+  if (!DEVICE) {
+    console.error("[monitor] VHF_DEVICE is not set: export it as <tv tailnet address>:5555 (see private/curation-notes.md).");
+    process.exitCode = 2;
+    return;
+  }
   const observe = argv.includes("--observe");
   const jsonAt = argv.includes("--json") ? argv[argv.indexOf("--json") + 1] : null;
   const shotAt = argv.includes("--screenshot")
