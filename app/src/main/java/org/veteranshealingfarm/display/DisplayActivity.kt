@@ -1,11 +1,7 @@
 package org.veteranshealingfarm.display
 
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
-import android.content.Context
-import android.net.ConnectivityManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -40,7 +36,13 @@ import androidx.appcompat.app.AppCompatActivity
  *  - a renderer crash or OOM kill does not take the app down: the dead WebView is replaced
  *    in place, inside this activity — immediately if it is in front, otherwise the next time
  *    it is resumed. Nothing here ever brings the activity forward.
- *  - the remote cannot navigate away from the display
+ *  - the page cannot navigate away from the published site, and a short BACK press cannot
+ *    close the display; holding BACK steps it aside (KeyPolicy). Every other key, HOME,
+ *    volume, mute, power and media included, belongs to the system and passes straight through.
+ *
+ * The television is shared with residents after hours, so nothing here ever brings the
+ * activity forward or switches the panel on. The only self-start is BootReceiver, and only
+ * when the television is already on.
  */
 class DisplayActivity : AppCompatActivity() {
 
@@ -128,25 +130,13 @@ class DisplayActivity : AppCompatActivity() {
             request: WebResourceRequest?,
             error: WebResourceError?
         ) {
-            // No super: on API 23+ it forwards main-frame errors to the deprecated overload
-            // below, which would count every failure twice.
+            // No super: it forwards main-frame errors to the deprecated overload, which
+            // would count every failure twice.
             // Sub-resource failures are the page's problem, not ours.
             if (request?.isForMainFrame != true) return
             // A navigation we cancelled ourselves (offline card <-> retry) is not a failure.
             if (error?.description?.contains("ERR_ABORTED") == true) return
             onMainFrameFailed(view, request.url?.toString(), "error ${error?.errorCode} ${error?.description}")
-        }
-
-        @Suppress("DEPRECATION")
-        override fun onReceivedError(
-            view: WebView?,
-            errorCode: Int,
-            description: String?,
-            failingUrl: String?
-        ) {
-            // Pre-API-23 path only; newer releases report through the overload above.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) return
-            onMainFrameFailed(view, failingUrl, "error $errorCode $description")
         }
 
         override fun onReceivedHttpError(
@@ -160,7 +150,6 @@ class DisplayActivity : AppCompatActivity() {
             onMainFrameFailed(view, request.url?.toString(), "HTTP ${errorResponse?.statusCode}")
         }
 
-        @TargetApi(Build.VERSION_CODES.O)
         override fun onRenderProcessGone(view: WebView?, detail: RenderProcessGoneDetail?): Boolean {
             // Returning true is what keeps the process alive; the default (false) kills the app.
             onRendererGone(view, detail?.didCrash() == true)
@@ -174,20 +163,19 @@ class DisplayActivity : AppCompatActivity() {
             val host = request?.url?.host.orEmpty()
             return host != displayHost
         }
-
-        @Suppress("DEPRECATION")
-        override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
-            return Uri.parse(url ?: "").host.orEmpty() != displayHost
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // Keeps the panel on only while this window is visible; it never switches a panel on.
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        window.addFlags(WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON)
-        window.addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD)
         hideSystemUi()
+
+        // Lets the page be inspected from the PC without a rebuild: chrome://inspect after
+        // `adb forward tcp:9222 localabstract:webview_devtools_remote_<pid>`. Reachable only
+        // through adb, so it opens nothing that adb access does not already give.
+        WebView.setWebContentsDebuggingEnabled(true)
 
         container = FrameLayout(this)
         setContentView(container)
@@ -345,32 +333,34 @@ class DisplayActivity : AppCompatActivity() {
     }
 
     /**
-     * Swallow every remote key except a long-press BACK, which is the deliberate way out.
-     * A short BACK press instead wakes the page from quiet hours (web/js/engine.js,
-     * VhfQuietHours.wake) so staff can confirm the display is alive on a closed day
-     * without waiting for content to come back on its own.
+     * Keys (decisions in KeyPolicy, unit-tested): a short BACK does nothing; holding BACK
+     * steps the display aside; every other key goes to the system. Tracking the BACK press
+     * here is what lets the system deliver onKeyLongPress.
      */
-    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK && event != null && event.isLongPress) {
-            return super.onKeyDown(keyCode, event)
+    override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean =
+        when (KeyPolicy.onDown(keyCode)) {
+            KeyPolicy.Down.TRACK -> {
+                if (event != null && event.repeatCount == 0) event.startTracking()
+                true
+            }
+            KeyPolicy.Down.PASS -> super.onKeyDown(keyCode, event)
         }
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            event?.startTracking()
-            return true
-        }
+
+    /**
+     * Holding BACK moves the display's task behind whatever was there before (normally the
+     * Fire TV home screen). It never finishes the activity and never relaunches it; the
+     * display comes back only when someone opens it again (or at the next boot with the TV on).
+     */
+    override fun onKeyLongPress(keyCode: Int, event: KeyEvent?): Boolean {
+        if (!KeyPolicy.onLongPress(keyCode)) return super.onKeyLongPress(keyCode, event)
+        Log.i(TAG, "long-press BACK: stepping aside")
+        moveTaskToBack(true)
         return true
     }
 
-    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean {
-        if (keyCode == KeyEvent.KEYCODE_BACK) {
-            webView?.evaluateJavascript(
-                "window.VhfQuietHours && window.VhfQuietHours.wake();",
-                null
-            )
-            return true
-        }
-        return true
-    }
+    /** Consuming the BACK release keeps the system from calling onBackPressed (which would finish). */
+    override fun onKeyUp(keyCode: Int, event: KeyEvent?): Boolean =
+        if (KeyPolicy.consumeUp(keyCode)) true else super.onKeyUp(keyCode, event)
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
@@ -387,13 +377,6 @@ class DisplayActivity : AppCompatActivity() {
                 or View.SYSTEM_UI_FLAG_FULLSCREEN
                 or View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
             )
-    }
-
-    @Suppress("unused")
-    private fun isOnline(): Boolean {
-        val cm = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        @Suppress("DEPRECATION")
-        return cm.activeNetworkInfo?.isConnected == true
     }
 
     private companion object {

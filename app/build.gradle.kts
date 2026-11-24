@@ -9,14 +9,10 @@ android {
 
     defaultConfig {
         applicationId = "org.veteranshealingfarm.display"
-        // Exact Fire TV Edition model/OS on the VHF television isn't confirmed yet.
-        // One build spans Fire OS 5 (Android 5.1 / API 22, oldest Fire TV Edition sets)
-        // through Fire OS 7 (Android 9 / API 28) so that's never a blocker — see
-        // docs/ARCHITECTURE.md "Unconfirmed device" for the compatibility approach.
-        minSdk = 21
+        minSdk = 28 // the VHF television: AFTTI43, Fire OS 7.7 (Android 9 / API 28)
         targetSdk = 28
-        versionCode = 5
-        versionName = "1.2.1"
+        versionCode = 6
+        versionName = "1.3.0"
     }
 
     buildTypes {
@@ -32,7 +28,7 @@ android {
     lint {
         // This APK is sideloaded onto one television and is never published to Google Play,
         // so the Play target-API requirement does not apply. targetSdk stays at 28 to match
-        // Fire OS 7 — see the note on defaultConfig above.
+        // Fire OS 7.
         disable += "ExpiredTargetSdkVersion"
     }
 
@@ -51,6 +47,6 @@ dependencies {
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.webkit:webkit:1.10.0")
 
-    // JVM unit tests for the pure mesh-bridge logic (app/src/test, MeshLogic.kt).
+    // JVM unit tests for the pure shell decisions (app/src/test, ShellPolicy.kt).
     testImplementation("junit:junit:4.13.2")
 }
