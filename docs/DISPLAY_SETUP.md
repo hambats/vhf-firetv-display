@@ -95,12 +95,14 @@ Leaving the television on is the more reliable setup, and what the display is de
 | What is on screen | What it means | What to do |
 |---|---|---|
 | "Reconnecting" on a dark green background | The television has no network yet | Nothing — it retries on its own, at most once a minute |
-| A frozen image | Rare; the watchdog should have caught it | Hold BACK to exit, reopen VHF Display |
+| A frozen image | Rare; the watchdog should have caught it | Press HOME, then reopen VHF Display |
 | The Fire TV home screen | The television rebooted | Open VHF Display from the app row |
 | The display is old content | The PC has not published yet | Publish from the PC; the page picks it up on its own |
 
-To exit the app deliberately, **press and hold BACK**. A short press does nothing — that is
-on purpose, so a stray remote press cannot take the display down.
+To leave the app, **press HOME** on the remote. Holding BACK does **not** exit, whatever older
+notes say (checked against `DisplayActivity.kt`, Nov 23, 2026): the app swallows BACK on key-up,
+so a long press never reaches the system. A short BACK press only wakes the page from quiet
+hours. HOME is handled by Fire OS itself, so it always works.
 
 ## Changing where the display points
 

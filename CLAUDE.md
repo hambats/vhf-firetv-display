@@ -61,8 +61,11 @@ it independently. The television must NOT depend on the developer's PC remaining
   [docs/DISPLAY_SETUP.md](docs/DISPLAY_SETUP.md).
 - **The television is reachable from anywhere (Sept 19).** It runs Tailscale with always-on VPN, so
   `adb connect <tv tailnet address>:5555` works off-site — installs, screenshots, logcat. This is *access,
-  not awareness*: nothing yet notices a dead display. See
-  [docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md).
+  not awareness*: nothing notices a dead display (the CI display-monitor workflow is disabled on
+  purpose, see BUILD_TREE). See [docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md).
+- **This repo is public.** Real addresses, contacts and curation reasons live in the git-ignored
+  `private/curation-notes.md` (backed up to the owner's vault). Tracked files use placeholders
+  such as `<tv tailnet address>`, and exclude files carry only an id and a one-word category.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for full rationale.
 
@@ -76,7 +79,7 @@ npm test                # node --test tests/*.test.mjs
 node --test tests/engine.test.mjs   # run a single test file
 npm run validate-content
 npm run sync-sources    # re-scrape gallery + re-fetch calendar into content/generated/ (never hand-edit that dir)
-npm run admin           # local content editor at http://127.0.0.1:8787, no auth — do not expose beyond localhost
+npm run admin           # local content editor at http://127.0.0.1:8787, no auth — KNOWN-BROKEN (Playlist saves roll back), do not expose beyond localhost
 npm run publish         # the ONLY supported publish path: validate → build → test → commit → push → poll version.json until live
 npm run publish -- --dry-run       # everything except commit/push
 npm run publish -- --verify-only   # just check the currently live version
@@ -85,10 +88,12 @@ npm run publish -- --verify-only   # just check the currently live version
 Building the Fire TV shell (`app/`, rarely needed — see [docs/BUILD_TREE.md](docs/BUILD_TREE.md) §5):
 
 ```bash
-JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew assembleDebug
+JAVA_HOME="/c/Program Files/Android/Android Studio/jbr" ./gradlew :app:assembleRelease
 ```
 
-APK lands at `app/build/outputs/apk/debug/app-debug.apk`. Needs Android SDK Platform 34 + JDK 17+;
+APK lands at `app/build/outputs/apk/release/app-release.apk` (the release type is signed with the
+local debug key on purpose; keep a copy as `release/vhf-display-<version>.apk`, git-ignored). Needs
+Android SDK Platform 34 + JDK 17+;
 the Gradle wrapper is at the repo root, not inside `app/`. There is no linter for JS or Kotlin in
 this repo — `scripts/lint-content.mjs` is a content-appropriateness advisory check (always exits 0),
 not a code style tool.
@@ -107,13 +112,14 @@ not a code style tool.
     skips the Service Worker, and reports `ready`/`missing` to the embedding page by postMessage.
   - `js/scenes.js` — pure render functions, one per scene type (photo, photo-pool, event,
     information, announcement...); tracks and skips images that fail to load. Written in ES5
-    because it is also bundled unmodified into the `app/` WebView shell.
+    as a conservative policy (no build step). Note: the TV's WebView is Chromium 138, not a
+    Fire OS 7-era engine (BUILD_TREE, Sept 21), so the original "old WebView" reason is wrong.
   - `js/content-source.js` — the single cache-vs-network policy for content JSON (network-first,
     cache-fallback); feeds the `?diag=1` overlay counters.
   - `sw.js` — Service Worker; owns the app-shell and image caches only (a capped cache for remote
     gallery photos, an uncapped one for local artwork) — content JSON caching is
     `content-source.js`'s job, not the SW's. `BUILD`/`SHELL` constants are rewritten by
-    `build-site.mjs` at publish time. Also ES5-only for the same Fire OS 7 WebView reason.
+    `build-site.mjs` at publish time. Also ES5-only, by the same conservative policy.
   - `js/compat.js`, `scale-to-fit.js`, `diagnostics.js` — browser-compat shims, 16:9 scale-to-fit
     for arbitrary screen sizes, and the `?diag=1` overlay.
   - Fonts are self-hosted under `css/`/`fonts/` — no external font CDN, since offline must not
@@ -130,12 +136,16 @@ not a code style tool.
 - **`content/`** — the source of truth for what the display shows. `playlist.json` and
   `settings.json` are hand-authored; `generated/*.json` (gallery, events, curated-photos) is
   machine-written by `sync-sources.mjs` and never hand-edited; `gallery-exclude.json`,
-  `gallery-focus.json`, `events-exclude.json`, `events-time-overrides.json` are PC-side curation
-  notes that stay off the published site; `artwork/curated/` vs `artwork/candidates/` — only
-  `curated/` gets published.
+  `gallery-focus.json`, `events-exclude.json`, `events-time-overrides.json` are curation files
+  that stay off the published site (but are in the public repo, so reasons are one-word categories;
+  the full notes go in `private/curation-notes.md`). They take effect at the next `sync-sources`
+  run — the daily CI sync or a local one. Only `artwork/curated/` gets published; nothing is
+  tracked under `artwork/candidates/`.
 - **`admin/`** — `server.mjs`, a small dependency-free Node HTTP server bound to `127.0.0.1:8787`
   only, no auth. Reads/writes `content/*.json` through the same `validateContentDir` the build uses,
   so a rejected write restores the previous file rather than producing a broken deploy.
+  **Known-broken:** the Playlist tab lacks the `event-pool` type, so every playlist save is
+  rejected and rolled back, and the deploy button is still labelled "Netlify". Use the skills.
 - **`app/`** — Kotlin/Android WebView shell. The display is `DisplayActivity.kt` (fullscreen
   WebView, screen-on, immersive chrome, remote/back-key lockout, retry with an offline card, and
   in-place WebView rebuild after a renderer crash — never by bringing itself forward) and
@@ -174,7 +184,8 @@ including ship gates, in [docs/BUILD_TREE.md](docs/BUILD_TREE.md).
 0. **On the screen** — *done (Sept 18–19).* The `app/` WebView shell is the answer: fullscreen,
    no chrome, screen never sleeps, points at GitHub Pages. v1.2.1 (renderer-crash recovery, isolated mesh bridge) is the current build.
    `docs/DISPLAY_SETUP.md` covers sideloading and the television's own sleep/screensaver settings.
-1. **Survives being left alone** — Service Worker (app shell + JSON + photos), self-hosted fonts,
+1. **Survives being left alone** — Service Worker (app shell + photos; content JSON via
+   `content-source.js`), self-hosted fonts,
    version polling so content actually refreshes, error/stall watchdog, diagnostics overlay,
    browser compatibility check. *This is the heart of the plan; two real gaps live here.*
 2. **Repeatable publish** — *done (Sept 20).* `scripts/publish.mjs`: validate → build → test →
@@ -184,8 +195,9 @@ including ship gates, in [docs/BUILD_TREE.md](docs/BUILD_TREE.md).
    from what actually broke.
 4. **Content that maintains itself** — quiet hours, burn-in review, the Instagram decision,
    ongoing exclude-list curation.
-5. **Administration** — publish button and version display in `admin/`; auth before it ever
-   leaves 127.0.0.1.
+5. **Administration** — *done as far as planned:* publish button and version display exist in
+   `admin/`, with a written decision of no auth because it never leaves 127.0.0.1 (BUILD_TREE M5).
+   The editor is currently known-broken (see `admin/` above).
 
 How the display **looks** is a separate track: [docs/DESIGN_REVIEW.md](docs/DESIGN_REVIEW.md) is
 the critique, [docs/DESIGN_PLAN.md](docs/DESIGN_PLAN.md) is the plan (D0–D5). It runs in parallel
@@ -193,12 +205,12 @@ with the milestones above and shares almost no files. **D0 is live on the public
 ship regardless of what else is happening.**
 
 Already built and current: the scene engine and all scene types, the content schema and its
-validator, JSON cache fallback, the gallery and calendar adapters, the local admin editor, the live
+validator, JSON cache fallback, the gallery and calendar adapters, the local admin editor (known-broken), the live
 GitHub Pages site, the `app/` shell installed on the television, off-site access to that television
 ([docs/REMOTE_ACCESS.md](docs/REMOTE_ACCESS.md)), registration QR codes with per-event overrides,
 face-aware photo cropping, and the portrait fill treatment.
 
-**Start at the "State of play" section at the top of [docs/BUILD_TREE.md](docs/BUILD_TREE.md)** —
+**Start at the "State of play — Nov 23, 2026" section at the top of [docs/BUILD_TREE.md](docs/BUILD_TREE.md)** —
 it carries what was tried, what is blocked and why, which is the part that saves time. §6 lists
 what exists.
 

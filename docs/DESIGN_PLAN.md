@@ -160,6 +160,9 @@ threshold at 32px.
 - [x] darken the announcement ground to ≈`#b34a46`
 - [x] run the same check on cream-on-olive and navy-on-olive before shipping D2.1 (used
       navy-on-olive per the table above)
+- **Correction (Nov 23, 2026):** the check above was wrong. Navy `#3f5a78` on olive `#a59d7a` is
+  **2.62:1** and failed (Nov 23 visual audit). **Now genuinely fixed by commit 53a84b3:** impact
+  text is charcoal on olive (5.12:1) and impact slides draw no photo wash.
 
 **Done when:** every text/ground pair in the table clears 4.5:1, or is ≥40px and clears 3:1.
 
@@ -251,8 +254,10 @@ Ordered by impact per unit of effort.
       slideshow into something alive.
 - [x] **D4.2 Staggered text entrance** — eyebrow, then title, then body/subtitle, then caption, each
       fading up 12px over 400ms, ~120ms apart.
-- [x] **D4.3 Independent grid drift** — each of the 4 grid cells gets its own `nth-child`-keyed
-      direction so the grid doesn't move as one block.
+- [–] **D4.3 Independent grid drift** — *moot (Nov 23, 2026): the grid scenes were removed by
+      commit 83b0888 ("Revert photo-pool grid scenes back to single photos"), so there is no grid
+      and no `nth-child` drift rule.* Originally: each of the 4 grid cells gets its own
+      `nth-child`-keyed direction so the grid doesn't move as one block.
 - [ ] **D4.4 Wash pan** — not done; the wash is decorative and low-priority next to the rest.
 - [x] **D4.5 Announcement breathes** — added to `.scene--announcement` and `.scene--crisis`: a 16s
       ease-in-out `scale(1) → scale(1.015)`, never a blink/pulse.
@@ -292,7 +297,8 @@ Content work rather than code; can run in parallel with everything above.
       the farm is a seasonal place and the display shows one slice of the year
 
 ### D5.2 Pacing
-- [ ] per-type durations instead of uniform: information 12–14s, photo grids 8–10s, single photo 8s
+- [x] per-type durations instead of uniform — done (confirmed Nov 23, 2026): information 13–14s,
+      photo pool 9–12s, events 14–16s, crisis 14s in `playlist.json`
 - [ ] re-order so text slides don't stack — `our-mission` → `our-history` and
       `program-agritherapy` → `program-herb-squad` are currently back to back, and 15 of 30 items
       are text
@@ -302,7 +308,10 @@ Content work rather than code; can run in parallel with everything above.
 same visual weight as "Founded in 2013".
 - [x] give it its own calm, high-contrast treatment — `content.family: "crisis"` on the `crisis-line`
       playlist item now renders `.scene--crisis`: charcoal ground, centered, no photo wash/fade,
-      slow breathing animation, no visual overlap with the announcement/terracotta treatment
+      slow breathing animation, no visual overlap with the announcement/terracotta treatment.
+      *Correction (Nov 23, 2026): until then the code still drew a photo wash behind the crisis
+      slide and the terracotta eyebrow on charcoal was 3.45:1. **Now genuinely fixed by commit
+      53a84b3:** no wash, cream eyebrow, and "988, then press 1" on its own line (`content.callout`).*
 - [ ] guarantee its position in the loop — not done, needs playlist/engine ordering logic
 - [ ] make sure it is never the slide left frozen if the playlist stalls — not done, needs engine
       watchdog work (BUILD_TREE M1), out of scope for this design pass

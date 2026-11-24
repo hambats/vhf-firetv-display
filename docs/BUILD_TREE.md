@@ -14,9 +14,34 @@ the source of truth; the display is a runtime that must keep working with the PC
 
 ---
 
-## State of play — Sept 21, 2026
+## State of play — Nov 23, 2026
 
-Read this first. It is the handover point for whoever picks the project up next.
+Read this first. It supersedes the Sept 21 block below, which is kept as history.
+
+- **App shell active, v1.2.1.** `app/` is not dormant: the 1.2.1 source (renderer-crash recovery,
+  isolated mesh bridge) is merged to `main`, and 1.2.1 is the build on the television (last
+  confirmed by the owner; re-check with `dumpsys package` over adb when next connected).
+- **Review fixes merged and live.** The `review-fixes` and `apk-fixes` branches are merged into
+  `main` (5b64694, 2e7df0a) and published. `npm test`: 137 passing.
+- **Content sync runs daily in CI.** `.github/workflows/sync-content.yml` runs `sync-sources` at
+  13:00 UTC and commits + publishes when the gallery or calendar changed. Curation edits
+  (`gallery-exclude.json`, `events-exclude.json`) take effect at that run, not before.
+- **The display-monitor workflow is disabled on purpose.** Its `TS_AUTHKEY` secret turned out to
+  be a full-scope Tailscale API key, not a node auth key, and the version on GitHub uploaded TV
+  screenshots as artifacts on this public repo and would have raised an "Allow USB debugging?"
+  prompt on the residents' TV. Do not re-enable it until the key is revoked and replaced, the
+  screenshot upload question is settled, and the `VHF_DEVICE` secret is set. Nothing watches the
+  display meanwhile.
+- **The admin editor is known-broken.** Its Playlist tab lacks the `event-pool` type, so any
+  playlist save is rejected and rolled back; its deploy button still says "Netlify". Edit
+  content through Claude Code and the skills instead.
+- **Private notes live outside the repo.** The repo is public: curation reasons, contacts and
+  tailnet addresses are in the git-ignored `private/curation-notes.md` (backed up to the owner's
+  vault). Tracked exclude files keep only ids and a one-word category.
+- **A rebuild proposal exists** in the owner's vault ("Rebuild Assessment 2026-11-23"), not in
+  this repo. It scores every part of the system and lists the decisions only the owner can make.
+
+## State of play — Sept 21, 2026 (superseded by the Nov 23 block above)
 
 **The display is live, unattended, and recovers on its own.** v1.1.0 of the `app/` shell is on the
 television (Toshiba AFTTI43, Fire OS 7.7.1.6). It relaunches after a power cut, keeps the screen

@@ -1,35 +1,37 @@
 # VHF Fire TV Display — Architecture
 
-> **Revision note (Sept 2026) — the native app shell is dormant.**
-> This document originally proposed a native Kotlin app wrapping a WebView. That app was built to
-> Phase 1, never installed on the television, and is now **dormant by decision**: the display runs
-> as a web page shown through a browser or off-the-shelf app on the Fire TV.
+> **Correction (Nov 23, 2026) — the native app shell is active, and the host is GitHub Pages.**
+> The Kotlin WebView shell in `app/` (v1.2.1) is installed on the television and is how the
+> display is shown. It is a *thin* shell: fullscreen, screen-on, remote/back-key lockout, offline
+> card and retry, renderer-crash rebuild, relaunch on boot. Scenes, caching and refresh stay in
+> `web/`. The site is published to **GitHub Pages** by `.github/workflows/deploy-pages.yml`;
+> Netlify was dropped on Sept 18, 2026 and is a dormant fallback only. An earlier note here called
+> the shell "dormant" and the host Netlify; both are out of date.
 >
-> Still accurate below: the target platform notes, the publish transport, and the conservative
-> web-code compatibility constraint. **Superseded:** "App shell", "Storage / persistence",
-> "Platform isolation", and "Phase 1 scope" — replaced by "Web runtime" immediately below.
-> See [BUILD_TREE.md](BUILD_TREE.md) §0 and §5 for the decision and its honest costs.
+> **Superseded below:** "App shell", "Storage / persistence", "Platform isolation", and "Phase 1
+> scope" describe the original, heavier native-app plan (local asset bundle, native sync), not the
+> thin shell that shipped. See [BUILD_TREE.md](BUILD_TREE.md) §5.
 
 ## Web runtime *(current)*
 
-- The display is **HTML/CSS/JS in `web/`**, published as a static site to Netlify and loaded on the
-  television by a browser/app selected during device setup (see `DISPLAY_SETUP.md`).
-- The page owns every behaviour the native shell was going to own, except two:
+- The display is **HTML/CSS/JS in `web/`**, published as a static site to GitHub Pages and loaded on
+  the television by the `app/` WebView shell (see `DISPLAY_SETUP.md`).
+- The page owns every display behaviour; the shell owns only what a page cannot do:
 
   | Behaviour | Mechanism |
   |---|---|
-  | Offline operation | Service Worker (`web/sw.js`) — app shell, content JSON, and photos |
+  | Offline operation | Service Worker (`web/sw.js`) — app shell and photos; content JSON is network-first with cache fallback in `web/js/content-source.js` (the SW passes it through) |
   | Content refresh | version poll in `engine.js` against `content/version.json` |
   | Crash/stall recovery | `window.onerror` + stall detector + periodic self-reload |
-  | Comes back after power loss | **device configuration — not fully solvable from a page** |
-  | Screen stays on | **device configuration** (TV sleep/screensaver settings) |
+  | Comes back after power loss | `app/` `BootReceiver` relaunch (Fire OS does not guarantee it; observed working) |
+  | Screen stays on | `app/` keeps the screen on, plus the TV's own sleep/screensaver settings |
 
-- The two device-configuration rows are the real cost of this path. They are recorded in
+- The last two rows still depend partly on device configuration. They are recorded in
   [BUILD_TREE.md](BUILD_TREE.md) §5 and must be written into `DISPLAY_SETUP.md`, because nothing in
   this repository can enforce them and they are lost the first time the TV is factory reset.
 - Gallery photos are cross-origin (Squarespace CDN) and cache as opaque `no-cors` responses: they
   render correctly, cannot be inspected, and cost more storage quota. The image cache is capped.
-- The display talks to exactly two hosts: the Netlify `publishUrl` and the Squarespace CDN. Fonts
+- The display talks to exactly two hosts: the GitHub Pages `publishUrl` and the Squarespace CDN. Fonts
   are self-hosted so an offline display still looks like VHF.
 
 ## Target platform *(still accurate)*
@@ -50,17 +52,17 @@ features younger than ~2018) so it renders correctly on older embedded WebView a
 **This constraint now applies to `web/` itself** — originally it applied only to the copy bundled
 inside the APK. Verify it against whatever browser is chosen on the device (BUILD_TREE.md, M1).
 
-## Publish transport *(still accurate)*
+## Publish transport *(corrected Nov 23, 2026)*
 
-- PC-side content (this repo's `content/` folder) is deployed to a **Netlify static site** (a JSON
-  manifest plus asset files). No server code required — Netlify serves static files over HTTPS.
+- PC-side content (this repo's `content/` folder) is deployed to a **GitHub Pages static site** (a
+  JSON manifest plus asset files) on every push to `main`. No server code required.
   HTTPS matters beyond privacy here: Service Workers and Cache Storage require a secure context, so
   the offline story depends on the display being loaded over `https://`.
 - The display polls `<publishUrl>/content/version.json` on an interval (`syncIntervalMinutes` in
   `content/settings.json`) and on load.
-- No credentials are embedded in anything the television loads — the Netlify site is a public
-  read-only content endpoint. Gallery/calendar/Instagram access stays on the PC side, in the
-  sync/authoring layer that publishes to Netlify.
+- No credentials are embedded in anything the television loads — the Pages site is a public
+  read-only content endpoint. Gallery/calendar/Drive access stays on the build side (the PC or the
+  daily CI sync), in the sync/authoring layer that publishes to Pages.
 
 ---
 
