@@ -16,7 +16,11 @@
     "closedWeekdays": [
       0,
       1
-    ]
+    ],
+    "open": {
+      "from": "10:00",
+      "to": "16:00"
+    }
   },
   "heartbeat": {
     "url": "",
